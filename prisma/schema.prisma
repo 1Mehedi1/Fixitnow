@@ -1,0 +1,91 @@
+// Prisma schema for the SG Home Services portfolio + blog site.
+// Single admin worker, public portfolio/blog browsing, WhatsApp contact only.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// The single admin user (the home-services worker). Managed by NextAuth.
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String?
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts Post[]
+}
+
+model Post {
+  id             String       @id @default(cuid())
+  title          String
+  slug           String       @unique
+  excerpt        String?
+  content        String? // markdown body
+  /// "portfolio" | "blog"
+  type           String       @default("portfolio")
+  category       String?
+  tags           String? // comma-separated
+  featured       Boolean      @default(false)
+  published      Boolean      @default(true)
+  coverImage     String?
+  views          Int          @default(0)
+  whatsappClicks Int          @default(0)
+  authorId       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  author        User?         @relation(fields: [authorId], references: [id])
+  images        PostImage[]
+  analytics     AnalyticsEvent[]
+
+  @@index([type, published, featured])
+  @@index([slug])
+}
+
+model PostImage {
+  id        String  @id @default(cuid())
+  postId    String
+  url       String
+  /// "gallery" | "before" | "after"
+  kind      String  @default("gallery")
+  position  Int     @default(0)
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String? // e.g. "HDB Owner, Bedok"
+  rating    Int      @default(5) // 1..5
+  content   String
+  avatar    String?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+/// Lightweight event-sink for analytics: page views, whatsapp clicks, dwell time.
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  eventType String // "page_view" | "post_view" | "whatsapp_click" | "dwell"
+  postId    String?
+  session   String?
+  duration  Int? // seconds, for dwell events
+  path      String?
+  createdAt DateTime @default(now())
+
+  post Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  @@index([eventType, createdAt])
+}
