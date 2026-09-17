@@ -8,7 +8,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useStore } from "@/store/useStore"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 import { FeaturedJobs } from "./FeaturedJobs"
 import type { Post, PostImage } from "@prisma/client"
 
@@ -16,11 +17,11 @@ interface Props {
   posts: (Post & { images: PostImage[] })[]
 }
 
-const CATEGORIES = siteConfig.services.map((s) => s.label)
-
 export function PortfolioSection({ posts }: Props) {
   const [cat, setCat] = useState<string>("All")
   const { openPost } = useStore()
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
+  const CATEGORIES = s.services.map((svc) => svc.label)
 
   const filtered = useMemo(() => {
     if (cat === "All") return posts
@@ -81,7 +82,7 @@ export function PortfolioSection({ posts }: Props) {
           <p className="mb-4">No jobs in this category yet.</p>
           <Button asChild className="bg-[#25D366] hover:bg-[#1ebe5d] text-white">
             <a
-              href={whatsappLink(`Hi ${siteConfig.name}, I have a job in this category — can you help?`)}
+              href={whatsappLink(s, `Hi ${s.workerName}, I have a job in this category — can you help?`)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() =>

@@ -4,7 +4,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { Providers } from "@/components/providers"
-import { siteConfig } from "@/lib/site"
+import { defaultSiteConfig } from "@/lib/site"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +23,8 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: `${siteConfig.brand} — ${siteConfig.tagline}`,
-  description: `Singapore home-services specialist: plumbing, painting, renovation, electrical & interior works by ${siteConfig.name}. ${siteConfig.yearsExperience}+ years, ${siteConfig.jobsCompleted}+ jobs completed.`,
+  title: `${defaultSiteConfig.brand} — ${defaultSiteConfig.tagline}`,
+  description: `Singapore home-services specialist: plumbing, painting, renovation, electrical & interior works. ${defaultSiteConfig.yearsExperience}+ years, ${defaultSiteConfig.jobsCompleted}+ jobs completed.`,
   keywords: [
     "Singapore handyman",
     "HDB renovation",
@@ -34,17 +34,17 @@ export const metadata: Metadata = {
     "interior works",
     "home repair Singapore",
   ],
-  authors: [{ name: siteConfig.name }],
+  authors: [{ name: defaultSiteConfig.workerName }],
   openGraph: {
-    title: `${siteConfig.brand} — ${siteConfig.tagline}`,
-    description: `Premium home-services worker in Singapore. Plumbing, painting, renovation, electrical, interior works.`,
-    siteName: siteConfig.brand,
+    title: `${defaultSiteConfig.brand} — ${defaultSiteConfig.tagline}`,
+    description: `Premium home-services company in Singapore. Plumbing, painting, renovation, electrical, interior works.`,
+    siteName: defaultSiteConfig.brand,
     type: "website",
     locale: "en_SG",
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.brand,
+    title: defaultSiteConfig.brand,
     description: "Singapore home-services specialist",
   },
   icons: { icon: "/logo.svg" },

@@ -5,10 +5,12 @@ import { ArrowRight, MapPin, Phone, Mail, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore, type View } from "@/store/useStore"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 
 export function Footer() {
   const { setView } = useStore()
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   const year = new Date().getFullYear()
 
@@ -33,7 +35,7 @@ export function Footer() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-7">
               <Button asChild size="lg" className="bg-[#25D366] hover:bg-[#1ebe5d] text-white h-12 px-7">
                 <a
-                  href={whatsappLink(`Hi ${siteConfig.name}, I'd like to start a job. Here are the details:`)}
+                  href={whatsappLink(s, `Hi ${s.workerName}, I'd like to start a job. Here are the details:`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
@@ -67,17 +69,17 @@ export function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg">
-                {siteConfig.brand.charAt(0)}
+                {s.brand.charAt(0)}
               </div>
               <div>
-                <div className="font-display font-bold">{siteConfig.brand}</div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-background/60">{siteConfig.tagline}</div>
+                <div className="font-display font-bold">{s.brand}</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-background/60">{s.tagline}</div>
               </div>
             </div>
             <p className="text-sm text-background/70 max-w-md leading-relaxed">
-              {siteConfig.name} — a one-man home-services specialist in Singapore. Plumbing,
-              painting, renovation, electrical & interior works. {siteConfig.yearsExperience}+ years,
-              {siteConfig.jobsCompleted}+ jobs, 7-day workmanship warranty.
+              {s.brand} — a Singapore home-services company. Plumbing, painting,
+              renovation, electrical & interior works. {s.yearsExperience}+ years,
+              {s.jobsCompleted}+ jobs, 7-day workmanship warranty.
             </p>
           </div>
 
@@ -107,15 +109,15 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2 text-background/80">
                 <Phone className="h-4 w-4 mt-0.5 text-primary" />
-                <a href={`tel:${siteConfig.phone.replace(/\s/g, "")}`} className="hover:text-background">{siteConfig.phone}</a>
+                <a href={`tel:${s.phone.replace(/\s/g, "")}`} className="hover:text-background">{s.phone}</a>
               </li>
               <li className="flex items-start gap-2 text-background/80">
                 <Mail className="h-4 w-4 mt-0.5 text-primary" />
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-background">{siteConfig.email}</a>
+                <a href={`mailto:${s.email}`} className="hover:text-background">{s.email}</a>
               </li>
               <li className="flex items-start gap-2 text-background/80">
                 <MapPin className="h-4 w-4 mt-0.5 text-primary" />
-                {siteConfig.location}
+                {s.location}
               </li>
               <li className="flex items-start gap-2 text-background/80">
                 <Clock className="h-4 w-4 mt-0.5 text-primary" />
@@ -126,7 +128,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row gap-3 justify-between text-xs text-background/60">
-          <p>© {year} {siteConfig.brand}. All rights reserved.</p>
+          <p>© {year} {s.brand}. All rights reserved.</p>
           <p>Singapore · UEN available on request · BCA-licensed sub-contractors where applicable</p>
         </div>
       </div>

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -88,4 +88,28 @@ model AnalyticsEvent {
   post Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
 
   @@index([eventType, createdAt])
+}
+
+/// Single-row table holding every piece of tweakable site text/config.
+/// The worker edits this from the admin "Site Settings" tab — no code changes needed.
+/// Fields are stored as JSON strings for flexibility (services array, hero stats, etc.).
+model SiteSettings {
+  id              String   @id @default("singleton")
+  brand           String   @default("Ahmad HomeWorks")
+  tagline         String   @default("Singapore's Trusted Handyman")
+  workerName      String   @default("Ahmad Rahman")
+  phone           String   @default("+65 9123 4567")
+  whatsapp        String   @default("6591234567")
+  email           String   @default("hello@ahmadhomeworks.sg")
+  location        String   @default("Singapore · Islandwide")
+  yearsExperience Int      @default(12)
+  jobsCompleted   Int      @default(540)
+  happyClients    Int      @default(320)
+  rating          Float    @default(4.9)
+  heroHeadline    String   @default("Your home, expertly handled.")
+  heroSubtext     String   @default("Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works.")
+  aboutTitle      String   @default("Built on trust. Delivered with care.")
+  aboutBody       String   @default("We are a Singapore-based home-services company with over a decade of hands-on experience across HDB flats, condominiums and landed homes. Our commitment is simple: show up when we say, do the job properly, and stand behind our work.")
+  servicesJson    String   @default("[]") // JSON array of {key,label,icon,desc}
+  updatedAt       DateTime @updatedAt
 }

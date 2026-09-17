@@ -10,7 +10,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import { useStore } from "@/store/useStore"
-import { siteConfig, whatsappForPost, whatsappLink } from "@/lib/site"
+import { whatsappLink, whatsappForPost, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 import { BeforeAfterSlider } from "./BeforeAfterSlider"
 import type { Post, PostImage } from "@prisma/client"
 
@@ -22,6 +23,7 @@ export function PostDetailModal() {
   const { detailOpen, selectedPost, closePost } = useStore()
   const [full, setFull] = useState<DetailedPost | null>(null)
   const [loading, setLoading] = useState(false)
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   useEffect(() => {
     if (!detailOpen || !selectedPost) {
@@ -95,7 +97,7 @@ export function PostDetailModal() {
                   </span>
                   <span className="flex items-center gap-1.5">
                     <MapPin className="h-4 w-4" />
-                    {siteConfig.location}
+                    {s.location}
                   </span>
                   <span className="flex items-center gap-1.5">
                     <Eye className="h-4 w-4" />
@@ -154,11 +156,11 @@ export function PostDetailModal() {
                 <div className="rounded-2xl bg-accent p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
                   <div>
                     <h4 className="font-display font-bold text-lg mb-1">Interested in similar work?</h4>
-                    <p className="text-sm text-muted-foreground">WhatsApp {siteConfig.name} directly. Quote within the hour.</p>
+                    <p className="text-sm text-muted-foreground">WhatsApp {s.workerName} directly. Quote within the hour.</p>
                   </div>
                   <Button asChild size="lg" className="bg-[#25D366] hover:bg-[#1ebe5d] text-white h-12 px-6 shrink-0">
                     <a
-                      href={whatsappLink(whatsappForPost(full.title, full.type as "portfolio" | "blog"))}
+                      href={whatsappLink(s, whatsappForPost(s, full.title, full.type as "portfolio" | "blog" | "showcase"))}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => {

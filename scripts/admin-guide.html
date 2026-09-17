@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Site Admin & Operations Guide — Ahmad HomeWorks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+@page {
+    size: 720px 1020px;
+    margin: 0;
+}
+:root {
+    --c-bg: #fbf7f0;
+    --c-card: #ffffff;
+    --c-text: #2a2520;
+    --c-muted: #6b6258;
+    --c-accent: #b8741a;
+    --c-accent-soft: #f4e6d3;
+    --c-border: #e8ddd0;
+    --c-dark: #1f1a14;
+    --c-success: #2d7a3f;
+    --c-danger: #b03434;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 720px;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+}
+@media screen {
+    html {
+        height: auto;
+        display: flex;
+        justify-content: center;
+        background: #2a2520;
+    }
+    body {
+        transform-origin: top center;
+        margin: 20px auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+}
+
+/* ===== COVER ===== */
+.cover {
+    width: 720px;
+    height: 1020px;
+    box-sizing: border-box;
+    break-after: page;
+    overflow: hidden;
+    background: linear-gradient(160deg, #1f1a14 0%, #2d2418 50%, #3a2d1a 100%);
+    color: #fff;
+    position: relative;
+    padding: 70px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.cover::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(184,116,26,0.35), transparent 70%);
+    border-radius: 50%;
+}
+.cover::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(184,116,26,0.2), transparent 70%);
+    border-radius: 50%;
+}
+.cover-brand {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.cover-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--c-accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 24px;
+}
+.cover-brand-text {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+}
+.cover-brand-text small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-top: 2px;
+}
+.cover-main {
+    position: relative;
+    z-index: 2;
+}
+.cover-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(184,116,26,0.18);
+    border: 1px solid rgba(184,116,26,0.4);
+    color: var(--c-accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+}
+.cover-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 1.05;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.02em;
+}
+.cover-title span {
+    color: var(--c-accent);
+    font-style: italic;
+}
+.cover-subtitle {
+    font-size: 17px;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.75);
+    font-weight: 300;
+    max-width: 480px;
+}
+.cover-footer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+}
+.cover-meta {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+}
+.cover-meta strong {
+    color: #fff;
+    font-weight: 600;
+}
+.cover-edition {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    text-align: right;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    padding: 56px 60px 40px 60px;
+}
+
+/* Chapter headers */
+.chapter-header {
+    break-after: avoid;
+    break-inside: avoid;
+    margin-top: 32px;
+    margin-bottom: 18px;
+}
+.chapter-header:first-child {
+    margin-top: 0;
+}
+.chapter-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: var(--c-accent-soft);
+    color: var(--c-accent);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1.15;
+    margin: 0 0 8px 0;
+    color: var(--c-text);
+    letter-spacing: -0.01em;
+}
+.chapter-divider {
+    width: 50px;
+    height: 3px;
+    background: var(--c-accent);
+    border-radius: 2px;
+    margin-bottom: 4px;
+}
+
+/* Body text */
+.body-text {
+    margin: 0 0 12px 0;
+    color: var(--c-text);
+    font-size: 13.5px;
+    line-height: 1.65;
+}
+.body-text strong {
+    color: var(--c-text);
+    font-weight: 700;
+}
+.body-text em {
+    color: var(--c-accent);
+    font-style: italic;
+}
+
+/* Step cards */
+.step-card {
+    break-inside: avoid;
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    position: relative;
+}
+.step-card-number {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.step-card-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--c-text);
+    margin: 0 36px 6px 0;
+    line-height: 1.3;
+}
+.step-card-body {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--c-muted);
+    margin: 0;
+}
+.step-card-body strong {
+    color: var(--c-text);
+}
+
+/* Callout */
+.callout {
+    break-inside: avoid;
+    background: var(--c-accent-soft);
+    border-left: 4px solid var(--c-accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+}
+.callout-title {
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--c-accent);
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.callout-body {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--c-text);
+    margin: 0;
+}
+
+/* Warning callout */
+.callout.warn {
+    background: #fef3cd;
+    border-left-color: #d97706;
+}
+.callout.warn .callout-title {
+    color: #92400e;
+}
+
+/* Success callout */
+.callout.success {
+    background: #dcfce7;
+    border-left-color: #16a34a;
+}
+.callout.success .callout-title {
+    color: #15803d;
+}
+
+/* Two-column table-like */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+}
+.info-card {
+    break-inside: avoid;
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+.info-card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--c-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+.info-card-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--c-text);
+    word-break: break-all;
+}
+
+/* Code/URL style */
+.url-mono {
+    font-family: 'Courier New', monospace;
+    background: var(--c-accent-soft);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--c-accent);
+}
+
+/* TOC */
+.toc {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 24px;
+}
+.toc-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0 0 12px 0;
+    color: var(--c-text);
+}
+.toc-item {
+    display: flex;
+    align-items: baseline;
+    padding: 6px 0;
+    font-size: 12.5px;
+    border-bottom: 1px dashed var(--c-border);
+}
+.toc-item:last-child {
+    border-bottom: none;
+}
+.toc-num {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--c-accent);
+    width: 26px;
+    flex-shrink: 0;
+}
+.toc-label {
+    color: var(--c-text);
+    flex: 1;
+}
+.toc-page {
+    color: var(--c-muted);
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* Ending */
+.ending {
+    width: 720px;
+    height: 1020px;
+    box-sizing: border-box;
+    break-before: page;
+    overflow: hidden;
+    background: linear-gradient(160deg, #1f1a14, #2d2418);
+    color: #fff;
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+.ending::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(184,116,26,0.18), transparent 70%);
+    border-radius: 50%;
+}
+.ending-mark {
+    position: relative;
+    z-index: 2;
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: var(--c-accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 30px;
+    margin-bottom: 28px;
+}
+.ending-title {
+    position: relative;
+    z-index: 2;
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 1.15;
+    margin: 0 0 14px 0;
+    letter-spacing: -0.01em;
+}
+.ending-sub {
+    position: relative;
+    z-index: 2;
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    max-width: 420px;
+    font-weight: 300;
+}
+.ending-foot {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+    <div class="cover-brand">
+        <div class="cover-logo">A</div>
+        <div class="cover-brand-text">
+            Ahmad HomeWorks
+            <small>Singapore's Trusted Handyman</small>
+        </div>
+    </div>
+    <div class="cover-main">
+        <div class="cover-tag">Admin & Operations Guide</div>
+        <h1 class="cover-title">Run your site<br>like a <span>pro.</span></h1>
+        <p class="cover-subtitle">
+            Every task — from creating your first portfolio post, to swapping the
+            business name, to replacing a before/after photo — explained
+            step-by-step. No technical knowledge required.
+        </p>
+    </div>
+    <div class="cover-footer">
+        <div class="cover-meta">
+            <strong>For:</strong> The site admin (you)<br>
+            <strong>Site:</strong> Ahmad HomeWorks<br>
+            <strong>Version:</strong> 1.0 · 2026
+        </div>
+        <div class="cover-edition">The Worker's Handbook</div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- TOC -->
+    <div class="toc">
+        <div class="toc-title">What's inside</div>
+        <div class="toc-item"><span class="toc-num">1</span><span class="toc-label">Getting started — your first login</span></div>
+        <div class="toc-item"><span class="toc-num">2</span><span class="toc-label">The admin dashboard tour</span></div>
+        <div class="toc-item"><span class="toc-num">3</span><span class="toc-label">Creating a new post (portfolio job)</span></div>
+        <div class="toc-item"><span class="toc-num">4</span><span class="toc-label">Uploading images & marking before/after</span></div>
+        <div class="toc-item"><span class="toc-num">5</span><span class="toc-label">Editing an existing post</span></div>
+        <div class="toc-item"><span class="toc-num">6</span><span class="toc-label">Featuring, unfeaturing & publishing</span></div>
+        <div class="toc-item"><span class="toc-num">7</span><span class="toc-label">Deleting a post</span></div>
+        <div class="toc-item"><span class="toc-num">8</span><span class="toc-label">Replacing an existing image with a new one</span></div>
+        <div class="toc-item"><span class="toc-num">9</span><span class="toc-label">Managing testimonials</span></div>
+        <div class="toc-item"><span class="toc-num">10</span><span class="toc-label">Reading your analytics</span></div>
+        <div class="toc-item"><span class="toc-num">11</span><span class="toc-label">Site Settings — change business name, phone, services</span></div>
+        <div class="toc-item"><span class="toc-num">12</span><span class="toc-label">Changing the hero headline & about text</span></div>
+        <div class="toc-item"><span class="toc-num">13</span><span class="toc-label">Changing colours & dark mode</span></div>
+        <div class="toc-item"><span class="toc-num">14</span><span class="toc-label">Troubleshooting & FAQs</span></div>
+    </div>
+
+    <!-- Chapter 1 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 1</div>
+        <h2 class="chapter-title">Getting started — your first login</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Your website has a public side (what visitors see) and an admin side
+        (where you manage everything). The admin side is protected by a login
+        screen so only you can make changes. To reach it, open your website URL
+        and add <span class="url-mono">?view=admin</span> at the end of the
+        address. For example, if your site lives at
+        <span class="url-mono">https://ahmadhomeworks.sg</span>, go to
+        <span class="url-mono">https://ahmadhomeworks.sg/?view=admin</span>.
+    </p>
+    <p class="body-text">
+        You'll see a clean login card asking for your email and password. The
+        demo credentials are <strong>admin@homeworks.sg</strong> and password
+        <strong>admin123</strong>. Once you log in for the first time, change
+        this password immediately — see Chapter 14 for how. After you sign in,
+        you'll land on the admin dashboard.
+    </p>
+    <div class="callout">
+        <p class="callout-title">Tip — bookmark the admin URL</p>
+        <p class="callout-body">
+            Save the admin URL in your browser bookmarks so you don't have to
+            type <span class="url-mono">?view=admin</span> every time. You can
+            also reach the admin login from the mobile menu — tap the menu icon
+            (three lines) in the top right, then tap "Admin Login".
+        </p>
+    </div>
+
+    <!-- Chapter 2 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 2</div>
+        <h2 class="chapter-title">The admin dashboard tour</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        The admin panel has a sidebar (on desktop) or a top bar (on mobile)
+        with five sections. Each one does one job, so you always know where to
+        look. Here's what each one is for:
+    </p>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-card-label">Overview</div>
+            <div class="info-card-value">Quick stats + recent posts + quick-action buttons</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Posts</div>
+            <div class="info-card-value">Create / edit / delete portfolio jobs and blog-style posts</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Testimonials</div>
+            <div class="info-card-value">Add / edit / delete client reviews shown on the homepage</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Analytics</div>
+            <div class="info-card-value">See site views, post views, WhatsApp clicks, popular posts</div>
+        </div>
+        <div class="info-card" style="grid-column: 1 / -1;">
+            <div class="info-card-label">Site Settings</div>
+            <div class="info-card-value">Edit business name, phone, WhatsApp, services list, hero text, about text, stats — no code needed</div>
+        </div>
+    </div>
+    <p class="body-text">
+        The sidebar also has two buttons at the bottom: <strong>"View public
+        site"</strong> (opens the site as visitors see it) and
+        <strong>"Sign out"</strong> (always click this when you're done on a
+        shared computer).
+    </p>
+
+    <!-- Chapter 3 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 3</div>
+        <h2 class="chapter-title">Creating a new post (portfolio job)</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        A "post" is one job or one before/after showcase on your site. Every
+        post has a title, a category (Plumbing, Painting, etc.), an optional
+        excerpt, optional markdown content, and one or more images. Posts with
+        both a "before" and an "after" image will automatically show a slider
+        on the Before & After page — see Chapter 4 for how to mark them.
+    </p>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Open the Posts tab</p>
+        <p class="step-card-body">Click <strong>Posts</strong> in the sidebar. You'll see a list of every post on your site, with tabs to filter by All / Portfolio / Blog. Click the blue <strong>"New post"</strong> button in the top right.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Fill in the title</p>
+        <p class="step-card-body">Type a clear, descriptive title — e.g. <em>"HDB Kitchen Sink Replacement, Toa Payoh"</em>. This title appears on cards, in the detail modal, and in search results. Keep it under 80 characters for best display.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Pick type and category</p>
+        <p class="step-card-body">Choose <strong>Portfolio Job</strong> (most common — shows up in the Portfolio and Before & After sections) or <strong>Blog Post</strong> (text-only articles, hidden from public nav but still accessible). Then pick a category from the dropdown — these match your services list and can be edited in Site Settings.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">4</div>
+        <p class="step-card-title">Add an excerpt (optional but recommended)</p>
+        <p class="step-card-body">A one-line summary shown on cards. Example: <em>"Replaced corroded galvanised pipes with PPR, fixed a stubborn leak under the sink."</em> Keep it punchy — visitors decide whether to click based on this line.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">5</div>
+        <p class="step-card-title">Write the content (optional)</p>
+        <p class="step-card-body">The big text area supports Markdown. Use <strong># Heading</strong>, <strong>## Sub-heading</strong>, <strong>- bullet</strong>, <strong>**bold**</strong>. This becomes the body of the post detail page when a visitor clicks in.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">6</div>
+        <p class="step-card-title">Upload images</p>
+        <p class="step-card-body">Scroll to the Images section. Drag your photos into the upload box (or click to browse). They're automatically compressed to under 1.5 MB and converted to WebP for fast loading. See Chapter 4 for marking before/after.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">7</div>
+        <p class="step-card-title">Toggle Featured / Published</p>
+        <p class="step-card-body">Switch <strong>Featured</strong> on if you want this post to appear on the homepage "Selected work" section. Switch <strong>Published</strong> on to make it visible to the public (leave off to keep as a draft).</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">8</div>
+        <p class="step-card-title">Click Save</p>
+        <p class="step-card-body">Hit the blue <strong>Save</strong> button at the bottom right. You'll see a success toast and the page will reload, showing your new post in the list.</p>
+    </div>
+
+    <!-- Chapter 4 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 4</div>
+        <h2 class="chapter-title">Uploading images &amp; marking before/after</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Every post can have multiple images. By default, an uploaded image is
+        tagged as <strong>gallery</strong> — it just shows as a single photo.
+        To enable the before/after slider, you must tag one image as
+        <strong>before</strong> and another as <strong>after</strong>. The
+        system will then automatically show the draggable comparison slider
+        on the post detail page and on the Before &amp; After gallery page.
+    </p>
+    <p class="body-text">
+        If a post has only a "before" image (or only an "after"), it will
+        simply show as a single photo on the Before &amp; After page — nothing
+        breaks. The slider only appears when both before AND after are present.
+    </p>
+    <div class="callout success">
+        <p class="callout-title">Three image kinds — pick one per image</p>
+        <p class="callout-body">
+            <strong>Gallery</strong> (default) — single photo, no slider.<br>
+            <strong>Before</strong> — the "before work started" photo. Only one per post.<br>
+            <strong>After</strong> — the "after work finished" photo. Only one per post.
+        </p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Upload your images</p>
+        <p class="step-card-body">In the post editor's Images section, drag in your before photo and your after photo. Both will appear as thumbnails in a grid, each tagged "G" (gallery) by default.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Click the "B" button on the before photo</p>
+        <p class="step-card-body">Hover over the thumbnail of the before photo. You'll see three small buttons in the top-left corner: <strong>G</strong> (gallery), <strong>B</strong> (before), <strong>A</strong> (after). Click <strong>B</strong>. The thumbnail's badge turns red and shows a checkmark.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Click the "A" button on the after photo</p>
+        <p class="step-card-body">Repeat for the after photo — click <strong>A</strong>. The badge turns green. You'll see a confirmation banner: <em>"Before/After slider will be enabled on this post"</em>.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">4</div>
+        <p class="step-card-title">Reorder if needed</p>
+        <p class="step-card-body">Use the small arrow buttons at the bottom of each thumbnail to move images left or right. The first image becomes the cover image (shown on cards) unless you override it in the "Cover image URL" field below.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">5</div>
+        <p class="step-card-title">Save the post</p>
+        <p class="step-card-body">Hit Save. Visit the Before &amp; After page on the public site — your new post will appear as a card with the slider front and centre. Drag the divider to compare.</p>
+    </div>
+    <div class="callout warn">
+        <p class="callout-title">Image compression — what you should know</p>
+        <p class="callout-body">
+            Every image you upload is automatically compressed in your browser
+            before it reaches the server. Files are shrunk to under 1.5 MB and
+            resized to fit within 1920×1920 pixels. PNGs are converted to WebP
+            for smaller file size. You don't need to do anything — just upload
+            the original photo from your phone or camera. The compression
+            preserves more than enough quality for web display.
+        </p>
+    </div>
+
+    <!-- Chapter 5 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 5</div>
+        <h2 class="chapter-title">Editing an existing post</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        To change anything about a post you've already created — the title, the
+        text, the images, the featured flag, anything — open it in the editor,
+        make your change, and save. The public site updates the moment you
+        click Save.
+    </p>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Go to Posts and find the post</p>
+        <p class="step-card-body">Click <strong>Posts</strong> in the sidebar. Use the search box (top right) or the All/Portfolio/Blog tabs to filter. Click anywhere on the post's row — the editor opens in a modal.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Make your changes</p>
+        <p class="step-card-body">Edit any field — title, excerpt, content, category, images, toggles. The changes are saved only when you click Save, so you can experiment freely.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Click Save</p>
+        <p class="step-card-body">Hit the blue <strong>Save</strong> button at the bottom right. The page reloads and your changes are live on the public site immediately.</p>
+    </div>
+
+    <!-- Chapter 6 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 6</div>
+        <h2 class="chapter-title">Featuring, unfeaturing &amp; publishing</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Two switches at the bottom of the post editor control where a post
+        shows up on your site. Both can be toggled on or off at any time —
+        changes apply the moment you save.
+    </p>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-card-label">Featured (on)</div>
+            <div class="info-card-value">Shows on the homepage "Selected work" section</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Featured (off)</div>
+            <div class="info-card-value">Only shows in Portfolio and Before &amp; After listings</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Published (on)</div>
+            <div class="info-card-value">Visible to the public</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Published (off)</div>
+            <div class="info-card-value">Hidden from public — saved as a draft only you can see</div>
+        </div>
+    </div>
+    <div class="callout">
+        <p class="callout-title">When to feature a post</p>
+        <p class="callout-body">
+            Feature your best 3–6 jobs. The homepage "Selected work" section
+            shows up to 6 featured posts. If you feature more than 6, only the
+            6 most recent will appear on the homepage — the rest still show in
+            Portfolio and Before &amp; After.
+        </p>
+    </div>
+
+    <!-- Chapter 7 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 7</div>
+        <h2 class="chapter-title">Deleting a post</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Deleting a post is permanent — there's no undo. The post and all its
+        images are removed from the database. If you only want to hide a post
+        temporarily, switch Published off instead of deleting.
+    </p>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Open the post in the editor</p>
+        <p class="step-card-body">Go to <strong>Posts</strong>, click the post's row to open it in the editor.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Click the trash icon</p>
+        <p class="step-card-body">In the top right of the editor header (next to the X close button), click the small trash icon. You'll be asked to confirm.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Confirm deletion</p>
+        <p class="step-card-body">Click <strong>OK</strong> in the confirm dialog. The post is deleted and the page reloads.</p>
+    </div>
+    <div class="callout warn">
+        <p class="callout-title">Recovering a deleted post</p>
+        <p class="callout-body">
+            Deleted posts cannot be recovered from the admin panel. If you
+            need to restore one, contact whoever manages your hosting — they
+            can restore the database from a backup. To avoid this, prefer
+            unpublishing over deleting.
+        </p>
+    </div>
+
+    <!-- Chapter 8 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 8</div>
+        <h2 class="chapter-title">Replacing an existing image with a new one</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        There are two situations: replacing an image on a post you've already
+        created (most common), and replacing a stock image in the homepage
+        collage or hero. Both are covered below.
+    </p>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Open the post in the editor</p>
+        <p class="step-card-body">Go to <strong>Posts</strong>, click the post's row. Scroll down to the Images section.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Remove the old image</p>
+        <p class="step-card-body">Find the thumbnail of the image you want to replace. Click the small <strong>X</strong> button in its top-right corner. The thumbnail disappears from the grid.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Upload the new image</p>
+        <p class="step-card-body">Drag the new photo into the upload box (or click to browse). It will appear as a new thumbnail at the end of the grid, tagged "G" (gallery).</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">4</div>
+        <p class="step-card-title">Re-tag if needed</p>
+        <p class="step-card-body">If the image you removed was tagged "before" or "after", click the <strong>B</strong> or <strong>A</strong> button on the new thumbnail to give it the same tag. The system only allows one before and one after per post, so the tag is automatically transferred.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">5</div>
+        <p class="step-card-title">Reorder to the right position</p>
+        <p class="step-card-body">Use the left-arrow button on the new thumbnail to move it to the position the old image occupied. The first image in the grid becomes the cover image (shown on cards).</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">6</div>
+        <p class="step-card-title">Save</p>
+        <p class="step-card-body">Click <strong>Save</strong>. The old image is removed and the new one is live. (The old image file is still on your server but no longer linked — it can be cleaned up by your hosting provider.)</p>
+    </div>
+    <div class="callout">
+        <p class="callout-title">Replacing the homepage collage / hero images</p>
+        <p class="callout-body">
+            The four images in the homepage hero (right-side collage) and the
+            worker image on the old About section are currently loaded from
+            Unsplash URLs hardcoded in <span class="url-mono">src/components/site/Hero.tsx</span>.
+            To replace them with your own photos, ask whoever set up your site
+            to swap the four <span class="url-mono">src="https://images.unsplash.com/..."</span>
+            URLs with paths to your own images (uploaded to the
+            <span class="url-mono">public/</span> folder). This is a one-time
+            change and is the only image swap that requires touching code.
+        </p>
+    </div>
+
+    <!-- Chapter 9 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 9</div>
+        <h2 class="chapter-title">Managing testimonials</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Testimonials are the client reviews that scroll across your homepage in
+        the carousel. Each has a client name, an optional role/location label
+        (e.g. "HDB Owner · Punggol"), a 1–5 star rating, and the review text.
+        You can add, hide, or delete them anytime.
+    </p>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Open the Testimonials tab</p>
+        <p class="step-card-body">Click <strong>Testimonials</strong> in the sidebar. You'll see a list of every testimonial on your site, with a small toggle showing Live / Hidden status.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Add a new testimonial</p>
+        <p class="step-card-body">Click the <strong>"Add testimonial"</strong> button in the top right. Fill in the client's name, their role/location, pick a star rating (click the stars), and paste the review text. Toggle "Publish immediately" on. Click Save.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Hide or show a testimonial</p>
+        <p class="step-card-body">Each testimonial has a small switch on its right side. Toggle it on to show the testimonial on the public site, off to hide it. Hidden testimonials are kept in the database — you can re-show them anytime.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">4</div>
+        <p class="step-card-title">Delete a testimonial</p>
+        <p class="step-card-body">Click the small trash icon on the right side of the testimonial row. Confirm. The testimonial is permanently removed.</p>
+    </div>
+
+    <!-- Chapter 10 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 10</div>
+        <h2 class="chapter-title">Reading your analytics</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        The Analytics tab shows you how visitors are interacting with your
+        site. All tracking is anonymous — no cookies, no personal data. The
+        dashboard has four sections:
+    </p>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-card-label">Site views</div>
+            <div class="info-card-value">Total page loads across the whole site</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Post views</div>
+            <div class="info-card-value">How many times visitors opened a post detail modal</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">WhatsApp clicks</div>
+            <div class="info-card-value">How many times a WhatsApp button was clicked</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Avg dwell</div>
+            <div class="info-card-value">Average seconds spent per page (lower is normal for quick visits)</div>
+        </div>
+    </div>
+    <p class="body-text">
+        Below the KPI cards, you'll see a 14-day line chart showing daily
+        activity, and a bar chart of your top-6 most-viewed posts with their
+        WhatsApp conversion. Use this to see which jobs attract the most
+        interest — if a particular type of job (say, painting) gets lots of
+        WhatsApp clicks, consider featuring more of those.
+    </p>
+
+    <!-- Chapter 11 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 11</div>
+        <h2 class="chapter-title">Site Settings — change business name, phone, services</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        This is the most powerful tab in the admin panel. Everything visible on
+        the public site is editable from here — no code changes required. The
+        moment you click <strong>Save changes</strong>, the new values go live
+        across the entire site.
+    </p>
+    <div class="callout success">
+        <p class="callout-title">What you can edit here</p>
+        <p class="callout-body">
+            Business name, tagline, worker/contact name, phone, WhatsApp
+            number, email, location, all showcase stats (years, jobs,
+            clients, rating), hero headline &amp; subtext, about title &amp;
+            body, and the full services list (add / edit / remove services).
+        </p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">1</div>
+        <p class="step-card-title">Open Site Settings</p>
+        <p class="step-card-body">Click <strong>Site Settings</strong> in the sidebar. The page loads with all your current values pre-filled in editable fields.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">2</div>
+        <p class="step-card-title">Edit any field</p>
+        <p class="step-card-body">Click into any text box and change the value. Numbers (years, jobs, etc.) accept any whole number. The rating field accepts decimals (e.g. 4.9).</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">3</div>
+        <p class="step-card-title">Edit the services list</p>
+        <p class="step-card-body">Scroll to the Services List section. Each service is a card with a Label (e.g. "Plumbing"), an Icon (dropdown), a Key (lowercase slug), and a Description. Click any field to edit. Click <strong>"Add service"</strong> to add a new one. Click the trash icon on a service card to remove it.</p>
+    </div>
+    <div class="step-card">
+        <div class="step-card-number">4</div>
+        <p class="step-card-title">Click Save changes</p>
+        <p class="step-card-body">Hit the blue <strong>Save changes</strong> button at the top right (or the one at the bottom). A success toast appears, the page reloads, and your new values are live on the public site.</p>
+    </div>
+    <div class="callout warn">
+        <p class="callout-title">WhatsApp number format</p>
+        <p class="callout-body">
+            The WhatsApp field must contain digits only, country code first,
+            no <strong>+</strong> sign, no spaces. Example: <strong>6591234567</strong>
+            (not <em>+65 9123 4567</em>). The phone field (for the "Call"
+            button) can be formatted normally with spaces — that one is just
+            for display.
+        </p>
+    </div>
+    <div class="callout">
+        <p class="callout-title">Reset to defaults</p>
+        <p class="callout-body">
+            If you ever want to undo all your changes and start over, click the
+            <strong>Reset</strong> button. This restores the original demo
+            values into the form (but does NOT save them — you still need to
+            click Save to apply).
+        </p>
+    </div>
+
+    <!-- Chapter 12 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 12</div>
+        <h2 class="chapter-title">Changing the hero headline &amp; about text</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        The hero is the big section at the top of your homepage. It has a
+        large headline (currently "Your home, expertly handled.") and a subtext
+        paragraph below it. Both are editable from Site Settings.
+    </p>
+    <div class="callout">
+        <p class="callout-title">Headline format tip</p>
+        <p class="callout-body">
+            If your headline contains a comma, the text before the comma
+            appears on line 1, and the text after the comma appears on line 2
+            (highlighted in the accent colour). Example: <em>"Your home,
+            expertly handled."</em> renders as two lines. If you don't use a
+            comma, the whole headline appears on one line.
+        </p>
+    </div>
+    <p class="body-text">
+        The About section title and body are also editable from Site Settings.
+        The current defaults are "Built on trust. Delivered with care." and a
+        company-focused paragraph. Keep the about body to 2–4 sentences —
+        longer paragraphs look cramped on mobile.
+    </p>
+
+    <!-- Chapter 13 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 13</div>
+        <h2 class="chapter-title">Changing colours &amp; dark mode</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Your site has a warm amber colour scheme on a cream background, with a
+        rich charcoal dark mode. Visitors can switch between light and dark
+        using the moon/sun icon in the header. The colour palette is defined
+        in CSS variables and is the only thing on the site that requires a
+        code change to customise.
+    </p>
+    <p class="body-text">
+        To change the primary colour from amber to something else (say, deep
+        blue or forest green), ask whoever set up your site to edit the
+        <span class="url-mono">--primary</span> CSS variable in
+        <span class="url-mono">src/app/globals.css</span>. The change applies
+        instantly — buttons, badges, the floating stat card, and all accents
+        update together.
+    </p>
+    <div class="callout">
+        <p class="callout-title">Why colours aren't in the Settings panel</p>
+        <p class="callout-body">
+            Colours are tightly coupled with contrast ratios for accessibility
+            and dark-mode support. A wrong colour choice can make text
+            unreadable. For this reason, colour changes are a one-time setup
+            decision, done by whoever built your site. All other content
+            (text, images, services, stats) is fully self-serve from the
+            Settings panel.
+        </p>
+    </div>
+
+    <!-- Chapter 14 -->
+    <div class="chapter-header">
+        <div class="chapter-tag">Chapter 14</div>
+        <h2 class="chapter-title">Troubleshooting &amp; FAQs</h2>
+        <div class="chapter-divider"></div>
+    </div>
+    <p class="body-text">
+        Common situations and how to handle them. If you can't find your
+        answer here, contact whoever set up your hosting — they have access
+        to the server logs and database directly.
+    </p>
+    <div class="callout">
+        <p class="callout-title">I forgot my password</p>
+        <p class="callout-body">
+            Passwords are hashed and cannot be recovered. Your hosting admin
+            can reset it by running a one-line command in the project
+            directory: <span class="url-mono">bun run reset-password</span>
+            (or by editing the database directly). After reset, sign in with
+            the new password and change it again from the admin panel.
+        </p>
+    </div>
+    <div class="callout">
+        <p class="callout-title">My changes don't appear on the public site</p>
+        <p class="callout-body">
+            The site caches pages for fast loading. After clicking Save, wait
+            2–3 seconds and refresh the public page (Cmd/Ctrl+R). If changes
+            still don't show, your browser may be showing a cached version —
+            try opening the site in an incognito/private window to confirm.
+        </p>
+    </div>
+    <div class="callout">
+        <p class="callout-title">My uploaded image looks low quality</p>
+        <p class="callout-body">
+            Images are auto-compressed to under 1.5 MB. If a photo looks
+            blurry, it was probably very small to begin with. Try uploading a
+            higher-resolution original — at least 1200×800 pixels works best.
+            Phone photos are usually fine.
+        </p>
+    </div>
+    <div class="callout">
+        <p class="callout-title">The before/after slider doesn't show</p>
+        <p class="callout-body">
+            Check that the post has one image tagged "before" AND one tagged
+            "after" (look for the red B badge and green A badge in the post
+            editor's image grid). If only one is tagged, the post shows as a
+            single photo — that's normal behaviour, not a bug.
+        </p>
+    </div>
+    <div class="callout">
+        <p class="callout-title">WhatsApp button doesn't open a chat</p>
+        <p class="callout-body">
+            Check that your WhatsApp number in Site Settings is digits only,
+            country code first (e.g. 6591234567). If it has a + or spaces, the
+            link will break. Save the settings and try again.
+        </p>
+    </div>
+    <div class="callout success">
+        <p class="callout-title">You're all set.</p>
+        <p class="callout-body">
+            That's everything. Bookmark your admin URL, log in whenever you
+            want to make a change, and remember to click Save. The site is
+            designed so that you never need to touch code for day-to-day
+            work — every piece of content, every business detail, every
+            testimonial is editable from the admin panel.
+        </p>
+    </div>
+
+</div>
+
+<!-- ENDING -->
+<div class="ending">
+    <div class="ending-mark">A</div>
+    <h2 class="ending-title">Now go make<br>great work visible.</h2>
+    <p class="ending-sub">
+        Upload your first before/after job today. The slider is the single
+        most powerful trust-builder on your entire site.
+    </p>
+    <div class="ending-foot">Ahmad HomeWorks · Admin Guide v1.0</div>
+</div>
+
+</body>
+</html>

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useStore } from "@/store/useStore"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 import type { Post, PostImage } from "@prisma/client"
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 
 function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); index: number }) {
   const { openPost } = useStore()
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   const cover = post.coverImage || post.images[0]?.url
   const category = post.category || post.type
   return (
@@ -70,7 +72,7 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <MapPin className="h-3 w-3" />
-              {siteConfig.location}
+              {s.location}
             </span>
             <span>{new Date(post.createdAt).toLocaleDateString("en-SG", { month: "short", year: "numeric" })}</span>
           </div>

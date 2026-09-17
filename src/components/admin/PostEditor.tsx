@@ -14,11 +14,10 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { useStore } from "@/store/useStore"
-import { siteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
+import { defaultSiteConfig } from "@/lib/site"
 import { ImageUploader, type UploadedImage } from "./ImageUploader"
 import type { Post, PostImage } from "@prisma/client"
-
-const CATEGORIES = siteConfig.services.map((s) => s.label)
 
 interface FormState {
   title: string
@@ -33,21 +32,23 @@ interface FormState {
   images: UploadedImage[]
 }
 
-const EMPTY: FormState = {
-  title: "",
-  excerpt: "",
-  content: "",
-  type: "portfolio",
-  category: CATEGORIES[0],
-  tags: "",
-  featured: false,
-  published: true,
-  coverImage: "",
-  images: [],
-}
-
 export function PostEditor() {
   const { editingPostId, editorOpen, closeEditor } = useStore()
+  const settings = useSiteSettings() ?? defaultSiteConfig
+  const CATEGORIES = settings.services.map((s) => s.label)
+
+  const EMPTY: FormState = {
+    title: "",
+    excerpt: "",
+    content: "",
+    type: "portfolio",
+    category: CATEGORIES[0] || "General",
+    tags: "",
+    featured: false,
+    published: true,
+    coverImage: "",
+    images: [],
+  }
   const [form, setForm] = useState<FormState>(EMPTY)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)

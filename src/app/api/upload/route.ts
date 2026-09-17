@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import path from "path"
 import { isAdmin } from "@/lib/auth"
-import crypto from "crypto"
+import { createClient } from "@supabase/supabase-js"
 
-/**
- * Image upload endpoint — saves to /public/uploads.
- * The client side already compressed the image via browser-image-compression
- * before sending it here. We keep the bytes as-is on disk.
- */
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+)
+
 export async function POST(req: NextRequest) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -17,20 +15,19 @@ export async function POST(req: NextRequest) {
   const file = form.get("file") as File | null
   if (!file) return NextResponse.json({ error: "No file" }, { status: 400 })
 
-  // 8 MB safety cap (client should already be much smaller)
-  if (file.size > 8 * 1024 * 1024) {
-    return NextResponse.json({ error: "File too large (max 8MB)" }, { status: 413 })
+  const buf = Buffer.from(await file.arrayBuffer())
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${
+    file.name.replace(/[^a-zA-Z0-9.-]/g, "_")
+  }`
+
+  const { error } = await supabase.storage
+    .from("uploads")
+    .upload(filename, buf, { contentType: file.type || "image/jpeg" })
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads")
-  await mkdir(uploadsDir, { recursive: true })
-
-  const buf = Buffer.from(await file.arrayBuffer())
-  const hash = crypto.createHash("md5").update(buf).digest("hex").slice(0, 10)
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase()
-  const filename = `${Date.now()}-${hash}.${ext}`
-  await writeFile(path.join(uploadsDir, filename), buf)
-
-  // Always serve as WebP if uploaded as webp; otherwise keep original ext for <img>.
-  return NextResponse.json({ url: `/uploads/${filename}` })
+  const { data } = supabase.storage.from("uploads").getPublicUrl(filename)
+  return NextResponse.json({ url: data.publicUrl })
 }

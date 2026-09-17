@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { motion } from "framer-motion"
 import {
-  LayoutDashboard, FileText, MessageSquare, BarChart3,
+  LayoutDashboard, FileText, MessageSquare, BarChart3, Settings,
   LogOut, ExternalLink, Loader2, Plus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,7 @@ import { PostList } from "./PostList"
 import { PostEditor } from "./PostEditor"
 import { TestimonialManager } from "./TestimonialManager"
 import { AnalyticsDashboard } from "./AnalyticsDashboard"
+import { SettingsManager } from "./SettingsManager"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
 
 interface Props {
@@ -28,6 +29,7 @@ const NAV: { key: AdminTab; label: string; icon: any }[] = [
   { key: "posts", label: "Posts", icon: FileText },
   { key: "testimonials", label: "Testimonials", icon: MessageSquare },
   { key: "analytics", label: "Analytics", icon: BarChart3 },
+  { key: "settings", label: "Site Settings", icon: Settings },
 ]
 
 export function AdminPanel({ posts, testimonials }: Props) {
@@ -204,6 +206,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
           {adminTab === "posts" && <PostList posts={posts} />}
           {adminTab === "testimonials" && <TestimonialManager testimonials={testimonials} />}
           {adminTab === "analytics" && <AnalyticsDashboard />}
+          {adminTab === "settings" && <SettingsManager />}
         </motion.div>
       </main>
 

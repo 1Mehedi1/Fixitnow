@@ -8,7 +8,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useStore } from "@/store/useStore"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 import type { Post } from "@prisma/client"
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
 export function BlogSection({ posts }: Props) {
   const [cat, setCat] = useState<string>("All")
   const { openPost } = useStore()
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   const categories = useMemo(() => {
     const set = new Set<string>()
@@ -178,7 +180,7 @@ export function BlogSection({ posts }: Props) {
         </p>
         <Button asChild size="lg" className="bg-[#25D366] hover:bg-[#1ebe5d] text-white h-12 px-7">
           <a
-            href={whatsappLink(`Hi ${siteConfig.name}, I read your blog and want to chat.`)}
+            href={whatsappLink(s, `Hi ${s.workerName}, I read your blog and want to chat.`)}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() =>

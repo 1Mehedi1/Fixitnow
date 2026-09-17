@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Sun, Moon, Phone, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore, type View } from "@/store/useStore"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT } from "@/lib/site"
+import { defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 import { useTheme } from "next-themes"
 import {
   Sheet,
@@ -18,7 +20,7 @@ import {
 const NAV: { label: string; view: View }[] = [
   { label: "Home", view: "home" },
   { label: "Portfolio", view: "portfolio" },
-  { label: "Blog", view: "blog" },
+  { label: "Before & After", view: "beforeAfter" },
   { label: "About", view: "about" },
 ]
 
@@ -27,6 +29,7 @@ export function Header() {
   const { theme, setTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), [])
@@ -50,11 +53,11 @@ export function Header() {
           {/* Logo */}
           <button onClick={() => setView("home")} className="flex items-center gap-2 group">
             <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg shadow-md shadow-primary/30">
-              {siteConfig.brand.charAt(0)}
+              {s.brand.charAt(0)}
             </div>
             <div className="text-left leading-none">
-              <div className="font-display font-bold text-base tracking-tight">{siteConfig.brand}</div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{siteConfig.tagline}</div>
+              <div className="font-display font-bold text-base tracking-tight">{s.brand}</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.tagline}</div>
             </div>
           </button>
 
@@ -93,7 +96,7 @@ export function Header() {
               </Button>
             )}
 
-            <a href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}>
+            <a href={`tel:${s.phone.replace(/\s/g, "")}`}>
               <Button variant="ghost" size="icon" className="hidden sm:flex rounded-full" aria-label="Call">
                 <Phone className="h-4 w-4" />
               </Button>
@@ -104,7 +107,7 @@ export function Header() {
               className="hidden sm:flex bg-[#25D366] hover:bg-[#1ebe5d] text-white"
             >
               <a
-                href={whatsappLink(`Hi ${siteConfig.name}, I'd like to discuss a job.`)}
+                href={whatsappLink(s, `Hi ${s.workerName}, I'd like to discuss a job.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() =>
@@ -129,7 +132,7 @@ export function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[280px]">
                 <SheetHeader>
-                  <SheetTitle className="text-left">{siteConfig.brand}</SheetTitle>
+                  <SheetTitle className="text-left">{s.brand}</SheetTitle>
                 </SheetHeader>
                 <div className="px-4 py-2 flex flex-col gap-1">
                   {NAV.map((item) => (
@@ -152,7 +155,7 @@ export function Header() {
                     <ShieldCheck className="h-4 w-4" /> Admin Login
                   </button>
                   <a
-                    href={whatsappLink(`Hi ${siteConfig.name}, I'd like to discuss a job.`)}
+                    href={whatsappLink(s, `Hi ${s.workerName}, I'd like to discuss a job.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 px-4 py-3 rounded-lg bg-[#25D366] text-white font-semibold text-center text-sm"

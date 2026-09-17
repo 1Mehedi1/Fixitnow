@@ -4,10 +4,12 @@ import { motion } from "framer-motion"
 import { ArrowRight, Star, MapPin, ShieldCheck, Clock, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/store/useStore"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 
 export function Hero() {
   const { setView } = useStore()
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-accent/30">
@@ -37,20 +39,18 @@ export function Hero() {
                   <Star key={i} className="h-3 w-3 fill-primary text-primary" />
                 ))}
               </span>
-              <span className="font-semibold">{siteConfig.rating}</span>
+              <span className="font-semibold">{s.rating}</span>
               <span className="text-muted-foreground">·</span>
-              <span>{siteConfig.happyClients}+ happy SG clients</span>
+              <span>{s.happyClients}+ happy SG clients</span>
             </motion.div>
 
             <div className="space-y-4">
               <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-balance leading-[1.05]">
-                Your home, <br />
-                <span className="gradient-text">expertly handled.</span>
+                {s.heroHeadline.split(",")[0]},{" "}<br />
+                <span className="gradient-text">{s.heroHeadline.split(",")[1]?.trim() || "expertly handled."}</span>
               </h1>
               <p className="text-lg sm:text-xl text-muted-foreground max-w-xl text-pretty leading-relaxed">
-                {siteConfig.name} — Singapore's trusted handyman for plumbing, painting,
-                renovation, electrical and interior works. {siteConfig.yearsExperience} years.
-                {siteConfig.jobsCompleted}+ jobs. One phone number.
+                {s.heroSubtext} {s.yearsExperience} years. {s.jobsCompleted}+ jobs. One phone number.
               </p>
             </div>
 
@@ -61,7 +61,7 @@ export function Hero() {
                 className="bg-[#25D366] hover:bg-[#1ebe5d] text-white text-base h-12 px-7 shadow-lg shadow-[#25D366]/25"
               >
                 <a
-                  href={whatsappLink(`Hi ${siteConfig.name}, I saw your website and would like a quote.`)}
+                  href={whatsappLink(s, `Hi ${s.workerName}, I saw your website and would like a quote.`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
@@ -97,7 +97,7 @@ export function Hero() {
                 <MapPin className="h-4 w-4 text-primary" /> Islandwide
               </span>
               <span className="flex items-center gap-1.5">
-                <Award className="h-4 w-4 text-primary" /> {siteConfig.yearsExperience}+ yrs
+                <Award className="h-4 w-4 text-primary" /> {s.yearsExperience}+ yrs
               </span>
             </div>
           </motion.div>
@@ -165,7 +165,7 @@ export function Hero() {
               transition={{ delay: 0.8 }}
               className="absolute -left-8 bottom-16 bg-card border border-border rounded-2xl p-4 shadow-2xl shadow-black/15 w-44"
             >
-              <div className="text-3xl font-display font-bold text-primary">{siteConfig.jobsCompleted}+</div>
+              <div className="text-3xl font-display font-bold text-primary">{s.jobsCompleted}+</div>
               <div className="text-xs text-muted-foreground mt-1">Jobs completed across Singapore</div>
             </motion.div>
           </motion.div>

@@ -4,7 +4,8 @@ import { motion } from "framer-motion"
 import { Wrench, PaintRoller, Hammer, Zap, Sofa, Settings, ArrowRight, type LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 
 const ICONS: Record<string, LucideIcon> = {
   Wrench,
@@ -16,6 +17,7 @@ const ICONS: Record<string, LucideIcon> = {
 }
 
 export function Services() {
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   return (
     <section className="py-20 lg:py-28 bg-background relative">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -39,11 +41,11 @@ export function Services() {
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {siteConfig.services.map((s, i) => {
-            const Icon = ICONS[s.icon] || Wrench
+          {s.services.map((svc, i) => {
+            const Icon = ICONS[svc.icon] || Wrench
             return (
               <motion.div
-                key={s.key}
+                key={svc.key}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
@@ -55,10 +57,10 @@ export function Services() {
                     <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="font-display font-bold text-xl mb-2">{s.label}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">{s.desc}</p>
+                    <h3 className="font-display font-bold text-xl mb-2">{svc.label}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">{svc.desc}</p>
                     <a
-                      href={whatsappLink(`Hi ${siteConfig.name}, I'm interested in your ${s.label} service.`)}
+                      href={whatsappLink(s, `Hi ${s.workerName}, I'm interested in your ${svc.label} service.`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() =>
@@ -83,7 +85,7 @@ export function Services() {
         <div className="mt-12 text-center">
           <Button asChild size="lg" className="bg-[#25D366] hover:bg-[#1ebe5d] text-white h-12 px-8">
             <a
-              href={whatsappLink(`Hi ${siteConfig.name}, I have a job that doesn't fit any category — can I describe it?`)}
+              href={whatsappLink(s, `Hi ${s.workerName}, I have a job that doesn't fit any category — can I describe it?`)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() =>

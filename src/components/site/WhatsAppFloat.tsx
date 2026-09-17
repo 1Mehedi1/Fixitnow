@@ -3,12 +3,15 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X } from "lucide-react"
 import { useState, useEffect } from "react"
-import { siteConfig, whatsappLink } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT } from "@/lib/site"
+import { defaultSiteConfig } from "@/lib/site"
+import { useSiteSettings } from "@/components/site-settings-context"
 
 /** Floating WhatsApp button shown on every public view. */
 export function WhatsAppFloat() {
   const [open, setOpen] = useState(false)
   const [show, setShow] = useState(false)
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   useEffect(() => {
     const t = setTimeout(() => setShow(true), 600)
@@ -36,16 +39,16 @@ export function WhatsAppFloat() {
                 <div className="bg-[#25D366] px-4 py-3 text-white">
                   <div className="flex items-center gap-2 font-semibold">
                     <MessageCircle className="h-4 w-4" />
-                    Chat with {siteConfig.name}
+                    Chat with {s.workerName}
                   </div>
                   <p className="text-xs text-white/80 mt-0.5">Typically replies within minutes</p>
                 </div>
                 <div className="p-4 space-y-3 bg-muted/40">
                   <div className="rounded-lg rounded-tl-none bg-card px-3 py-2 text-sm border border-border">
-                    Hi! I'm {siteConfig.name}. 👋 How can I help with your home today?
+                    Hi! I'm {s.workerName}. 👋 How can I help with your home today?
                   </div>
                   <a
-                    href={whatsappLink(`Hi ${siteConfig.name}, I saw your website and would like a quote.`)}
+                    href={whatsappLink(s, `Hi ${s.workerName}, I saw your website and would like a quote.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full rounded-lg bg-[#25D366] hover:bg-[#1ebe5d] transition-colors text-white text-center font-semibold py-2.5 text-sm"

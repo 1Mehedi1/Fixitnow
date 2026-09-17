@@ -1,22 +1,13 @@
 import { db } from "@/lib/db"
-import { Header } from "@/components/site/Header"
-import { Hero } from "@/components/site/Hero"
-import { Services } from "@/components/site/Services"
-import { FeaturedJobs } from "@/components/site/FeaturedJobs"
-import { LatestBlog } from "@/components/site/LatestBlog"
-import { Testimonials } from "@/components/site/Testimonials"
-import { About } from "@/components/site/About"
-import { Footer } from "@/components/site/Footer"
-import { WhatsAppFloat } from "@/components/site/WhatsAppFloat"
-import { PostDetailModal } from "@/components/site/PostDetailModal"
-import { PortfolioSection } from "@/components/site/PortfolioSection"
-import { BlogSection } from "@/components/site/BlogSection"
-import { AdminPanel } from "@/components/admin/AdminPanel"
+import { loadSiteSettings } from "@/lib/site"
 import { HomeView } from "@/components/HomeView"
 
 export const dynamic = "force-dynamic"
 
 export default async function Page() {
+  // Load site settings from DB (with defaults fallback)
+  const settings = await loadSiteSettings()
+
   // Fetch all data server-side
   const [posts, testimonials] = await Promise.all([
     db.post.findMany({
@@ -40,13 +31,18 @@ export default async function Page() {
   })
 
   const portfolioPosts = posts.filter((p) => p.type === "portfolio")
-  const blogPosts = posts.filter((p) => p.type === "blog")
+  // Before/After gallery includes all published PORTFOLIO posts that have at least one image
+  // (posts with both before + after render as sliders; others as single photos).
+  const beforeAfterPosts = posts.filter(
+    (p) => p.type === "portfolio" && (p.images.length > 0 || p.coverImage)
+  )
 
   return (
     <HomeView
+      settings={settings}
       posts={posts}
       portfolioPosts={portfolioPosts}
-      blogPosts={blogPosts}
+      beforeAfterPosts={beforeAfterPosts}
       testimonials={testimonials}
       allPosts={allPosts}
       allTestimonials={allTestimonials}
