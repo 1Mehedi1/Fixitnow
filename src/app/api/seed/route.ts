@@ -13,13 +13,13 @@ import { db } from "@/lib/db"
  */
 export async function GET() {
   // Idempotent — if admin exists, skip.
-  const existing = await db.user.findUnique({ where: { email: "admin@homeworks.sg" } })
+  const existing = await db.user.findUnique({ where: { email: "mdrazonmia8334@gmail.com" } })
   if (!existing) {
-    const passwordHash = await bcrypt.hash("admin123", 10)
+    const passwordHash = await bcrypt.hash("Fixitnow2026Pass", 10)
     await db.user.create({
       data: {
-        email: "admin@homeworks.sg",
-        name: "Ahmad Rahman",
+        email: "mdrazonmia8334@gmail.com",
+        name: "tanvirahmed",
         passwordHash,
         role: "admin",
       },
@@ -42,7 +42,7 @@ export async function GET() {
 
   return NextResponse.json({
     ok: true,
-    admin: { email: "admin@homeworks.sg", password: "admin123" },
+    admin: { email: "mdrazonmia8334@gmail.com" },
   })
 }
 

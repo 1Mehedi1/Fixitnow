@@ -13,8 +13,8 @@ import { toast } from "sonner"
 
 export function AdminLogin() {
   const { setView } = useStore()
-  const [email, setEmail] = useState("admin@homeworks.sg")
-  const [password, setPassword] = useState("admin123")
+  const [email, setEmail] = useState("mdrazonmia8334@gmail.com")
+  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -99,11 +99,6 @@ export function AdminLogin() {
                 {loading ? "Signing in…" : "Sign in"}
               </Button>
             </form>
-            <div className="mt-5 text-xs text-muted-foreground bg-muted/50 rounded-md p-3 text-center">
-              <span className="font-semibold">Demo credentials</span> · admin@homeworks.sg / admin123
-              <br />
-              (Call <code className="font-mono">/api/seed</code> first to create the user.)
-            </div>
           </CardContent>
         </Card>
       </motion.div>
