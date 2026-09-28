@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles } from "lucide-react"
+import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -35,12 +35,17 @@ interface FormState {
   aboutTitle: string
   aboutBody: string
   services: ServiceItem[]
+  heroImages: string[]
+  companyName: string
+  companyUen: string
+  licenseInfo: string
 }
 
 export function SettingsManager() {
   const [form, setForm] = useState<FormState>({
     ...defaultSiteConfig,
     services: [...defaultSiteConfig.services],
+    heroImages: [...defaultSiteConfig.heroImages],
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -50,23 +55,33 @@ export function SettingsManager() {
       .then((r) => r.json())
       .then((d) => {
         if (d.settings) {
+          let heroImgs = [...defaultSiteConfig.heroImages]
+          try {
+            const parsed = JSON.parse(d.settings.heroImagesJson || "[]")
+            if (Array.isArray(parsed) && parsed.length > 0) heroImgs = parsed
+          } catch {}
+
           setForm({
-            brand: d.settings.brand,
-            tagline: d.settings.tagline,
-            workerName: d.settings.workerName,
-            phone: d.settings.phone,
-            whatsapp: d.settings.whatsapp,
-            email: d.settings.email,
-            location: d.settings.location,
-            yearsExperience: d.settings.yearsExperience,
-            jobsCompleted: d.settings.jobsCompleted,
-            happyClients: d.settings.happyClients,
-            rating: d.settings.rating,
-            heroHeadline: d.settings.heroHeadline,
-            heroSubtext: d.settings.heroSubtext,
-            aboutTitle: d.settings.aboutTitle,
-            aboutBody: d.settings.aboutBody,
+            brand: d.settings.brand || defaultSiteConfig.brand,
+            tagline: d.settings.tagline || defaultSiteConfig.tagline,
+            workerName: d.settings.workerName || defaultSiteConfig.workerName,
+            phone: d.settings.phone || defaultSiteConfig.phone,
+            whatsapp: d.settings.whatsapp || defaultSiteConfig.whatsapp,
+            email: d.settings.email || defaultSiteConfig.email,
+            location: d.settings.location || defaultSiteConfig.location,
+            yearsExperience: d.settings.yearsExperience ?? defaultSiteConfig.yearsExperience,
+            jobsCompleted: d.settings.jobsCompleted ?? defaultSiteConfig.jobsCompleted,
+            happyClients: d.settings.happyClients ?? defaultSiteConfig.happyClients,
+            rating: d.settings.rating ?? defaultSiteConfig.rating,
+            heroHeadline: d.settings.heroHeadline || defaultSiteConfig.heroHeadline,
+            heroSubtext: d.settings.heroSubtext || defaultSiteConfig.heroSubtext,
+            aboutTitle: d.settings.aboutTitle || defaultSiteConfig.aboutTitle,
+            aboutBody: d.settings.aboutBody || defaultSiteConfig.aboutBody,
             services: Array.isArray(d.services) && d.services.length > 0 ? d.services : [...defaultSiteConfig.services],
+            heroImages: heroImgs,
+            companyName: d.settings.companyName || defaultSiteConfig.companyName,
+            companyUen: d.settings.companyUen || defaultSiteConfig.companyUen,
+            licenseInfo: d.settings.licenseInfo || defaultSiteConfig.licenseInfo,
           })
         }
       })
@@ -79,7 +94,11 @@ export function SettingsManager() {
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, servicesJson: form.services }),
+        body: JSON.stringify({
+          ...form,
+          servicesJson: form.services,
+          heroImagesJson: form.heroImages,
+        }),
       })
       if (!res.ok) throw new Error("Save failed")
       toast.success("Settings saved — site is now live with your changes.")
@@ -94,8 +113,38 @@ export function SettingsManager() {
 
   const reset = () => {
     if (!confirm("Reset all settings to defaults? Your custom values will be lost.")) return
-    setForm({ ...defaultSiteConfig, services: [...defaultSiteConfig.services] })
+    setForm({
+      ...defaultSiteConfig,
+      services: [...defaultSiteConfig.services],
+      heroImages: [...defaultSiteConfig.heroImages],
+    })
     toast.info("Form reset to defaults. Click Save to apply.")
+  }
+
+  const handleHeroImageChange = (index: number, url: string) => {
+    const updated = [...form.heroImages]
+    updated[index] = url
+    setForm({ ...form, heroImages: updated })
+  }
+
+  const handleHeroFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const fd = new FormData()
+    fd.append("file", file)
+    const tId = toast.loading(`Uploading Hero Photo ${index + 1}...`)
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const data = await res.json()
+      if (data.url) {
+        handleHeroImageChange(index, data.url)
+        toast.success(`Hero Photo ${index + 1} uploaded!`, { id: tId })
+      } else {
+        throw new Error(data.error || "Upload failed")
+      }
+    } catch (err: any) {
+      toast.error("Upload failed", { description: err.message, id: tId })
+    }
   }
 
   const updateService = (i: number, key: keyof ServiceItem, value: string) => {
@@ -158,6 +207,11 @@ export function SettingsManager() {
           <Field label="WhatsApp number" value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} placeholder="6591234567" hint="Digits only, country code first — no +, no spaces" />
           <Field label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="hello@ahmadhomeworks.sg" />
           <Field label="Location" value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Singapore · Islandwide" />
+          <Field label="Company Name (Work Permit Employer)" value={form.companyName} onChange={(v) => setForm({ ...form, companyName: v })} placeholder="4R ENGINEERING PTE. LTD." hint="Shown in trust badges & licensing details" />
+          <Field label="Company UEN (ACRA)" value={form.companyUen} onChange={(v) => setForm({ ...form, companyUen: v })} placeholder="202143324G" hint="Singapore Unique Entity Number" />
+          <div className="sm:col-span-2">
+            <Field label="Licensing & Trust Description" value={form.licenseInfo} onChange={(v) => setForm({ ...form, licenseInfo: v })} placeholder="MOM Registered Work Permit · Construction Sector" hint="Displayed under Hero and in About section" />
+          </div>
         </CardContent>
       </Card>
 
@@ -212,6 +266,65 @@ export function SettingsManager() {
               placeholder="Singapore's trusted handyman for plumbing, painting, renovation…"
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Hero 4 Photos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <ImageIcon className="h-4 w-4 text-primary" /> Hero Showcase Photos (4 Images)
+          </CardTitle>
+          <CardDescription>
+            The 4 photos featured prominently in the hero collage. Paste image URLs or upload photos directly.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid sm:grid-cols-2 gap-5">
+          {[0, 1, 2, 3].map((idx) => {
+            const labels = [
+              "Photo 1 · Top-Left (Portrait)",
+              "Photo 2 · Bottom-Left (Square)",
+              "Photo 3 · Top-Right (Square)",
+              "Photo 4 · Bottom-Right (Portrait)"
+            ]
+            const currentImg = form.heroImages[idx] || defaultSiteConfig.heroImages[idx] || ""
+            return (
+              <div key={idx} className="border border-border/80 rounded-xl p-4 bg-muted/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{labels[idx]}</span>
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Upload new</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleHeroFileUpload(idx, e)}
+                    />
+                  </label>
+                </div>
+                <div className="aspect-[4/3] rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center relative group">
+                  {currentImg ? (
+                    <img src={currentImg} alt={`Hero Photo ${idx + 1}`} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-xs text-muted-foreground flex flex-col items-center gap-1">
+                      <ImageIcon className="h-6 w-6 opacity-40" />
+                      <span>No photo set</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Image URL</Label>
+                  <Input
+                    value={form.heroImages[idx] || ""}
+                    onChange={(e) => handleHeroImageChange(idx, e.target.value)}
+                    placeholder="https://images.unsplash.com/..."
+                    className="text-xs h-9 font-mono"
+                  />
+                </div>
+              </div>
+            )
+          })}
         </CardContent>
       </Card>
 

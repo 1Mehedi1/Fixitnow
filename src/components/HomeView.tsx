@@ -86,7 +86,6 @@ export function HomeView({
           {view === "home" && (
             <>
               <Hero />
-              <Services />
               <FeaturedJobs
                 posts={portfolioPosts}
                 title="Selected work"
@@ -95,6 +94,7 @@ export function HomeView({
               {beforeAfterPosts.length > 0 && (
                 <BeforeAfterPreview posts={beforeAfterPosts.slice(0, 4)} onSeeAll={() => setView("beforeAfter")} />
               )}
+              <Services />
               <Testimonials testimonials={testimonials} />
               <About />
             </>
@@ -128,17 +128,17 @@ function BeforeAfterPreview({
 }) {
   const { openPost } = useStore()
   return (
-    <section className="py-20 lg:py-24 bg-muted/30">
+    <section className="py-12 sm:py-20 lg:py-24 bg-muted/30">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-10">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-4 uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-3 sm:mb-4 uppercase tracking-wider">
               Before & After
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-balance">
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-balance">
               See the difference.
             </h2>
-            <p className="text-lg text-muted-foreground mt-3 text-pretty">
+            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 sm:mt-3 text-pretty">
               Drag any slider to compare before and after. Real jobs, real transformations.
             </p>
           </div>

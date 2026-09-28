@@ -33,7 +33,18 @@ export interface SiteSettingsT {
   aboutTitle: string
   aboutBody: string
   services: ServiceItem[]
+  heroImages: string[]
+  companyName: string
+  companyUen: string
+  licenseInfo: string
 }
+
+export const DEFAULT_HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=600&auto=format&fit=crop&q=70",
+  "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=70",
+  "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600&auto=format&fit=crop&q=70",
+  "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=600&auto=format&fit=crop&q=70",
+]
 
 const DEFAULT_SERVICES: ServiceItem[] = [
   { key: "plumbing", label: "Plumbing", icon: "Wrench", desc: "Leaks, taps, pipes, water heaters, toilets — fixed fast and guaranteed." },
@@ -63,6 +74,10 @@ export const defaultSiteConfig: SiteSettingsT = {
   aboutBody:
     "We are a Singapore-based home-services company with over a decade of hands-on experience across HDB flats, condominiums and landed homes. Our commitment is simple: show up when we say, do the job properly, and stand behind our work.",
   services: DEFAULT_SERVICES,
+  heroImages: DEFAULT_HERO_IMAGES,
+  companyName: "4R ENGINEERING PTE. LTD.",
+  companyUen: "202143324G",
+  licenseInfo: "MOM Registered Construction Work Permit · Employment of Foreign Manpower Act",
 }
 
 /**
@@ -76,7 +91,7 @@ export const siteConfig = defaultSiteConfig
 export async function loadSiteSettings(): Promise<SiteSettingsT> {
   // Lazy import — server-side only
   const { db } = await import("@/lib/db")
-  let row = null
+  let row: import("@prisma/client").SiteSettings | null = null
   try {
     row = await db.siteSettings.findUnique({ where: { id: "singleton" } })
     if (!row) {
@@ -87,11 +102,25 @@ export async function loadSiteSettings(): Promise<SiteSettingsT> {
     return defaultSiteConfig
   }
 
+  if (!row) {
+    return defaultSiteConfig
+  }
+
   let services: ServiceItem[] = DEFAULT_SERVICES
   try {
     const parsed = JSON.parse(row.servicesJson || "[]")
     if (Array.isArray(parsed) && parsed.length > 0) {
       services = parsed
+    }
+  } catch {
+    // keep defaults
+  }
+
+  let heroImages: string[] = DEFAULT_HERO_IMAGES
+  try {
+    const parsedImgs = JSON.parse(row.heroImagesJson || "[]")
+    if (Array.isArray(parsedImgs) && parsedImgs.length > 0) {
+      heroImages = parsedImgs
     }
   } catch {
     // keep defaults
@@ -114,6 +143,10 @@ export async function loadSiteSettings(): Promise<SiteSettingsT> {
     aboutTitle: row.aboutTitle || defaultSiteConfig.aboutTitle,
     aboutBody: row.aboutBody || defaultSiteConfig.aboutBody,
     services,
+    heroImages,
+    companyName: row.companyName || defaultSiteConfig.companyName,
+    companyUen: row.companyUen || defaultSiteConfig.companyUen,
+    licenseInfo: row.licenseInfo || defaultSiteConfig.licenseInfo,
   }
 }
 

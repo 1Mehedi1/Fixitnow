@@ -87,23 +87,23 @@ export function FeaturedJobs({ posts, title = "Recent work", subtitle, showAll =
   const display = showAll ? posts : posts.slice(0, 6)
 
   return (
-    <section className="py-20 lg:py-24 bg-muted/30">
+    <section className="py-12 sm:py-20 lg:py-24 bg-muted/30">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10"
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-10"
         >
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-4 uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-3 sm:mb-4 uppercase tracking-wider">
               Portfolio
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-balance">
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-balance">
               {title}
             </h2>
-            {subtitle && <p className="text-lg text-muted-foreground mt-3 text-pretty">{subtitle}</p>}
+            {subtitle && <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 sm:mt-3 text-pretty">{subtitle}</p>}
           </div>
           {!showAll && posts.length > 6 && (
             <Button variant="ghost" className="self-start sm:self-auto" onClick={() => setView("portfolio")}>

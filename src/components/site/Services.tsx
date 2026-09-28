@@ -19,22 +19,22 @@ const ICONS: Record<string, LucideIcon> = {
 export function Services() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   return (
-    <section className="py-20 lg:py-28 bg-background relative">
+    <section className="py-12 sm:py-20 lg:py-28 bg-background relative">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-14 max-w-3xl mx-auto"
+          className="text-center mb-8 sm:mb-14 max-w-3xl mx-auto"
         >
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-accent-foreground mb-4 uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-accent-foreground mb-3 sm:mb-4 uppercase tracking-wider">
             What I do
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-balance">
+          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-balance">
             Every job, handled with care.
           </h2>
-          <p className="text-lg text-muted-foreground mt-4 text-pretty">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 sm:mt-4 text-pretty">
             From a leaky tap to a full-home renovation — one worker, one phone number, one
             warranty. Here's the work I do across Singapore.
           </p>

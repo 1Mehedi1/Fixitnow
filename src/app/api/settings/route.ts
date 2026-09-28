@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
     "brand", "tagline", "workerName", "phone", "whatsapp", "email", "location",
     "yearsExperience", "jobsCompleted", "happyClients", "rating",
     "heroHeadline", "heroSubtext", "aboutTitle", "aboutBody",
-    "servicesJson",
+    "servicesJson", "heroImagesJson", "companyName", "companyUen", "licenseInfo",
   ]
 
   const data: any = {}
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest) {
         data[k] = parseInt(body[k], 10) || 0
       } else if (k === "rating") {
         data[k] = parseFloat(body[k]) || 0
-      } else if (k === "servicesJson") {
+      } else if (k === "servicesJson" || k === "heroImagesJson") {
         // Accept either a string or an array
         data[k] = typeof body[k] === "string" ? body[k] : JSON.stringify(body[k] || [])
       } else {

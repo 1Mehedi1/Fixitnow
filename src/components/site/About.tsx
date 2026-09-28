@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import {
   ShieldCheck, Award, Clock, Heart, Wrench, Phone, Mail, MapPin,
-  Building2, Users, Sparkles, ThumbsUp,
+  Building2, Users, Sparkles, ThumbsUp, CheckCircle2,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -109,6 +109,77 @@ export function About() {
           ))}
         </div>
 
+        {/* Verified Singapore Licensing & Credentials Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6 }}
+          className="mb-16"
+        >
+          <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card p-6 sm:p-8 lg:p-10 shadow-lg shadow-primary/5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border/80">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <ShieldCheck className="h-7 w-7 text-primary" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Verified Singapore Entity
+                    </span>
+                    <span className="text-xs text-muted-foreground hidden sm:inline">MOM & ACRA Recognized</span>
+                  </div>
+                  <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight mt-1 text-foreground">
+                    Licensed & Regulated Trade Specialist
+                  </h3>
+                </div>
+              </div>
+              <div className="text-left md:text-right">
+                <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Unique Entity Number</div>
+                <div className="font-mono text-base sm:text-lg font-bold text-primary tracking-wide">{s.companyUen || "202143324G"}</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 py-6 border-b border-border/80">
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Registered Company</div>
+                <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.companyName || "4R ENGINEERING PTE. LTD."}</div>
+                <div className="text-xs text-muted-foreground">Singapore ACRA Registered</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Lead Trade Specialist</div>
+                <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.workerName || "Ahmed Mohammod Tanbir"}</div>
+                <div className="text-xs text-muted-foreground">MOM Construction Sector Authorized</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Regulatory Authority</div>
+                <div className="font-display font-bold text-foreground text-sm sm:text-base">Ministry of Manpower (MOM)</div>
+                <div className="text-xs text-muted-foreground">EFMA Compliant & Regulated</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Trade Capabilities</div>
+                <div className="font-display font-bold text-foreground text-sm sm:text-base">Electrical · Plumbing · Renovation</div>
+                <div className="text-xs text-muted-foreground">BCA & Safety Code Compliant</div>
+              </div>
+            </div>
+
+            <div className="pt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-muted-foreground">
+              <p className="max-w-2xl leading-relaxed">
+                All structural works, electrical installations, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by an itemized quote, transparent pricing, and a genuine 7-day workmanship warranty.
+              </p>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <span className="inline-flex items-center gap-1 rounded-md bg-secondary/80 px-2.5 py-1 font-medium text-foreground text-[11px]">
+                  ✓ No Subcontractor Markup
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-md bg-secondary/80 px-2.5 py-1 font-medium text-foreground text-[11px]">
+                  ✓ Workmanship Guaranteed
+                </span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Company / contact info card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -127,6 +198,7 @@ export function About() {
                   <div>
                     <div className="font-display font-bold text-lg">{s.brand}</div>
                     <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.tagline}</div>
+                    <div className="text-xs text-muted-foreground font-medium mt-0.5">{s.companyName || "4R ENGINEERING PTE. LTD."} · UEN: {s.companyUen || "202143324G"}</div>
                   </div>
                 </div>
                 <h3 className="font-display text-2xl font-bold tracking-tight mb-3">
