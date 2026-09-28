@@ -13,25 +13,25 @@ export function Hero() {
   const heroPhotos = s.heroImages && s.heroImages.length >= 4 ? s.heroImages : DEFAULT_HERO_IMAGES
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-accent/30 pt-4 pb-10 sm:py-16">
+    <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-accent/30 pt-4 pb-10 sm:py-16 w-full max-w-full">
       {/* Decorative blurred blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute bottom-[-10%] left-[-5%] h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
       </div>
 
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[auto] lg:min-h-[82vh]">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative w-full max-w-full">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[auto] lg:min-h-[82vh] w-full min-w-0">
           {/* Left — content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-4 sm:space-y-6"
+            className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full"
           >
             {/* Top badges: rating + 4R Engineering license badge */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-3 py-1 text-xs font-medium text-foreground/80 shadow-2xs">
+            <div className="flex flex-wrap items-center gap-2 w-full">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-2.5 sm:px-3 py-1 text-xs font-medium text-foreground/80 shadow-2xs shrink-0">
                 <span className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
@@ -42,29 +42,29 @@ export function Hero() {
                 <span className="text-[11px] sm:text-xs">{s.happyClients}+ happy clients</span>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] sm:text-xs font-medium text-emerald-800 dark:text-emerald-300">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-medium text-emerald-800 dark:text-emerald-300 max-w-full">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>MOM Licensed · {s.companyName}</span>
+                <span className="truncate">MOM Licensed · {s.companyName}</span>
               </div>
             </div>
 
             {/* Headline */}
-            <div className="space-y-2 sm:space-y-3">
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.1] sm:leading-[1.05]">
+            <div className="space-y-2 sm:space-y-3 w-full min-w-0">
+              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.15] sm:leading-[1.05] break-words">
                 {s.heroHeadline.split(",")[0]},{" "}<br className="hidden xs:inline" />
                 <span className="gradient-text">{s.heroHeadline.split(",")[1]?.trim() || "expertly handled."}</span>
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-xl text-pretty leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-xl text-pretty leading-relaxed break-words">
                 {s.heroSubtext} <span className="font-semibold text-foreground">{s.yearsExperience} years</span> experience. <span className="font-semibold text-foreground">{s.jobsCompleted}+ jobs</span> completed across Singapore.
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full">
               <Button
                 asChild
                 size="lg"
-                className="bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm sm:text-base h-11 sm:h-12 px-6 shadow-md shadow-[#25D366]/25"
+                className="bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm sm:text-base h-11 sm:h-12 px-6 shadow-md shadow-[#25D366]/25 w-full sm:w-auto"
               >
                 <a
                   href={whatsappLink(s, `Hi ${s.workerName}, I saw your website and would like a quote.`)}
@@ -85,7 +85,7 @@ export function Hero() {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-sm sm:text-base h-11 sm:h-12 px-6"
+                className="text-sm sm:text-base h-11 sm:h-12 px-6 w-full sm:w-auto"
                 onClick={() => setView("portfolio")}
               >
                 View Selected Work
@@ -93,30 +93,30 @@ export function Hero() {
             </div>
 
             {/* Trust points */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
+            <div className="grid grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2 pt-1 text-xs text-muted-foreground w-full">
+              <span className="flex items-center gap-1.5 min-w-0">
                 <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>UEN: {s.companyUen}</span>
+                <span className="truncate">UEN: {s.companyUen}</span>
               </span>
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 min-w-0">
                 <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>7-day warranty</span>
+                <span className="truncate">7-day warranty</span>
               </span>
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 min-w-0">
                 <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>Singapore Islandwide</span>
+                <span className="truncate">Singapore Islandwide</span>
               </span>
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 min-w-0">
                 <Award className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>{s.yearsExperience}+ yrs hands-on</span>
+                <span className="truncate">{s.yearsExperience}+ yrs hands-on</span>
               </span>
             </div>
 
-            {/* Mobile Visual Showcase Strip (Brings desktop visual richness to mobile) */}
-            <div className="lg:hidden pt-2">
-              <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
-                {heroPhotos.map((imgUrl, i) => (
-                  <div key={i} className="shrink-0 w-32 h-24 rounded-xl overflow-hidden shadow-xs border border-border/80 snap-start relative">
+            {/* Mobile Visual Showcase (Responsive 4-column thumbnail grid: 100% fluid, no overflow) */}
+            <div className="lg:hidden pt-2 w-full min-w-0">
+              <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full">
+                {heroPhotos.slice(0, 4).map((imgUrl, i) => (
+                  <div key={i} className="aspect-[4/3] rounded-xl overflow-hidden shadow-xs border border-border/80 relative">
                     <img src={imgUrl} alt={`Showcase work ${i + 1}`} className="w-full h-full object-cover" />
                   </div>
                 ))}
