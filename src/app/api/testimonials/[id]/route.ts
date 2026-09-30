@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
 
@@ -9,6 +10,11 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   const { id } = await ctx.params
   const body = await req.json()
   const t = await db.testimonial.update({ where: { id }, data: body })
+
+  try {
+    revalidatePath("/")
+  } catch {}
+
   return NextResponse.json({ testimonial: t })
 }
 
@@ -18,5 +24,10 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
   }
   const { id } = await ctx.params
   await db.testimonial.delete({ where: { id } })
+
+  try {
+    revalidatePath("/")
+  } catch {}
+
   return NextResponse.json({ ok: true })
 }

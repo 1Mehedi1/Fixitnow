@@ -15,10 +15,16 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
   useEffect(() => {
     const video = videoRef.current
     if (video) {
+      video.defaultMuted = true
       video.muted = true
-      video.play().catch(() => {
-        // Autoplay policy fallback
-      })
+      const playPromise = video.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setIsLoaded(true))
+          .catch(() => {
+            // Autoplay policy fallback (e.g. mobile battery saver mode)
+          })
+      }
     }
   }, [])
 
@@ -35,10 +41,13 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className={`relative overflow-hidden shrink-0 flex items-center justify-center bg-background border border-primary/20 shadow-md shadow-primary/15 transition-all duration-300 group-hover:scale-105 group-hover:border-primary/50 group-hover:shadow-primary/30 ${sizeClasses} ${className}`}
     >
-      {/* Fallback image while video buffers */}
+      {/* Fallback image while video buffers or on mobile power-save mode */}
       <img
         src="/favicon.ico"
         alt="Logo"
+        width={36}
+        height={36}
+        decoding="async"
         className={`absolute inset-0 w-full h-full object-contain p-1.5 transition-opacity duration-300 ${
           isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
@@ -47,14 +56,18 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
       {/* Continuously running animation */}
       <video
         ref={videoRef}
-        src="/logo-animation.mp4"
         autoPlay
         loop
         muted
         playsInline
+        preload="auto"
         onCanPlay={() => setIsLoaded(true)}
+        onLoadedData={() => setIsLoaded(true)}
+        onPlay={() => setIsLoaded(true)}
         className="w-full h-full object-cover relative z-10"
-      />
+      >
+        <source src="/logo-animation.mp4" type="video/mp4" />
+      </video>
     </motion.div>
   )
 }

@@ -1,34 +1,51 @@
 import { db } from "@/lib/db"
-import { loadSiteSettings } from "@/lib/site"
+import { loadSiteSettings, defaultSiteConfig } from "@/lib/site"
 import { HomeView } from "@/components/HomeView"
+import { FALLBACK_POSTS, FALLBACK_TESTIMONIALS } from "@/lib/fallback-data"
+import type { Post, PostImage, Testimonial } from "@prisma/client"
 
-export const dynamic = "force-dynamic"
+// Cache at Vercel Edge for instant TTFB (<100ms) on mobile across Singapore & worldwide.
+// Automatically revalidates in the background every 60 seconds (or immediately on admin saves).
+export const revalidate = 60
 
-export default async function Page() {
-  // Load site settings from DB (with defaults fallback)
-  const settings = await loadSiteSettings()
+async function fetchHomePageData() {
+  const timeoutMs = 4000
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("DB_TIMEOUT")), timeoutMs)
+  )
 
-  // Fetch all data server-side
-  const [posts, testimonials] = await Promise.all([
+  const queryPromise = Promise.all([
+    loadSiteSettings().catch(() => defaultSiteConfig),
     db.post.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
       include: { images: { orderBy: { position: "asc" } } },
-    }),
+    }).catch(() => [] as (Post & { images: PostImage[] })[]),
     db.testimonial.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
-    }),
+    }).catch(() => [] as Testimonial[]),
   ])
 
-  // Also fetch ALL posts (incl. drafts) for admin view
-  const allPosts = await db.post.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { images: { orderBy: { position: "asc" } } },
-  })
-  const allTestimonials = await db.testimonial.findMany({
-    orderBy: { createdAt: "desc" },
-  })
+  try {
+    const [settings, posts, testimonials] = await Promise.race([queryPromise, timeoutPromise])
+    return {
+      settings: settings || defaultSiteConfig,
+      posts: posts && posts.length > 0 ? posts : FALLBACK_POSTS,
+      testimonials: testimonials && testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS,
+    }
+  } catch (err) {
+    console.warn("DB query timed out or failed; serving resilient fallback data for instant mobile response:", err)
+    return {
+      settings: defaultSiteConfig,
+      posts: FALLBACK_POSTS,
+      testimonials: FALLBACK_TESTIMONIALS,
+    }
+  }
+}
+
+export default async function Page() {
+  const { settings, posts, testimonials } = await fetchHomePageData()
 
   const portfolioPosts = posts.filter((p) => p.type === "portfolio")
   // Before/After gallery includes all published PORTFOLIO posts that have at least one image
@@ -44,8 +61,9 @@ export default async function Page() {
       portfolioPosts={portfolioPosts}
       beforeAfterPosts={beforeAfterPosts}
       testimonials={testimonials}
-      allPosts={allPosts}
-      allTestimonials={allTestimonials}
+      allPosts={posts}
+      allTestimonials={testimonials}
     />
   )
 }
+

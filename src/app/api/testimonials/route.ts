@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
 
@@ -31,5 +32,10 @@ export async function POST(req: NextRequest) {
       published: published !== false,
     },
   })
+
+  try {
+    revalidatePath("/")
+  } catch {}
+
   return NextResponse.json({ testimonial: t })
 }

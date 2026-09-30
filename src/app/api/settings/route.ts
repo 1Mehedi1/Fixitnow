@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
 
@@ -53,6 +54,10 @@ export async function PUT(req: NextRequest) {
     update: data,
     create: { id: "singleton", ...data },
   })
+
+  try {
+    revalidatePath("/")
+  } catch {}
 
   return NextResponse.json({ settings })
 }
