@@ -217,6 +217,19 @@ export function Header() {
                   >
                     <ShieldCheck className="h-4 w-4" /> Admin Login
                   </button>
+                  <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium border border-border/70 my-1 bg-muted/40">
+                    <span className="flex items-center gap-2 text-foreground text-xs font-semibold">
+                      {theme === "dark" ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-amber-500" />}
+                      <span>{theme === "dark" ? "Dark Theme" : "Light Theme"}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                      className="text-xs font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                    >
+                      {theme === "dark" ? "Day View" : "Night View"}
+                    </button>
+                  </div>
                   <a
                     href={whatsappLink(s, `Hi ${s.workerName}, I'd like to discuss a job.`)}
                     target="_blank"

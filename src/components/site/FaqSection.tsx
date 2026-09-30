@@ -65,13 +65,17 @@ export function FaqSection() {
             return (
               <div
                 key={i}
-                className="rounded-2xl border border-border/80 bg-card overflow-hidden transition-all shadow-xs"
+                className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
+                  isOpen
+                    ? "border-primary/50 dark:border-amber-400/40 shadow-md shadow-primary/5 bg-card dark:bg-zinc-950/90"
+                    : "border-border/80 dark:border-white/10 bg-card dark:bg-zinc-950/50 hover:border-border/80 dark:hover:border-white/20 shadow-xs"
+                }`}
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-sm sm:text-base text-foreground cursor-pointer hover:bg-muted/30 transition-colors"
                 >
-                  <span>{faq.q}</span>
+                  <span className={isOpen ? "text-primary font-bold" : "text-foreground"}>{faq.q}</span>
                   <ChevronDown
                     className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-300 ${
                       isOpen ? "rotate-180 text-primary" : ""
@@ -86,7 +90,7 @@ export function FaqSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25 }}
                     >
-                      <div className="px-4 pb-5 sm:px-5 sm:pb-6 text-xs sm:text-sm text-muted-foreground leading-relaxed border-t border-border/40 pt-3">
+                      <div className="px-4 pb-5 sm:px-5 sm:pb-6 text-xs sm:text-sm text-muted-foreground leading-relaxed border-t border-border/40 dark:border-white/10 pt-3">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -97,7 +101,7 @@ export function FaqSection() {
           })}
         </div>
 
-        <div className="mt-8 text-center bg-card border border-border/80 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mt-8 text-center bg-card dark:bg-zinc-950/80 border border-border/80 dark:border-white/10 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div className="text-left">
             <div className="font-semibold text-sm text-foreground">Have a question not listed here?</div>
             <div className="text-xs text-muted-foreground">Message us directly on WhatsApp with your floor plan or photo.</div>

@@ -46,33 +46,37 @@ export function Testimonials({ testimonials }: Props) {
                     transition={{ duration: 0.5, delay: Math.min(i * 0.08, 0.4) }}
                     className="h-full"
                   >
-                    <Card className="h-full border-border/80 hover:border-primary/40 hover:shadow-lg transition-all duration-300">
-                      <CardContent className="p-6 flex flex-col h-full">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex gap-0.5">
-                            {Array.from({ length: 5 }).map((_, idx) => (
-                              <Star
-                                key={idx}
-                                className={`h-4 w-4 ${
-                                  idx < t.rating
-                                    ? "fill-primary text-primary"
-                                    : "fill-muted text-muted"
-                                }`}
-                              />
-                            ))}
+                    <Card className="h-full border-border/80 dark:border-white/10 bg-card dark:bg-zinc-950/70 hover:border-amber-400/40 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300">
+                      <CardContent className="p-6 flex flex-col h-full justify-between">
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex gap-0.5">
+                              {Array.from({ length: 5 }).map((_, idx) => (
+                                <Star
+                                  key={idx}
+                                  className={`h-4 w-4 ${
+                                    idx < t.rating
+                                      ? "fill-amber-500 text-amber-500"
+                                      : "fill-muted text-muted"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                              Verified
+                            </span>
                           </div>
-                          <Quote className="h-6 w-6 text-primary/30" />
+                          <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed italic">
+                            &ldquo;{t.content}&rdquo;
+                          </p>
                         </div>
-                        <p className="text-sm text-foreground/90 leading-relaxed flex-1 italic">
-                          &ldquo;{t.content}&rdquo;
-                        </p>
-                        <div className="mt-5 pt-5 border-t border-border flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary font-display font-bold flex items-center justify-center">
+                        <div className="mt-5 pt-4 border-t border-border/60 dark:border-white/10 flex items-center gap-3">
+                          <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-display font-bold flex items-center justify-center shrink-0">
                             {t.name.charAt(0)}
                           </div>
-                          <div>
-                            <div className="font-semibold text-sm">{t.name}</div>
-                            {t.role && <div className="text-xs text-muted-foreground">{t.role}</div>}
+                          <div className="min-w-0">
+                            <div className="font-semibold text-xs sm:text-sm truncate text-foreground">{t.name}</div>
+                            {t.role && <div className="text-[11px] text-muted-foreground truncate">{t.role}</div>}
                           </div>
                         </div>
                       </CardContent>
@@ -81,9 +85,13 @@ export function Testimonials({ testimonials }: Props) {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="hidden md:flex -left-4 bg-background dark:bg-zinc-900 border border-border/80 dark:border-white/10" />
+            <CarouselNext className="hidden md:flex -right-4 bg-background dark:bg-zinc-900 border border-border/80 dark:border-white/10" />
           </Carousel>
+          <div className="flex items-center justify-center gap-1.5 mt-6 md:hidden text-[11px] font-medium text-muted-foreground">
+            <span className="h-1.5 w-6 rounded-full bg-primary/50"></span>
+            <span>Swipe across to view more homeowner reviews</span>
+          </div>
         </div>
       </div>
     </section>

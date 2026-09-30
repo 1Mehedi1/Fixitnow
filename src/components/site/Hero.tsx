@@ -8,71 +8,72 @@ import { useStore } from "@/store/useStore"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_HERO_IMAGES } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 
-const DEFAULT_ROTATING_PHRASES = [
-  "Your home, expertly handled.",
-  "Plumbing & leaks, fixed fast.",
-  "HDB & condo painting, dust-free prep.",
-  "Full home renovation, one warranty.",
-  "Licensed electrical works, EMA compliant.",
-  "Trusted craftsmanship, islandwide service.",
+interface RotatingTrade {
+  prefix: string
+  highlight: string
+}
+
+const DEFAULT_ROTATING_ITEMS: RotatingTrade[] = [
+  { prefix: "Your home,", highlight: "expertly handled." },
+  { prefix: "Plumbing & leaks,", highlight: "fixed fast & cleanly." },
+  { prefix: "HDB & condo painting,", highlight: "dust-free prep guaranteed." },
+  { prefix: "Full home renovation,", highlight: "one accountable warranty." },
+  { prefix: "Licensed electrical works,", highlight: "EMA & LEW compliant." },
+  { prefix: "Trusted craftsmanship,", highlight: "islandwide across Singapore." },
 ]
 
 function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) {
-  const phrases = useMemo(() => {
-    return [fallbackHeadline, ...DEFAULT_ROTATING_PHRASES.filter((p) => p !== fallbackHeadline)]
+  const items = useMemo(() => {
+    if (fallbackHeadline && !fallbackHeadline.includes("expertly handled")) {
+      return [{ prefix: fallbackHeadline, highlight: "expertly handled." }, ...DEFAULT_ROTATING_ITEMS]
+    }
+    return DEFAULT_ROTATING_ITEMS
   }, [fallbackHeadline])
 
   const [index, setIndex] = useState(0)
-  const [displayedText, setDisplayedText] = useState(phrases[0] || "Your home, expertly handled.")
+  const currentItem = items[index] || items[0]
+  const [typedHighlight, setTypedHighlight] = useState(currentItem.highlight)
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    const fullText = phrases[index] || "Your home, expertly handled."
+    const target = currentItem.highlight
     let timer: NodeJS.Timeout
 
     if (!isDeleting) {
-      if (displayedText.length < fullText.length) {
-        // Variable typing speed: alternates between slow deliberate strokes and quick bursts
-        const isSlowPace = (displayedText.length % 6 === 0) || Math.random() < 0.22
-        const delay = isSlowPace ? (110 + Math.random() * 70) : (40 + Math.random() * 30)
+      if (typedHighlight.length < target.length) {
+        // Variable typing speed: deliberate strokes + rapid flow
+        const isSlowPace = (typedHighlight.length % 5 === 0) || Math.random() < 0.2
+        const delay = isSlowPace ? (100 + Math.random() * 60) : (40 + Math.random() * 30)
         timer = setTimeout(() => {
-          setDisplayedText(fullText.slice(0, displayedText.length + 1))
+          setTypedHighlight(target.slice(0, typedHighlight.length + 1))
         }, delay)
       } else {
         timer = setTimeout(() => {
           setIsDeleting(true)
-        }, 2200)
+        }, 2400)
       }
     } else {
-      if (displayedText.length > 0) {
-        const delay = 22 + Math.random() * 18
+      if (typedHighlight.length > 0) {
+        const delay = 25 + Math.random() * 15
         timer = setTimeout(() => {
-          setDisplayedText(fullText.slice(0, displayedText.length - 1))
+          setTypedHighlight(target.slice(0, typedHighlight.length - 1))
         }, delay)
       } else {
         setIsDeleting(false)
-        setIndex((prev) => (prev + 1) % phrases.length)
+        setIndex((prev) => (prev + 1) % items.length)
       }
     }
 
     return () => clearTimeout(timer)
-  }, [displayedText, isDeleting, index, phrases])
-
-  const parts = displayedText.split(",")
-  const prefix = parts[0]
-  const suffix = parts.slice(1).join(",").trim()
+  }, [typedHighlight, isDeleting, currentItem, items])
 
   return (
     <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance leading-snug sm:leading-tight break-words min-h-[2.4em] sm:min-h-[2.2em]">
-      <span>{prefix}{parts.length > 1 ? "," : ""}</span>
-      {parts.length > 1 && (
-        <>
-          {" "}<br className="hidden xs:inline" />
-          <span className="gradient-text underline underline-offset-6 decoration-amber-500/75 decoration-2">
-            {suffix}
-          </span>
-        </>
-      )}
+      <span>{currentItem.prefix}</span>{" "}
+      <br className="hidden xs:inline" />
+      <span className="gradient-text underline underline-offset-6 decoration-amber-500/75 decoration-2">
+        {typedHighlight}
+      </span>
       <span className="inline-block w-[2.5px] sm:w-[3px] h-[0.85em] bg-primary ml-1.5 align-baseline animate-pulse shadow-xs shadow-primary" />
     </h1>
   )
@@ -85,10 +86,10 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-accent/30 pt-4 pb-10 sm:py-16 w-full max-w-full">
-      {/* Decorative blurred blobs */}
+      {/* Architectural Atmospheric Lighting with Subtle Craft Grid */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute bottom-[-10%] left-[-5%] h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-10%,rgba(245,158,11,0.12),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-15%,rgba(245,158,11,0.08),rgba(0,0,0,0))]" />
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:36px_36px]" />
       </div>
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative w-full max-w-full">

@@ -87,8 +87,8 @@ export function PricingGuide() {
           </p>
         </motion.div>
 
-        {/* Trade Tab Switcher */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-xl mx-auto">
+        {/* Trade Tab Switcher — Segmented pill with sliding active indicator */}
+        <div className="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl bg-muted/60 dark:bg-zinc-900/80 border border-border/70 dark:border-white/10 max-w-xl mx-auto mb-10 shadow-xs">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon
             const isActive = activeTab === cat.id
@@ -96,28 +96,35 @@ export function PricingGuide() {
               <button
                 key={cat.id}
                 onClick={() => setActiveTab(cat.id)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                className={`relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-sm scale-105"
-                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "text-primary-foreground font-bold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                <span>{cat.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activePricingTab"
+                    className="absolute inset-0 bg-primary rounded-xl shadow-xs"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <Icon className="h-4 w-4 relative z-10" />
+                <span className="relative z-10">{cat.label}</span>
               </button>
             )
           })}
         </div>
 
         {/* Rate Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-4xl mx-auto mb-10">
           {currentCat.rates.map((rate, i) => (
             <motion.div
               key={rate.name}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: i * 0.05 }}
-              className="rounded-2xl border border-border/80 bg-card p-5 shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
+              className="rounded-2xl border border-border/80 dark:border-white/10 bg-card dark:bg-zinc-950/70 p-5 sm:p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2">

@@ -14,17 +14,63 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
 
   useEffect(() => {
     const video = videoRef.current
-    if (video) {
-      video.defaultMuted = true
-      video.muted = true
-      const playPromise = video.play()
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsLoaded(true))
-          .catch(() => {
-            // Autoplay policy fallback (e.g. mobile battery saver mode)
-          })
+    if (!video) return
+
+    video.defaultMuted = true
+    video.muted = true
+    video.playsInline = true
+    video.setAttribute("playsinline", "")
+    video.setAttribute("webkit-playsinline", "true")
+
+    const playVideo = () => {
+      const p = video.play()
+      if (p !== undefined) {
+        p.then(() => setIsLoaded(true)).catch(() => {
+          // Autoplay policy fallback (resumes on touch/scroll)
+        })
       }
+    }
+
+    playVideo()
+
+    // Handlers ensuring the animation continuously runs on mobile without freezing
+    const onPause = () => {
+      if (!document.hidden && video.paused) {
+        playVideo()
+      }
+    }
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) {
+        playVideo()
+      }
+    }
+
+    const onEnded = () => {
+      video.currentTime = 0
+      playVideo()
+    }
+
+    const onUserInteraction = () => {
+      if (video.paused) {
+        playVideo()
+      }
+    }
+
+    video.addEventListener("pause", onPause)
+    video.addEventListener("ended", onEnded)
+    document.addEventListener("visibilitychange", onVisibilityChange)
+    window.addEventListener("focus", playVideo)
+    window.addEventListener("touchstart", onUserInteraction, { passive: true })
+    window.addEventListener("scroll", onUserInteraction, { passive: true })
+
+    return () => {
+      video.removeEventListener("pause", onPause)
+      video.removeEventListener("ended", onEnded)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+      window.removeEventListener("focus", playVideo)
+      window.removeEventListener("touchstart", onUserInteraction)
+      window.removeEventListener("scroll", onUserInteraction)
     }
   }, [])
 

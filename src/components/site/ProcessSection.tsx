@@ -76,9 +76,9 @@ export function ProcessSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.45, delay: i * 0.06 }}
-              className="h-full"
+              className="h-full relative"
             >
-              <div className="relative rounded-2xl border border-border/80 bg-card p-5 sm:p-6 h-full flex flex-col justify-between shadow-xs hover:shadow-md hover:border-primary/40 transition-all group">
+              <div className="relative rounded-2xl border border-border/80 dark:border-white/10 bg-card dark:bg-zinc-950/70 p-5 sm:p-6 h-full flex flex-col justify-between shadow-xs hover:shadow-xl hover:shadow-amber-500/5 hover:border-amber-400/50 transition-all group">
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${step.color} border flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform`}>
@@ -100,8 +100,8 @@ export function ProcessSection() {
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-border/50 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-foreground/80 bg-muted px-2.5 py-0.5 rounded-full">
+                <div className="pt-4 mt-4 border-t border-border/50 dark:border-white/10 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-foreground/80 bg-muted dark:bg-zinc-900 px-2.5 py-0.5 rounded-full border border-border/40 dark:border-white/5">
                     {step.highlight}
                   </span>
                   <a
@@ -115,6 +115,13 @@ export function ProcessSection() {
                   </a>
                 </div>
               </div>
+
+              {/* Connecting arrow indicator between phases on desktop */}
+              {i < STEPS.length - 1 && (
+                <div className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 h-6 w-6 rounded-full bg-background dark:bg-zinc-900 border border-border/80 dark:border-white/10 items-center justify-center text-muted-foreground shadow-xs pointer-events-none">
+                  <ArrowRight className="h-3 w-3 text-primary/70" />
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
