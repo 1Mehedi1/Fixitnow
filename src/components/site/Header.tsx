@@ -72,7 +72,9 @@ export function Header() {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left cursor-pointer transition-transform hover:scale-[1.02]">
-            <BrandLogo size="md" />
+            <div id="navbar-brand-logo" className="shrink-0 flex items-center justify-center">
+              <BrandLogo size="md" />
+            </div>
             <div className="text-left leading-tight">
               <div className="font-display font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-amber-600 via-primary to-amber-500 bg-clip-text text-transparent group-hover:from-primary group-hover:to-amber-400 transition-all duration-300 drop-shadow-xs">
                 {s.brand}

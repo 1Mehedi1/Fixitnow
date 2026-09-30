@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { motion } from "framer-motion"
+import { motion, useAnimation } from "framer-motion"
 import { ArrowRight, Star, MapPin, ShieldCheck, Clock, Award, Building2 } from "lucide-react"
+import { ConstructionTruckAnimation } from "@/components/site/ConstructionTruckAnimation"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/store/useStore"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_HERO_IMAGES } from "@/lib/site"
@@ -81,6 +82,7 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
 
 export function Hero() {
   const { setView } = useStore()
+  const badge1Controls = useAnimation()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   const heroPhotos = s.heroImages && s.heroImages.length >= 4 ? s.heroImages : DEFAULT_HERO_IMAGES
 
@@ -101,9 +103,16 @@ export function Hero() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full"
           >
-            {/* Top badges: rating + professional breathing MOM license card box */}
-            <div className="flex flex-wrap items-center gap-3 w-full">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-3 py-1.5 text-xs font-semibold text-foreground/80 shadow-2xs shrink-0 hover:border-primary/40 hover:scale-105 transition-all">
+            {/* Top badges: rating + professional breathing MOM license card box with construction truck */}
+            <div id="hero-badges-track" className="relative flex flex-wrap items-center gap-3 w-full">
+              {/* Realistic Construction Truck Animation */}
+              <ConstructionTruckAnimation badge1Controls={badge1Controls} />
+
+              <motion.div
+                id="hero-rating-badge"
+                animate={badge1Controls}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-3 py-1.5 text-xs font-semibold text-foreground/80 shadow-2xs shrink-0 hover:border-primary/40 hover:scale-105 transition-all"
+              >
                 <span className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
@@ -112,10 +121,13 @@ export function Hero() {
                 <span className="font-bold text-foreground">{s.rating}</span>
                 <span className="text-muted-foreground">·</span>
                 <span className="text-[11px] sm:text-xs">{s.happyClients}+ happy clients</span>
-              </div>
+              </motion.div>
 
               {/* Professional MOM license badge without outline — natural breathing (shrink & expand) */}
-              <div className="animate-breathe inline-flex items-center gap-2 rounded-xl bg-emerald-500/15 dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-300 shadow-xs cursor-default">
+              <div
+                id="hero-license-badge"
+                className="animate-breathe inline-flex items-center gap-2 rounded-xl bg-emerald-500/15 dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-300 shadow-xs cursor-default"
+              >
                 <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">
                   MOM Licensed · <span className="font-bold">{s.companyName}</span>
