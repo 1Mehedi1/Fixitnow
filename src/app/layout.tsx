@@ -80,8 +80,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   var isMobile = (window.innerWidth < 768) || /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                   if (!saved) {
                     if (isMobile) {
+                      localStorage.setItem('theme', 'dark');
                       document.documentElement.classList.add('dark');
                       document.documentElement.style.colorScheme = 'dark';
+                    } else {
+                      localStorage.setItem('theme', 'light');
+                      document.documentElement.classList.remove('dark');
+                      document.documentElement.style.colorScheme = 'light';
                     }
                   } else if (saved === 'dark') {
                     document.documentElement.classList.add('dark');

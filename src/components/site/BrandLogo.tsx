@@ -9,10 +9,41 @@ interface BrandLogoProps {
 }
 
 export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isInView, setIsInView] = useState(false)
+
+  // IntersectionObserver: Only load/stream video when the logo is in viewport
+  // This avoids loading 3 instances simultaneously and saves 1.6MB bandwidth on mobile!
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    // If IntersectionObserver is not supported, just set true
+    if (!("IntersectionObserver" in window)) {
+      setIsInView(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true)
+            observer.disconnect()
+          }
+        })
+      },
+      { rootMargin: "150px" }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
+    if (!isInView) return
     const video = videoRef.current
     if (!video) return
 
@@ -22,57 +53,34 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
     video.setAttribute("playsinline", "")
     video.setAttribute("webkit-playsinline", "true")
 
-    const playVideo = () => {
-      const p = video.play()
-      if (p !== undefined) {
-        p.then(() => setIsLoaded(true)).catch(() => {
-          // Autoplay policy fallback (resumes on touch/scroll)
-        })
+    const playSafe = () => {
+      if (video && video.paused) {
+        video.play().then(() => setIsLoaded(true)).catch(() => {})
       }
     }
 
-    playVideo()
+    playSafe()
 
-    // Handlers ensuring the animation continuously runs on mobile without freezing
-    const onPause = () => {
-      if (!document.hidden && video.paused) {
-        playVideo()
-      }
-    }
-
+    // Resume cleanly if mobile browser throttles background tabs
     const onVisibilityChange = () => {
       if (!document.hidden) {
-        playVideo()
+        playSafe()
       }
     }
 
-    const onEnded = () => {
-      video.currentTime = 0
-      playVideo()
+    // Single passive touch gesture fallback in case browser policy blocked autoplay initially
+    const onFirstTouch = () => {
+      playSafe()
     }
 
-    const onUserInteraction = () => {
-      if (video.paused) {
-        playVideo()
-      }
-    }
-
-    video.addEventListener("pause", onPause)
-    video.addEventListener("ended", onEnded)
     document.addEventListener("visibilitychange", onVisibilityChange)
-    window.addEventListener("focus", playVideo)
-    window.addEventListener("touchstart", onUserInteraction, { passive: true })
-    window.addEventListener("scroll", onUserInteraction, { passive: true })
+    window.addEventListener("touchstart", onFirstTouch, { once: true, passive: true })
 
     return () => {
-      video.removeEventListener("pause", onPause)
-      video.removeEventListener("ended", onEnded)
       document.removeEventListener("visibilitychange", onVisibilityChange)
-      window.removeEventListener("focus", playVideo)
-      window.removeEventListener("touchstart", onUserInteraction)
-      window.removeEventListener("scroll", onUserInteraction)
+      window.removeEventListener("touchstart", onFirstTouch)
     }
-  }, [])
+  }, [isInView])
 
   const sizeClasses = {
     sm: "h-8 w-8 rounded-lg",
@@ -82,12 +90,13 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
       className={`relative overflow-hidden shrink-0 flex items-center justify-center bg-background border border-primary/20 shadow-md shadow-primary/15 transition-all duration-300 group-hover:scale-105 group-hover:border-primary/50 group-hover:shadow-primary/30 ${sizeClasses} ${className}`}
     >
-      {/* Fallback image while video buffers or on mobile power-save mode */}
+      {/* Crisp fallback image while video loads or when power-saver mode active */}
       <img
         src="/favicon.ico"
         alt="Logo"
@@ -99,21 +108,23 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
         }`}
       />
 
-      {/* Continuously running animation */}
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        onCanPlay={() => setIsLoaded(true)}
-        onLoadedData={() => setIsLoaded(true)}
-        onPlay={() => setIsLoaded(true)}
-        className="w-full h-full object-cover relative z-10"
-      >
-        <source src="/logo-animation.mp4" type="video/mp4" />
-      </video>
+      {/* Video animation with native HTML5 continuous looping */}
+      {isInView && (
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          onCanPlay={() => setIsLoaded(true)}
+          onLoadedData={() => setIsLoaded(true)}
+          onPlay={() => setIsLoaded(true)}
+          className="w-full h-full object-cover relative z-10"
+        >
+          <source src="/logo-animation.mp4" type="video/mp4" />
+        </video>
+      )}
     </motion.div>
   )
 }

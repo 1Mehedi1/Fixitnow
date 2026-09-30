@@ -9,7 +9,21 @@ import type { Post, PostImage, Testimonial } from "@prisma/client"
 export const revalidate = 60
 
 async function fetchHomePageData() {
-  const timeoutMs = 4000
+  const hasValidPostgres =
+    Boolean(process.env.DATABASE_URL) &&
+    (process.env.DATABASE_URL!.startsWith("postgresql://") ||
+      process.env.DATABASE_URL!.startsWith("postgres://"))
+
+  // If no PostgreSQL database is configured (or placeholder file: URL), return rich Singapore fallback data in 0ms!
+  if (!hasValidPostgres) {
+    return {
+      settings: defaultSiteConfig,
+      posts: FALLBACK_POSTS,
+      testimonials: FALLBACK_TESTIMONIALS,
+    }
+  }
+
+  const timeoutMs = 1200
   const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error("DB_TIMEOUT")), timeoutMs)
   )
@@ -35,7 +49,6 @@ async function fetchHomePageData() {
       testimonials: testimonials && testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS,
     }
   } catch (err) {
-    console.warn("DB query timed out or failed; serving resilient fallback data for instant mobile response:", err)
     return {
       settings: defaultSiteConfig,
       posts: FALLBACK_POSTS,

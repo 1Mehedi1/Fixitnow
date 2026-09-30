@@ -99,6 +99,15 @@ export const siteConfig = defaultSiteConfig
 
 /** Server-side helper: load DB settings and merge with defaults. */
 export async function loadSiteSettings(): Promise<SiteSettingsT> {
+  const hasValidPostgres =
+    Boolean(process.env.DATABASE_URL) &&
+    (process.env.DATABASE_URL!.startsWith("postgresql://") ||
+      process.env.DATABASE_URL!.startsWith("postgres://"))
+
+  if (!hasValidPostgres) {
+    return defaultSiteConfig
+  }
+
   // Lazy import — server-side only
   const { db } = await import("@/lib/db")
   let row: import("@prisma/client").SiteSettings | null = null

@@ -1,33 +1,11 @@
 "use client"
 
-import { useEffect } from "react"
 import { SessionProvider } from "next-auth/react"
-import { ThemeProvider, useTheme } from "next-themes"
-
-function MobileThemeInitializer() {
-  const { theme, setTheme } = useTheme()
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("theme")
-      if (!saved) {
-        const isMobile =
-          window.innerWidth < 768 ||
-          /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-        if (isMobile && theme !== "dark") {
-          setTheme("dark")
-        }
-      }
-    } catch {}
-  }, [theme, setTheme])
-
-  return null
-}
+import { ThemeProvider } from "next-themes"
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <MobileThemeInitializer />
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="theme">
       <SessionProvider>{children}</SessionProvider>
     </ThemeProvider>
   )
