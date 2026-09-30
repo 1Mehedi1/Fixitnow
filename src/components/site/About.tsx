@@ -66,71 +66,72 @@ export function About() {
           </p>
         </motion.div>
 
-        {/* Verified Singapore Licensing & Credentials Card */}
+        {/* Verified Singapore Licensing & Credentials Card — Professional, authoritative, no heavy neon outline */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="mb-12"
+          className="mb-10 sm:mb-12"
         >
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 via-card to-emerald-950/5 p-5 sm:p-8 lg:p-10 shadow-xl shadow-emerald-500/10 animate-breathe-glow">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-border/80">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-6 sm:p-8 lg:p-10 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-border/70">
               <div className="flex items-center gap-3.5">
-                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 shadow-md shadow-emerald-500/20">
-                  <ShieldCheck className="h-7 w-7 sm:h-8 sm:w-8 text-emerald-600 dark:text-emerald-400" />
+                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 px-3 py-0.5 text-xs font-bold">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+                    {/* Professional badge with subtle natural breathing shrink & expand */}
+                    <span className="animate-breathe inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 px-3 py-0.5 text-xs font-bold">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       Verified Singapore Entity
                     </span>
-                    <span className="text-xs font-semibold text-muted-foreground hidden sm:inline">MOM & ACRA Recognized</span>
+                    <span className="text-xs font-medium text-muted-foreground hidden sm:inline">MOM & ACRA Recognized</span>
                   </div>
-                  <h3 className="font-display text-xl sm:text-2xl font-black tracking-tight mt-1 text-foreground">
+                  <h3 className="font-display text-lg sm:text-xl font-bold tracking-tight mt-1 text-foreground">
                     Licensed & Regulated Trade Specialist
                   </h3>
                 </div>
               </div>
-              <div className="text-left sm:text-right bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-2 shrink-0">
-                <div className="text-[10px] uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-bold">Unique Entity Number</div>
-                <div className="font-mono text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 tracking-wider">{s.companyUen || "202143324G"}</div>
+              <div className="text-left sm:text-right bg-muted/50 border border-border/60 rounded-xl px-3.5 py-1.5 shrink-0">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Unique Entity Number</div>
+                <div className="font-mono text-sm sm:text-base font-bold text-foreground tracking-wider">{s.companyUen || "202143324G"}</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 py-5 border-b border-border/80">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 py-5 border-b border-border/70">
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Registered Company</div>
-                <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.companyName || "4R ENGINEERING PTE. LTD."}</div>
+                <div className="font-display font-semibold text-foreground text-sm">{s.companyName || "4R ENGINEERING PTE. LTD."}</div>
                 <div className="text-xs text-muted-foreground">Singapore ACRA Registered</div>
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Lead Trade Specialist</div>
-                <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.workerName || "Ahmed Mohammod Tanbir"}</div>
+                <div className="font-display font-semibold text-foreground text-sm">{s.workerName || "Ahmed Mohammod Tanbir"}</div>
                 <div className="text-xs text-muted-foreground">MOM Construction Sector Authorized</div>
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Regulatory Authority</div>
-                <div className="font-display font-bold text-foreground text-sm sm:text-base">Ministry of Manpower (MOM)</div>
+                <div className="font-display font-semibold text-foreground text-sm">Ministry of Manpower (MOM)</div>
                 <div className="text-xs text-muted-foreground">EFMA Compliant & Regulated</div>
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Trade Capabilities</div>
-                <div className="font-display font-bold text-foreground text-sm sm:text-base">Electrical · Plumbing · Renovation</div>
+                <div className="font-display font-semibold text-foreground text-sm">Electrical · Plumbing · Renovation</div>
                 <div className="text-xs text-muted-foreground">BCA & Safety Code Compliant</div>
               </div>
             </div>
 
             <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground">
-              <p className="max-w-2xl leading-relaxed font-medium">
-                All structural works, electrical installations, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by an itemized quote, transparent pricing, and a genuine 7-day workmanship warranty.
+              <p className="max-w-2xl leading-relaxed">
+                All structural works, electrical installations, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by itemized quotes and genuine workmanship warranty.
               </p>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 font-semibold text-emerald-800 dark:text-emerald-300 text-[11px]">
-                  ✓ No Subcontractor Markup
+                <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2.5 py-1 font-medium text-foreground text-[11px]">
+                  ✓ Direct Execution
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 font-semibold text-emerald-800 dark:text-emerald-300 text-[11px]">
+                <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2.5 py-1 font-medium text-foreground text-[11px]">
                   ✓ Workmanship Guaranteed
                 </span>
               </div>
@@ -138,61 +139,49 @@ export function About() {
           </div>
         </motion.div>
 
-        {/* Dynamic Colorful Stats Cards */}
+        {/* Dynamic Smaller Stats Cards in varied random sizes */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end mb-16"
         >
-          {[
-            {
-              icon: Award,
-              val: `${s.yearsExperience}+`,
-              label: "Years in business",
-              colorClass: "from-amber-500/15 via-amber-500/5 to-card border-amber-500/35 text-amber-600 dark:text-amber-400",
-              iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30",
-              accentBorder: "hover:border-amber-500/70 hover:shadow-amber-500/20",
-            },
-            {
-              icon: Wrench,
-              val: `${s.jobsCompleted}+`,
-              label: "Jobs completed",
-              colorClass: "from-emerald-500/15 via-emerald-500/5 to-card border-emerald-500/35 text-emerald-600 dark:text-emerald-400",
-              iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
-              accentBorder: "hover:border-emerald-500/70 hover:shadow-emerald-500/20",
-            },
-            {
-              icon: Users,
-              val: `${s.happyClients}+`,
-              label: "Happy clients",
-              colorClass: "from-blue-500/15 via-blue-500/5 to-card border-blue-500/35 text-blue-600 dark:text-blue-400",
-              iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30",
-              accentBorder: "hover:border-blue-500/70 hover:shadow-blue-500/20",
-            },
-            {
-              icon: Heart,
-              val: `${s.rating}★`,
-              label: "Average rating",
-              colorClass: "from-purple-500/15 via-purple-500/5 to-card border-purple-500/35 text-purple-600 dark:text-purple-400",
-              iconBg: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30",
-              accentBorder: "hover:border-purple-500/70 hover:shadow-purple-500/20",
-            },
-          ].map((stat, i) => (
-            <Card
-              key={i}
-              className={`border-2 bg-gradient-to-br transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg text-center ${stat.colorClass} ${stat.accentBorder} rounded-2xl overflow-hidden`}
-            >
-              <CardContent className="p-4 sm:p-5">
-                <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl mx-auto mb-2.5 flex items-center justify-center ${stat.iconBg}`}>
-                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
-                </div>
-                <div className="font-display text-2xl sm:text-3xl font-black tracking-tight">{stat.val}</div>
-                <div className="text-[11px] sm:text-xs text-muted-foreground font-semibold mt-0.5">{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Card 1: Compact square */}
+          <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-3 sm:p-3.5 text-center min-h-[92px] sm:min-h-[105px] flex flex-col items-center justify-center transition-all hover:scale-[1.02]">
+            <div className="h-7 w-7 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto mb-1 flex items-center justify-center">
+              <Award className="h-4 w-4" />
+            </div>
+            <div className="font-display text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">{s.yearsExperience}+</div>
+            <div className="text-[10px] sm:text-[11px] text-muted-foreground font-semibold">Years in business</div>
+          </div>
+
+          {/* Card 2: Featured taller/wider */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/8 p-4 sm:p-5 text-center min-h-[112px] sm:min-h-[128px] flex flex-col items-center justify-center transition-all hover:scale-[1.02] shadow-xs">
+            <div className="h-8 w-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 mx-auto mb-1.5 flex items-center justify-center">
+              <Wrench className="h-4.5 w-4.5" />
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">{s.jobsCompleted}+</div>
+            <div className="text-xs text-muted-foreground font-bold">Jobs completed</div>
+          </div>
+
+          {/* Card 3: Medium compact */}
+          <div className="rounded-xl border border-blue-500/25 bg-blue-500/5 p-3.5 sm:p-4 text-center min-h-[100px] sm:min-h-[114px] flex flex-col items-center justify-center transition-all hover:scale-[1.02]">
+            <div className="h-7 w-7 rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400 mx-auto mb-1 flex items-center justify-center">
+              <Users className="h-4 w-4" />
+            </div>
+            <div className="font-display text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400">{s.happyClients}+</div>
+            <div className="text-[10px] sm:text-[11px] text-muted-foreground font-semibold">Happy clients</div>
+          </div>
+
+          {/* Card 4: Compact slim */}
+          <div className="rounded-xl border border-purple-500/25 bg-purple-500/5 p-3 sm:p-3.5 text-center min-h-[94px] sm:min-h-[104px] flex flex-col items-center justify-center transition-all hover:scale-[1.02]">
+            <div className="h-7 w-7 rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 mx-auto mb-1 flex items-center justify-center">
+              <Heart className="h-4 w-4" />
+            </div>
+            <div className="font-display text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">{s.rating}★</div>
+            <div className="text-[10px] sm:text-[11px] text-muted-foreground font-semibold">Average rating</div>
+          </div>
         </motion.div>
 
         {/* Trust grid */}
@@ -220,65 +209,130 @@ export function About() {
           ))}
         </div>
 
-        {/* Company / contact info card */}
+        {/* Company / Contact Hub — Professional Executive Redesign */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
         >
-          <Card className="overflow-hidden border-border">
+          <div className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card shadow-lg overflow-hidden">
             <div className="grid md:grid-cols-2">
-              {/* Left — company info */}
-              <CardContent className="p-8 lg:p-10 bg-gradient-to-br from-accent/40 to-background">
-                <div className="inline-flex items-center gap-2.5 mb-4">
-                  <BrandLogo size="md" />
-                  <div>
-                    <div className="font-display font-bold text-lg">{s.brand}</div>
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.tagline}</div>
-                    <div className="text-xs text-muted-foreground font-medium mt-0.5">{s.companyName || "4R ENGINEERING PTE. LTD."} · UEN: {s.companyUen || "202143324G"}</div>
+              {/* Left — Professional Verification & Direct Channels */}
+              <div className="p-6 sm:p-8 lg:p-10 bg-muted/30 border-b md:border-b-0 md:border-r border-border/70 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-3 mb-5">
+                    <BrandLogo size="md" />
+                    <div>
+                      <div className="font-display font-bold text-lg text-foreground">{s.brand}</div>
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                        {s.companyName || "4R ENGINEERING PTE. LTD."} · UEN: {s.companyUen || "202143324G"}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <h3 className="font-display text-2xl font-bold tracking-tight mb-3">
-                  Get in touch.
-                </h3>
-                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                  Reach out via WhatsApp for the fastest response. We typically reply within
-                  the hour during business hours.
-                </p>
-                <div className="space-y-3 text-sm">
-                  <a href={`tel:${s.phone.replace(/\s/g, "")}`} className="flex items-center gap-3 hover:text-primary transition-colors">
-                    <Phone className="h-4 w-4 text-primary" />
-                    <span>{s.phone}</span>
-                  </a>
-                  <a href={`mailto:${s.email}`} className="flex items-center gap-3 hover:text-primary transition-colors">
-                    <Mail className="h-4 w-4 text-primary" />
-                    <span>{s.email}</span>
-                  </a>
-                  <div className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    <span>{s.location}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Building2 className="h-4 w-4 text-primary" />
-                    <span>Mon–Sat · 8am to 8pm</span>
-                  </div>
-                </div>
-              </CardContent>
 
-              {/* Right — CTA */}
-              <CardContent className="p-8 lg:p-10 flex flex-col justify-center">
-                <h3 className="font-display text-2xl font-bold tracking-tight mb-2">
-                  Have a job in mind?
-                </h3>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Send us a photo and a short description on WhatsApp. We'll get back to you
-                  with a rough quote — no obligation, no visit fee.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button asChild className="bg-[#25D366] hover:bg-[#1ebe5d] text-white">
+                  <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-2 text-foreground">
+                    Direct Contact Channels
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-6 leading-relaxed">
+                    Speak directly with the trade specialist. No call-centers, no automated bots. Direct answers, fast scheduling.
+                  </p>
+
+                  <div className="space-y-3.5 text-xs sm:text-sm">
                     <a
-                      href={whatsappLink(s, `Hi ${s.workerName}, I'd like to discuss a job.`)}
+                      href={whatsappLink(s, `Hi ${s.workerName}, I'd like to ask a quick question about a job.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-xl bg-background border border-border/70 hover:border-emerald-500/50 hover:shadow-sm transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                          <WhatsAppIcon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            WhatsApp Dispatch
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">{s.whatsapp}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        Fastest Reply
+                      </span>
+                    </a>
+
+                    <a
+                      href={`tel:${s.phone.replace(/\s/g, "")}`}
+                      className="flex items-center justify-between p-3 rounded-xl bg-background border border-border/70 hover:border-primary/50 hover:shadow-sm transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                          <Phone className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            Direct Phone Line
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">{s.phone}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-semibold text-muted-foreground">
+                        Direct Specialist
+                      </span>
+                    </a>
+
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-background/50 border border-border/40 text-muted-foreground">
+                      <MapPin className="h-4 w-4 text-primary shrink-0" />
+                      <div className="text-xs">
+                        <span className="font-semibold text-foreground">Service Area: </span>
+                        {s.location} · Islandwide HDB, Condo, Landed
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-background/50 border border-border/40 text-muted-foreground">
+                      <Clock className="h-4 w-4 text-primary shrink-0" />
+                      <div className="text-xs">
+                        <span className="font-semibold text-foreground">Hours: </span>
+                        Mon–Sat · 8:00 AM – 8:00 PM (Emergency slots available)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right — Professional Fast Quote & Job Request */}
+              <div className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-card">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold mb-3">
+                    Fast Quote · No Hidden Costs
+                  </div>
+                  <h3 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-2 text-foreground">
+                    Have a job in mind?
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-6 leading-relaxed">
+                    Send a photo or short description on WhatsApp. You'll receive a clear, itemized quote before any work starts.
+                  </p>
+
+                  <div className="space-y-2.5 mb-7 text-xs">
+                    <div className="flex items-center gap-2.5 text-foreground font-medium">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>Itemized transparent quote — no surprise invoices</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-foreground font-medium">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>Direct execution by registered trade specialist</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-foreground font-medium">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>7-Day complete workmanship warranty</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Button asChild size="lg" className="w-full bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold h-12 shadow-md hover:scale-[1.01] transition-transform">
+                    <a
+                      href={whatsappLink(s, `Hi ${s.workerName}, I have a job in mind and would like a quote.`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() =>
@@ -289,18 +343,18 @@ export function About() {
                         }).catch(() => {})
                       }
                     >
-                      <WhatsAppIcon className="h-4 w-4 mr-1.5" /> Chat on WhatsApp
+                      <WhatsAppIcon className="h-4 w-4 mr-2" /> Chat on WhatsApp for Quote
                     </a>
                   </Button>
-                  <Button asChild variant="outline">
+                  <Button asChild variant="outline" size="lg" className="w-full h-11 font-semibold border-border hover:bg-muted">
                     <a href={`tel:${s.phone.replace(/\s/g, "")}`}>
-                      <Phone className="h-4 w-4 mr-1.5" /> Call
+                      <Phone className="h-4 w-4 mr-2 text-primary" /> Call {s.phone}
                     </a>
                   </Button>
                 </div>
-              </CardContent>
+              </div>
             </div>
-          </Card>
+          </div>
         </motion.div>
       </div>
     </section>

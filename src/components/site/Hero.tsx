@@ -32,7 +32,9 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
 
     if (!isDeleting) {
       if (displayedText.length < fullText.length) {
-        const delay = 50 + Math.random() * 45
+        // Variable typing speed: alternates between slow deliberate strokes and quick bursts
+        const isSlowPace = (displayedText.length % 6 === 0) || Math.random() < 0.22
+        const delay = isSlowPace ? (110 + Math.random() * 70) : (40 + Math.random() * 30)
         timer = setTimeout(() => {
           setDisplayedText(fullText.slice(0, displayedText.length + 1))
         }, delay)
@@ -43,7 +45,7 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
       }
     } else {
       if (displayedText.length > 0) {
-        const delay = 25 + Math.random() * 20
+        const delay = 22 + Math.random() * 18
         timer = setTimeout(() => {
           setDisplayedText(fullText.slice(0, displayedText.length - 1))
         }, delay)
@@ -61,15 +63,17 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
   const suffix = parts.slice(1).join(",").trim()
 
   return (
-    <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.15] sm:leading-[1.05] break-words min-h-[2.4em] sm:min-h-[2.2em]">
+    <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance leading-snug sm:leading-tight break-words min-h-[2.4em] sm:min-h-[2.2em]">
       <span>{prefix}{parts.length > 1 ? "," : ""}</span>
       {parts.length > 1 && (
         <>
           {" "}<br className="hidden xs:inline" />
-          <span className="gradient-text">{suffix}</span>
+          <span className="gradient-text underline underline-offset-6 decoration-amber-500/75 decoration-2">
+            {suffix}
+          </span>
         </>
       )}
-      <span className="inline-block w-[3px] sm:w-[4px] h-[0.85em] bg-primary ml-1.5 align-baseline animate-pulse shadow-xs shadow-primary" />
+      <span className="inline-block w-[2.5px] sm:w-[3px] h-[0.85em] bg-primary ml-1.5 align-baseline animate-pulse shadow-xs shadow-primary" />
     </h1>
   )
 }
@@ -96,7 +100,7 @@ export function Hero() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full"
           >
-            {/* Top badges: rating + glowing breathing MOM license card box */}
+            {/* Top badges: rating + professional breathing MOM license card box */}
             <div className="flex flex-wrap items-center gap-3 w-full">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-3 py-1.5 text-xs font-semibold text-foreground/80 shadow-2xs shrink-0 hover:border-primary/40 hover:scale-105 transition-all">
                 <span className="flex items-center gap-0.5">
@@ -109,15 +113,11 @@ export function Hero() {
                 <span className="text-[11px] sm:text-xs">{s.happyClients}+ happy clients</span>
               </div>
 
-              {/* Glowing, breathing, high-contrast MOM license card box */}
-              <div className="relative inline-flex items-center gap-2 rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-teal-500/15 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-200 shadow-lg shadow-emerald-500/20 animate-breathe-glow transition-all hover:scale-[1.03] cursor-default max-w-full">
-                <div className="relative flex items-center justify-center shrink-0">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                </div>
-                <ShieldCheck className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              {/* Professional MOM license badge without outline — natural breathing (shrink & expand) */}
+              <div className="animate-breathe inline-flex items-center gap-2 rounded-xl bg-emerald-500/15 dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-300 shadow-xs cursor-default">
+                <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">
-                  MOM Licensed · <span className="font-black underline decoration-emerald-500/50 underline-offset-2">{s.companyName}</span>
+                  MOM Licensed · <span className="font-bold">{s.companyName}</span>
                 </span>
               </div>
             </div>

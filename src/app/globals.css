@@ -190,24 +190,26 @@
   background-size: 24px 24px;
 }
 
-/* Ensure no horizontal blowout on any mobile device */
+/* Ensure no horizontal blowout on any mobile device without breaking sticky positioning */
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
 }
 
-/* Glowing breathing animation for verified MOM credentials */
-@keyframes breathe-glow {
+/* Natural breathing motion: subtle shrink then expand */
+@keyframes breathe-scale {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25), 0 0 20px rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.5);
+    transform: scale(1);
   }
-  50% {
-    box-shadow: 0 0 24px rgba(16, 185, 129, 0.55), 0 0 40px rgba(16, 185, 129, 0.25);
-    border-color: rgba(16, 185, 129, 0.9);
+  38% {
+    transform: scale(0.98);
+  }
+  72% {
+    transform: scale(1.025);
   }
 }
 
-.animate-breathe-glow {
-  animation: breathe-glow 2.5s ease-in-out infinite;
+.animate-breathe {
+  animation: breathe-scale 3.5s ease-in-out infinite;
+  transform-origin: center center;
 }

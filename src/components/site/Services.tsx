@@ -55,46 +55,45 @@ export function Services() {
                 whileHover={{ y: -5 }}
                 className="h-full"
               >
-                <div className="group relative h-full min-h-[220px] sm:min-h-[240px] rounded-2xl overflow-hidden border border-border/80 dark:border-white/15 bg-neutral-950 shadow-md hover:shadow-2xl hover:border-amber-400/60 hover:shadow-amber-500/10 transition-all duration-500 flex flex-col justify-between">
-                  {/* Background Image with smooth zoom */}
-                  <img
-                    src={bgUrl}
-                    alt={svc.label}
-                    className="absolute inset-0 w-full h-full object-cover object-center transform transition-transform duration-700 ease-out group-hover:scale-110 filter brightness-[0.70] contrast-[1.05] group-hover:brightness-[0.78]"
-                  />
+                <div className="group relative h-full min-h-[220px] sm:min-h-[235px] rounded-2xl overflow-hidden border border-border/80 dark:border-white/10 bg-card p-5 sm:p-6 shadow-sm hover:shadow-2xl hover:border-amber-400/50 hover:shadow-amber-500/10 transition-all duration-500 flex flex-col justify-between">
+                  {/* Side-view image that expands to full background on hover, and returns to side on hover out */}
+                  <div className="absolute right-3.5 top-3.5 bottom-3.5 w-28 sm:w-36 rounded-xl overflow-hidden shadow-xs transition-all duration-500 ease-out group-hover:top-0 group-hover:right-0 group-hover:bottom-0 group-hover:left-0 group-hover:w-full group-hover:h-full group-hover:rounded-2xl z-0 pointer-events-none">
+                    <img
+                      src={bgUrl}
+                      alt={svc.label}
+                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    {/* Dark gradient overlay — activates only when image expands to full background on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </div>
 
-                  {/* Multi-layered dark gradient overlay for crystal clear text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/55 group-hover:from-black/90 group-hover:via-black/70 group-hover:to-black/45 transition-colors duration-500" />
-                  
-                  {/* Subtle warm amber ambient glow on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                  {/* Card Content */}
-                  <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full justify-between">
+                  {/* Card Content: side layout next to image in default state, expands on hover */}
+                  <div className="relative z-10 flex flex-col justify-between h-full pr-32 sm:pr-40 group-hover:pr-0 transition-all duration-500">
                     <div>
-                      {/* Top row: Icon badge + Islandwide tag */}
-                      <div className="flex items-center justify-between mb-3.5">
-                        <div className="inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/35 backdrop-blur-md group-hover:bg-amber-400 group-hover:text-black group-hover:scale-105 group-hover:shadow-[0_0_15px_rgba(251,191,36,0.5)] transition-all duration-300">
+                      {/* Top row: Icon badge */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-amber-400 group-hover:text-black group-hover:scale-105 group-hover:shadow-[0_0_15px_rgba(251,191,36,0.4)] transition-all duration-300">
                           <Icon className="h-5 w-5" />
                         </div>
-                        <span className="text-[10px] font-bold tracking-widest uppercase text-amber-300/90 bg-black/60 px-2.5 py-0.5 rounded-full border border-amber-400/30 backdrop-blur-md group-hover:border-amber-400/60 transition-colors">
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground group-hover:text-amber-300/90 group-hover:bg-black/60 px-2 py-0.5 rounded-full group-hover:border group-hover:border-amber-400/30 transition-all">
                           Islandwide
                         </span>
                       </div>
 
                       {/* Service Title */}
-                      <h3 className="font-display font-bold text-lg sm:text-xl text-white tracking-tight drop-shadow-md group-hover:text-amber-200 transition-colors duration-300">
+                      <h3 className="font-display font-bold text-base sm:text-lg text-foreground group-hover:text-white tracking-tight group-hover:drop-shadow-md transition-colors duration-300">
                         {svc.label}
                       </h3>
 
                       {/* Service Description */}
-                      <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-normal mt-1.5 drop-shadow-sm line-clamp-3">
+                      <p className="text-xs sm:text-sm text-muted-foreground group-hover:text-neutral-200 leading-relaxed font-normal mt-1 line-clamp-3 transition-colors duration-300">
                         {svc.desc}
                       </p>
                     </div>
 
                     {/* Bottom CTA Row */}
-                    <div className="pt-3 mt-4 border-t border-white/10 flex items-center justify-between">
+                    <div className="pt-3 mt-4 border-t border-border/60 group-hover:border-white/15 flex items-center justify-between transition-colors duration-300">
                       <a
                         href={whatsappLink(s, `Hi ${s.workerName}, I'm interested in your ${svc.label} service.`)}
                         target="_blank"
@@ -106,12 +105,14 @@ export function Services() {
                             body: JSON.stringify({ eventType: "whatsapp_click" }),
                           }).catch(() => {})
                         }
-                        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-amber-300 hover:text-amber-200 group-hover:gap-2.5 transition-all drop-shadow"
+                        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary group-hover:text-amber-300 hover:text-primary/80 group-hover:gap-2.5 transition-all"
                       >
                         <span>Get a quote</span>
                         <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                       </a>
-                      <span className="text-[11px] text-white/60 font-medium">Warranty covered</span>
+                      <span className="text-[11px] text-muted-foreground group-hover:text-white/60 font-medium transition-colors duration-300">
+                        Warranty covered
+                      </span>
                     </div>
                   </div>
                 </div>

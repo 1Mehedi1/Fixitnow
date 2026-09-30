@@ -79,10 +79,11 @@ export function HomeView({
 
   return (
     <SiteSettingsProvider settings={settings}>
-      <div className="min-h-screen flex flex-col bg-background overflow-x-hidden w-full max-w-full">
+      <div className="min-h-screen flex flex-col bg-background overflow-x-clip w-full max-w-full">
         <Header />
+        <div className="h-16 w-full shrink-0" aria-hidden="true" />
 
-        <main className="flex-1 w-full max-w-full overflow-x-hidden">
+        <main className="flex-1 w-full max-w-full overflow-x-clip">
           {view === "home" && (
             <>
               <Hero />
