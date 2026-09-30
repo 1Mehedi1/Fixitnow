@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
+import { BrandLogo } from "@/components/site/BrandLogo"
 
 export function About() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
@@ -191,10 +192,8 @@ export function About() {
             <div className="grid md:grid-cols-2">
               {/* Left — company info */}
               <CardContent className="p-8 lg:p-10 bg-gradient-to-br from-accent/40 to-background">
-                <div className="inline-flex items-center gap-2 mb-4">
-                  <div className="h-10 w-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-display font-bold">
-                    {s.brand.charAt(0)}
-                  </div>
+                <div className="inline-flex items-center gap-2.5 mb-4">
+                  <BrandLogo size="md" />
                   <div>
                     <div className="font-display font-bold text-lg">{s.brand}</div>
                     <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.tagline}</div>

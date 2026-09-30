@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { useStore, type View } from "@/store/useStore"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
+import { BrandLogo } from "@/components/site/BrandLogo"
 
 export function Footer() {
   const { setView } = useStore()
@@ -67,10 +68,8 @@ export function Footer() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg">
-                {s.brand.charAt(0)}
-              </div>
+            <div className="flex items-center gap-2.5 mb-4 group cursor-pointer" onClick={() => setView("home")}>
+              <BrandLogo size="md" />
               <div>
                 <div className="font-display font-bold">{s.brand}</div>
                 <div className="text-[10px] uppercase tracking-[0.18em] text-background/60">{s.tagline}</div>

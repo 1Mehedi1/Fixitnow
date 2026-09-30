@@ -47,7 +47,11 @@ export const metadata: Metadata = {
     title: defaultSiteConfig.brand,
     description: "Singapore home-services specialist",
   },
-  icons: { icon: "/logo.svg" },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

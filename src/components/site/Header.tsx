@@ -9,6 +9,7 @@ import { whatsappLink, type SiteSettingsT } from "@/lib/site"
 import { defaultSiteConfig } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 import { useTheme } from "next-themes"
+import { BrandLogo } from "@/components/site/BrandLogo"
 import {
   Sheet,
   SheetContent,
@@ -51,12 +52,10 @@ export function Header() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <button onClick={() => setView("home")} className="flex items-center gap-2 group">
-            <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-lg shadow-md shadow-primary/30">
-              {s.brand.charAt(0)}
-            </div>
+          <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left">
+            <BrandLogo size="md" />
             <div className="text-left leading-none">
-              <div className="font-display font-bold text-base tracking-tight">{s.brand}</div>
+              <div className="font-display font-bold text-base tracking-tight group-hover:text-primary transition-colors">{s.brand}</div>
               <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.tagline}</div>
             </div>
           </button>
