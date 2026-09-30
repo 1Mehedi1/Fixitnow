@@ -13,6 +13,12 @@ import { Footer } from "@/components/site/Footer"
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat"
 import { PostDetailModal } from "@/components/site/PostDetailModal"
 import { PortfolioSection } from "@/components/site/PortfolioSection"
+import { QuickQuoteCalculator } from "@/components/site/QuickQuoteCalculator"
+import { ProcessSection } from "@/components/site/ProcessSection"
+import { ComparisonTable } from "@/components/site/ComparisonTable"
+import { PricingGuide } from "@/components/site/PricingGuide"
+import { FaqSection } from "@/components/site/FaqSection"
+import { TradePartnership } from "@/components/site/TradePartnership"
 import { AdminPanel } from "@/components/admin/AdminPanel"
 import { SiteSettingsProvider } from "@/components/site-settings-context"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
@@ -87,6 +93,7 @@ export function HomeView({
           {view === "home" && (
             <>
               <Hero />
+              <QuickQuoteCalculator />
               <FeaturedJobs
                 posts={portfolioPosts}
                 title="Selected work"
@@ -96,6 +103,11 @@ export function HomeView({
                 <BeforeAfterPreview posts={beforeAfterPosts.slice(0, 4)} onSeeAll={() => setView("beforeAfter")} />
               )}
               <Services />
+              <ProcessSection />
+              <ComparisonTable />
+              <PricingGuide />
+              <FaqSection />
+              <TradePartnership />
               <Testimonials testimonials={testimonials} />
               <About />
             </>

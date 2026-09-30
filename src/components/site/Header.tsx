@@ -32,6 +32,8 @@ export function Header() {
   const [mounted, setMounted] = useState(false)
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
+  const [mobileOpen, setMobileOpen] = useState(false)
+
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), [])
   useEffect(() => {
@@ -40,6 +42,23 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+
+  const scrollToAnchor = (id: string) => {
+    if (view !== "home") {
+      setView("home")
+      setTimeout(() => {
+        const el = document.getElementById(id)
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" })
+        }
+      }, 150)
+    } else {
+      const el = document.getElementById(id)
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" })
+      }
+    }
+  }
 
   return (
     <header
@@ -65,12 +84,12 @@ export function Header() {
           </button>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1.5">
+          <nav className="hidden md:flex items-center gap-1">
             {NAV.map((item) => (
               <button
                 key={item.view}
                 onClick={() => setView(item.view)}
-                className={`relative px-4 py-2 text-sm font-bold tracking-wide transition-all duration-200 rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary active:scale-95 ${
+                className={`relative px-3.5 py-2 text-sm font-bold tracking-wide transition-all duration-200 rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary active:scale-95 ${
                   view === item.view
                     ? "text-primary font-black bg-primary/10 shadow-xs"
                     : "text-foreground/85 hover:text-primary"
@@ -85,6 +104,18 @@ export function Header() {
                 )}
               </button>
             ))}
+            <button
+              onClick={() => scrollToAnchor("pricing")}
+              className="px-3.5 py-2 text-sm font-bold tracking-wide text-foreground/85 hover:text-primary transition-all duration-200 rounded-full cursor-pointer hover:bg-primary/10 active:scale-95"
+            >
+              Pricing
+            </button>
+            <button
+              onClick={() => scrollToAnchor("faq")}
+              className="px-3.5 py-2 text-sm font-bold tracking-wide text-foreground/85 hover:text-primary transition-all duration-200 rounded-full cursor-pointer hover:bg-primary/10 active:scale-95"
+            >
+              FAQ
+            </button>
           </nav>
 
           {/* Actions */}
@@ -134,7 +165,7 @@ export function Header() {
             </Button>
 
             {/* Mobile menu */}
-            <Sheet>
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden rounded-full" aria-label="Open menu">
                   <Menu className="h-5 w-5" />
@@ -150,6 +181,7 @@ export function Header() {
                       key={item.view}
                       onClick={() => {
                         setView(item.view)
+                        setMobileOpen(false)
                       }}
                       className={`text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                         view === item.view ? "bg-accent text-accent-foreground" : "hover:bg-muted"
@@ -159,7 +191,28 @@ export function Header() {
                     </button>
                   ))}
                   <button
-                    onClick={() => setView("admin")}
+                    onClick={() => {
+                      setMobileOpen(false)
+                      scrollToAnchor("pricing")
+                    }}
+                    className="text-left px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    Rates & Pricing
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false)
+                      scrollToAnchor("faq")
+                    }}
+                    className="text-left px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    Common Questions (FAQ)
+                  </button>
+                  <button
+                    onClick={() => {
+                      setView("admin")
+                      setMobileOpen(false)
+                    }}
                     className="text-left px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted flex items-center gap-2"
                   >
                     <ShieldCheck className="h-4 w-4" /> Admin Login
