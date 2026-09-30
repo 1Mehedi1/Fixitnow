@@ -14,6 +14,16 @@ export interface ServiceItem {
   label: string
   icon: string
   desc: string
+  bgImage?: string
+}
+
+export const DEFAULT_SERVICE_IMAGES: Record<string, string> = {
+  plumbing: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=800&q=80",
+  painting: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80",
+  renovation: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80",
+  electrical: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
+  interior: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+  repair: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&w=800&q=80",
 }
 
 export interface SiteSettingsT {
@@ -47,12 +57,12 @@ export const DEFAULT_HERO_IMAGES = [
 ]
 
 const DEFAULT_SERVICES: ServiceItem[] = [
-  { key: "plumbing", label: "Plumbing", icon: "Wrench", desc: "Leaks, taps, pipes, water heaters, toilets — fixed fast and guaranteed." },
-  { key: "painting", label: "Painting", icon: "PaintRoller", desc: "HDB, condo, landed. Premium paints, neat edges, dust-free prep." },
-  { key: "renovation", label: "Renovation", icon: "Hammer", desc: "Kitchen, toilet, full-home. Design-build with trusted sub-contractors." },
-  { key: "electrical", label: "Electrical", icon: "Zap", desc: "Licensed (LEW) wiring, sockets, lighting, DB upgrades, EMA compliance." },
-  { key: "interior", label: "Interior Works", icon: "Sofa", desc: "Carpentry, built-ins, feature walls, false ceilings, lighting design." },
-  { key: "repair", label: "General Repair", icon: "Settings", desc: "Doors, locks, cabinets, tiles, grout, caulking. No job too small." },
+  { key: "plumbing", label: "Plumbing", icon: "Wrench", desc: "Leaks, taps, pipes, water heaters, toilets — fixed fast and guaranteed.", bgImage: DEFAULT_SERVICE_IMAGES.plumbing },
+  { key: "painting", label: "Painting", icon: "PaintRoller", desc: "HDB, condo, landed. Premium paints, neat edges, dust-free prep.", bgImage: DEFAULT_SERVICE_IMAGES.painting },
+  { key: "renovation", label: "Renovation", icon: "Hammer", desc: "Kitchen, toilet, full-home. Design-build with trusted sub-contractors.", bgImage: DEFAULT_SERVICE_IMAGES.renovation },
+  { key: "electrical", label: "Electrical", icon: "Zap", desc: "Licensed (LEW) wiring, sockets, lighting, DB upgrades, EMA compliance.", bgImage: DEFAULT_SERVICE_IMAGES.electrical },
+  { key: "interior", label: "Interior Works", icon: "Sofa", desc: "Carpentry, built-ins, feature walls, false ceilings, lighting design.", bgImage: DEFAULT_SERVICE_IMAGES.interior },
+  { key: "repair", label: "General Repair", icon: "Settings", desc: "Doors, locks, cabinets, tiles, grout, caulking. No job too small.", bgImage: DEFAULT_SERVICE_IMAGES.repair },
 ]
 
 export const defaultSiteConfig: SiteSettingsT = {
@@ -110,7 +120,10 @@ export async function loadSiteSettings(): Promise<SiteSettingsT> {
   try {
     const parsed = JSON.parse(row.servicesJson || "[]")
     if (Array.isArray(parsed) && parsed.length > 0) {
-      services = parsed
+      services = parsed.map((svc) => ({
+        ...svc,
+        bgImage: svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"],
+      }))
     }
   } catch {
     // keep defaults

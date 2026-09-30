@@ -72,29 +72,30 @@ export function About() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="mb-14"
+          className="mb-12"
         >
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card p-4 sm:p-8 lg:p-10 shadow-lg shadow-primary/5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-border/80">
-              <div className="flex items-center gap-3">
-                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                  <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 via-card to-emerald-950/5 p-5 sm:p-8 lg:p-10 shadow-xl shadow-emerald-500/10 animate-breathe-glow">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-border/80">
+              <div className="flex items-center gap-3.5">
+                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 shadow-md shadow-emerald-500/20">
+                  <ShieldCheck className="h-7 w-7 sm:h-8 sm:w-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Verified Singapore Entity
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 px-3 py-0.5 text-xs font-bold">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+                      Verified Singapore Entity
                     </span>
-                    <span className="text-xs text-muted-foreground hidden sm:inline">MOM & ACRA Recognized</span>
+                    <span className="text-xs font-semibold text-muted-foreground hidden sm:inline">MOM & ACRA Recognized</span>
                   </div>
-                  <h3 className="font-display text-lg sm:text-2xl font-bold tracking-tight mt-1 text-foreground">
+                  <h3 className="font-display text-xl sm:text-2xl font-black tracking-tight mt-1 text-foreground">
                     Licensed & Regulated Trade Specialist
                   </h3>
                 </div>
               </div>
-              <div className="text-left sm:text-right">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Unique Entity Number</div>
-                <div className="font-mono text-base sm:text-lg font-bold text-primary tracking-wide">{s.companyUen || "202143324G"}</div>
+              <div className="text-left sm:text-right bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-2 shrink-0">
+                <div className="text-[10px] uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-bold">Unique Entity Number</div>
+                <div className="font-mono text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 tracking-wider">{s.companyUen || "202143324G"}</div>
               </div>
             </div>
 
@@ -122,14 +123,14 @@ export function About() {
             </div>
 
             <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground">
-              <p className="max-w-2xl leading-relaxed">
+              <p className="max-w-2xl leading-relaxed font-medium">
                 All structural works, electrical installations, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by an itemized quote, transparent pricing, and a genuine 7-day workmanship warranty.
               </p>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <span className="inline-flex items-center gap-1 rounded-md bg-secondary/80 px-2.5 py-1 font-medium text-foreground text-[11px]">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 font-semibold text-emerald-800 dark:text-emerald-300 text-[11px]">
                   ✓ No Subcontractor Markup
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-secondary/80 px-2.5 py-1 font-medium text-foreground text-[11px]">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 font-semibold text-emerald-800 dark:text-emerald-300 text-[11px]">
                   ✓ Workmanship Guaranteed
                 </span>
               </div>
@@ -137,20 +138,58 @@ export function About() {
           </div>
         </motion.div>
 
-        {/* Stats band */}
+        {/* Dynamic Colorful Stats Cards */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-20"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-16"
         >
-          {stats.map((stat, i) => (
-            <Card key={i} className="border-border/60 text-center">
-              <CardContent className="p-6">
-                <stat.icon className="h-7 w-7 text-primary mx-auto mb-3" />
-                <div className="font-display text-3xl sm:text-4xl font-bold tracking-tight">{stat.val}</div>
-                <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
+          {[
+            {
+              icon: Award,
+              val: `${s.yearsExperience}+`,
+              label: "Years in business",
+              colorClass: "from-amber-500/15 via-amber-500/5 to-card border-amber-500/35 text-amber-600 dark:text-amber-400",
+              iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30",
+              accentBorder: "hover:border-amber-500/70 hover:shadow-amber-500/20",
+            },
+            {
+              icon: Wrench,
+              val: `${s.jobsCompleted}+`,
+              label: "Jobs completed",
+              colorClass: "from-emerald-500/15 via-emerald-500/5 to-card border-emerald-500/35 text-emerald-600 dark:text-emerald-400",
+              iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+              accentBorder: "hover:border-emerald-500/70 hover:shadow-emerald-500/20",
+            },
+            {
+              icon: Users,
+              val: `${s.happyClients}+`,
+              label: "Happy clients",
+              colorClass: "from-blue-500/15 via-blue-500/5 to-card border-blue-500/35 text-blue-600 dark:text-blue-400",
+              iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30",
+              accentBorder: "hover:border-blue-500/70 hover:shadow-blue-500/20",
+            },
+            {
+              icon: Heart,
+              val: `${s.rating}★`,
+              label: "Average rating",
+              colorClass: "from-purple-500/15 via-purple-500/5 to-card border-purple-500/35 text-purple-600 dark:text-purple-400",
+              iconBg: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30",
+              accentBorder: "hover:border-purple-500/70 hover:shadow-purple-500/20",
+            },
+          ].map((stat, i) => (
+            <Card
+              key={i}
+              className={`border-2 bg-gradient-to-br transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg text-center ${stat.colorClass} ${stat.accentBorder} rounded-2xl overflow-hidden`}
+            >
+              <CardContent className="p-4 sm:p-5">
+                <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl mx-auto mb-2.5 flex items-center justify-center ${stat.iconBg}`}>
+                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                </div>
+                <div className="font-display text-2xl sm:text-3xl font-black tracking-tight">{stat.val}</div>
+                <div className="text-[11px] sm:text-xs text-muted-foreground font-semibold mt-0.5">{stat.label}</div>
               </CardContent>
             </Card>
           ))}

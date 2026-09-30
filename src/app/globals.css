@@ -195,3 +195,19 @@ html, body {
   overflow-x: hidden;
   max-width: 100%;
 }
+
+/* Glowing breathing animation for verified MOM credentials */
+@keyframes breathe-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25), 0 0 20px rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.55), 0 0 40px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.9);
+  }
+}
+
+.animate-breathe-glow {
+  animation: breathe-glow 2.5s ease-in-out infinite;
+}

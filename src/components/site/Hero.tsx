@@ -1,11 +1,78 @@
 "use client"
 
+import { useEffect, useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { ArrowRight, Star, MapPin, ShieldCheck, Clock, Award, Building2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/store/useStore"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_HERO_IMAGES } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
+
+const DEFAULT_ROTATING_PHRASES = [
+  "Your home, expertly handled.",
+  "Plumbing & leaks, fixed fast.",
+  "HDB & condo painting, dust-free prep.",
+  "Full home renovation, one warranty.",
+  "Licensed electrical works, EMA compliant.",
+  "Trusted craftsmanship, islandwide service.",
+]
+
+function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) {
+  const phrases = useMemo(() => {
+    return [fallbackHeadline, ...DEFAULT_ROTATING_PHRASES.filter((p) => p !== fallbackHeadline)]
+  }, [fallbackHeadline])
+
+  const [index, setIndex] = useState(0)
+  const [displayedText, setDisplayedText] = useState(phrases[0] || "Your home, expertly handled.")
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const fullText = phrases[index] || "Your home, expertly handled."
+    let timer: NodeJS.Timeout
+
+    if (!isDeleting) {
+      if (displayedText.length < fullText.length) {
+        const delay = 50 + Math.random() * 45
+        timer = setTimeout(() => {
+          setDisplayedText(fullText.slice(0, displayedText.length + 1))
+        }, delay)
+      } else {
+        timer = setTimeout(() => {
+          setIsDeleting(true)
+        }, 2200)
+      }
+    } else {
+      if (displayedText.length > 0) {
+        const delay = 25 + Math.random() * 20
+        timer = setTimeout(() => {
+          setDisplayedText(fullText.slice(0, displayedText.length - 1))
+        }, delay)
+      } else {
+        setIsDeleting(false)
+        setIndex((prev) => (prev + 1) % phrases.length)
+      }
+    }
+
+    return () => clearTimeout(timer)
+  }, [displayedText, isDeleting, index, phrases])
+
+  const parts = displayedText.split(",")
+  const prefix = parts[0]
+  const suffix = parts.slice(1).join(",").trim()
+
+  return (
+    <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.15] sm:leading-[1.05] break-words min-h-[2.4em] sm:min-h-[2.2em]">
+      <span>{prefix}{parts.length > 1 ? "," : ""}</span>
+      {parts.length > 1 && (
+        <>
+          {" "}<br className="hidden xs:inline" />
+          <span className="gradient-text">{suffix}</span>
+        </>
+      )}
+      <span className="inline-block w-[3px] sm:w-[4px] h-[0.85em] bg-primary ml-1.5 align-baseline animate-pulse shadow-xs shadow-primary" />
+    </h1>
+  )
+}
 
 export function Hero() {
   const { setView } = useStore()
@@ -29,9 +96,9 @@ export function Hero() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full"
           >
-            {/* Top badges: rating + 4R Engineering license badge */}
-            <div className="flex flex-wrap items-center gap-2 w-full">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-2.5 sm:px-3 py-1 text-xs font-medium text-foreground/80 shadow-2xs shrink-0">
+            {/* Top badges: rating + glowing breathing MOM license card box */}
+            <div className="flex flex-wrap items-center gap-3 w-full">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-3 py-1.5 text-xs font-semibold text-foreground/80 shadow-2xs shrink-0 hover:border-primary/40 hover:scale-105 transition-all">
                 <span className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
@@ -42,29 +109,33 @@ export function Hero() {
                 <span className="text-[11px] sm:text-xs">{s.happyClients}+ happy clients</span>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-medium text-emerald-800 dark:text-emerald-300 max-w-full">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="truncate">MOM Licensed · {s.companyName}</span>
+              {/* Glowing, breathing, high-contrast MOM license card box */}
+              <div className="relative inline-flex items-center gap-2 rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-teal-500/15 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-200 shadow-lg shadow-emerald-500/20 animate-breathe-glow transition-all hover:scale-[1.03] cursor-default max-w-full">
+                <div className="relative flex items-center justify-center shrink-0">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </div>
+                <ShieldCheck className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate">
+                  MOM Licensed · <span className="font-black underline decoration-emerald-500/50 underline-offset-2">{s.companyName}</span>
+                </span>
               </div>
             </div>
 
-            {/* Headline */}
+            {/* Headline with Typewriter animation */}
             <div className="space-y-2 sm:space-y-3 w-full min-w-0">
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.15] sm:leading-[1.05] break-words">
-                {s.heroHeadline.split(",")[0]},{" "}<br className="hidden xs:inline" />
-                <span className="gradient-text">{s.heroHeadline.split(",")[1]?.trim() || "expertly handled."}</span>
-              </h1>
+              <TypewriterHeadline fallbackHeadline={s.heroHeadline} />
               <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-xl text-pretty leading-relaxed break-words">
                 {s.heroSubtext} <span className="font-semibold text-foreground">{s.yearsExperience} years</span> experience. <span className="font-semibold text-foreground">{s.jobsCompleted}+ jobs</span> completed across Singapore.
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full">
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button
                 asChild
                 size="lg"
-                className="bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm sm:text-base h-11 sm:h-12 px-6 shadow-md shadow-[#25D366]/25 w-full sm:w-auto"
+                className="bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm sm:text-base h-12 sm:h-13 px-7 shadow-lg shadow-[#25D366]/30 hover:shadow-xl hover:shadow-[#25D366]/45 hover:scale-[1.03] active:scale-95 transition-all duration-200 w-full sm:w-auto font-bold cursor-pointer"
               >
                 <a
                   href={whatsappLink(s, `Hi ${s.workerName}, I saw your website and would like a quote.`)}
@@ -85,7 +156,7 @@ export function Hero() {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-sm sm:text-base h-11 sm:h-12 px-6 w-full sm:w-auto"
+                className="text-sm sm:text-base h-12 sm:h-13 px-7 w-full sm:w-auto font-bold border-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:text-primary hover:scale-[1.03] hover:shadow-md hover:shadow-primary/15 active:scale-95 transition-all duration-200 cursor-pointer"
                 onClick={() => setView("portfolio")}
               >
                 View Selected Work

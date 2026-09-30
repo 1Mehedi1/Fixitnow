@@ -43,38 +43,44 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-xl ${
         scrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm"
-          : "bg-transparent"
+          ? "bg-background/90 border-b border-border shadow-md shadow-black/5"
+          : "bg-background/80 border-b border-border/60 shadow-xs"
       }`}
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left">
+          <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left cursor-pointer transition-transform hover:scale-[1.02]">
             <BrandLogo size="md" />
-            <div className="text-left leading-none">
-              <div className="font-display font-bold text-base tracking-tight group-hover:text-primary transition-colors">{s.brand}</div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{s.tagline}</div>
+            <div className="text-left leading-tight">
+              <div className="font-display font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-amber-600 via-primary to-amber-500 bg-clip-text text-transparent group-hover:from-primary group-hover:to-amber-400 transition-all duration-300 drop-shadow-xs">
+                {s.brand}
+              </div>
+              <div className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-[0.22em] text-foreground/80 dark:text-foreground/90 transition-colors">
+                {s.tagline}
+              </div>
             </div>
           </button>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1.5">
             {NAV.map((item) => (
               <button
                 key={item.view}
                 onClick={() => setView(item.view)}
-                className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-                  view === item.view ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                className={`relative px-4 py-2 text-sm font-bold tracking-wide transition-all duration-200 rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary active:scale-95 ${
+                  view === item.view
+                    ? "text-primary font-black bg-primary/10 shadow-xs"
+                    : "text-foreground/85 hover:text-primary"
                 }`}
               >
                 {item.label}
                 {view === item.view && (
                   <motion.div
                     layoutId="nav-active"
-                    className="absolute inset-x-3 -bottom-0.5 h-0.5 bg-primary rounded-full"
+                    className="absolute inset-x-3 -bottom-0.5 h-0.5 bg-primary rounded-full shadow-xs shadow-primary/50"
                   />
                 )}
               </button>
@@ -89,21 +95,26 @@ export function Header() {
                 size="icon"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 aria-label="Toggle theme"
-                className="rounded-full"
+                className="rounded-full hover:bg-primary/15 hover:text-primary hover:scale-110 active:scale-90 transition-all duration-200 border border-transparent hover:border-primary/25 cursor-pointer"
               >
                 {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
             )}
 
             <a href={`tel:${s.phone.replace(/\s/g, "")}`}>
-              <Button variant="ghost" size="icon" className="hidden sm:flex rounded-full" aria-label="Call">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden sm:flex rounded-full hover:bg-primary/15 hover:text-primary hover:scale-110 active:scale-90 transition-all duration-200 border border-transparent hover:border-primary/25 cursor-pointer"
+                aria-label="Call"
+              >
                 <Phone className="h-4 w-4" />
               </Button>
             </a>
 
             <Button
               asChild
-              className="hidden sm:flex bg-[#25D366] hover:bg-[#1ebe5d] text-white"
+              className="hidden sm:flex bg-[#25D366] hover:bg-[#1ebe5d] hover:scale-105 active:scale-95 shadow-md shadow-[#25D366]/25 hover:shadow-lg hover:shadow-[#25D366]/40 transition-all duration-200 font-bold cursor-pointer text-white"
             >
               <a
                 href={whatsappLink(s, `Hi ${s.workerName}, I'd like to discuss a job.`)}

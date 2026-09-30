@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { defaultSiteConfig, type ServiceItem } from "@/lib/site"
+import { defaultSiteConfig, type ServiceItem, DEFAULT_SERVICE_IMAGES } from "@/lib/site"
 
 const ICON_OPTIONS = [
   "Wrench", "PaintRoller", "Hammer", "Zap", "Sofa", "Settings",
@@ -147,6 +147,26 @@ export function SettingsManager() {
     }
   }
 
+  const handleServiceFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const fd = new FormData()
+    fd.append("file", file)
+    const tId = toast.loading(`Uploading background for "${form.services[index]?.label || `Service ${index + 1}`}"...`)
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const data = await res.json()
+      if (data.url) {
+        updateService(index, "bgImage", data.url)
+        toast.success(`Background image uploaded!`, { id: tId })
+      } else {
+        throw new Error(data.error || "Upload failed")
+      }
+    } catch (err: any) {
+      toast.error("Upload failed", { description: err.message, id: tId })
+    }
+  }
+
   const updateService = (i: number, key: keyof ServiceItem, value: string) => {
     const next = [...form.services]
     next[i] = { ...next[i], [key]: value }
@@ -158,7 +178,13 @@ export function SettingsManager() {
       ...form,
       services: [
         ...form.services,
-        { key: `svc-${Date.now()}`, label: "New Service", icon: "Wrench", desc: "Describe this service." },
+        {
+          key: `svc-${Date.now()}`,
+          label: "New Service",
+          icon: "Wrench",
+          desc: "Describe this service.",
+          bgImage: DEFAULT_SERVICE_IMAGES["repair"],
+        },
       ],
     })
   }
@@ -414,6 +440,45 @@ export function SettingsManager() {
                   rows={2}
                   placeholder="Short description of this service."
                 />
+              </div>
+
+              {/* Service Card Background Image */}
+              <div className="border border-border/70 rounded-lg p-3 bg-muted/40 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <ImageIcon className="h-3.5 w-3.5 text-primary" /> Card Background Image
+                  </span>
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Upload image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleServiceFileUpload(i, e)}
+                    />
+                  </label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-14 w-20 rounded-md overflow-hidden border border-border bg-black/60 flex-shrink-0 relative">
+                    <img
+                      src={svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"]}
+                      alt={svc.label}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <Input
+                      value={svc.bgImage || ""}
+                      onChange={(e) => updateService(i, "bgImage", e.target.value)}
+                      placeholder={DEFAULT_SERVICE_IMAGES[svc.key] || "https://images.unsplash.com/..."}
+                      className="text-xs h-9 font-mono"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Paste an image URL or upload directly. Leave empty to use the curated default.
+                    </p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}

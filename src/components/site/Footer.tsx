@@ -34,7 +34,7 @@ export function Footer() {
               Send me a WhatsApp message with a photo and I'll get back to you within the hour.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-7">
-              <Button asChild size="lg" className="bg-[#25D366] hover:bg-[#1ebe5d] text-white h-12 px-7">
+              <Button asChild size="lg" className="bg-[#25D366] hover:bg-[#1ebe5d] text-white h-12 px-7 shadow-lg shadow-[#25D366]/30 hover:scale-105 active:scale-95 transition-all duration-200 font-bold">
                 <a
                   href={whatsappLink(s, `Hi ${s.workerName}, I'd like to start a job. Here are the details:`)}
                   target="_blank"
@@ -53,8 +53,7 @@ export function Footer() {
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="h-12 px-7 border-white/30 text-background hover:bg-white/10 hover:text-background"
+                className="h-12 px-7 border-2 border-white/60 bg-white/10 backdrop-blur-md text-white hover:bg-white hover:text-black font-bold transition-all duration-200 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
                 onClick={() => setView("portfolio")}
               >
                 Browse my work
