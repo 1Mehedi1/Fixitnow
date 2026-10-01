@@ -16,6 +16,15 @@ const ICONS: Record<string, LucideIcon> = {
   Settings,
 }
 
+const CARD_GRADIENTS = [
+  "bg-gradient-to-br from-white via-rose-500/[0.03] to-amber-500/[0.04] dark:from-[#281819] dark:via-[#1e1416] dark:to-[#161113] border-border/80 dark:border-rose-900/35",
+  "bg-gradient-to-br from-white via-amber-500/[0.03] to-yellow-500/[0.04] dark:from-[#261c15] dark:via-[#1e1612] dark:to-[#16120f] border-border/80 dark:border-amber-900/35",
+  "bg-gradient-to-br from-white via-slate-500/[0.03] to-slate-500/[0.05] dark:from-[#1b222d] dark:via-[#161b23] dark:to-[#111419] border-border/80 dark:border-slate-700/40",
+  "bg-gradient-to-br from-white via-orange-500/[0.03] to-amber-500/[0.04] dark:from-[#271d15] dark:via-[#1e1712] dark:to-[#17130f] border-border/80 dark:border-amber-900/40",
+  "bg-gradient-to-br from-white via-sky-500/[0.03] to-sky-500/[0.05] dark:from-[#1d222b] dark:via-[#171a22] dark:to-[#12141a] border-border/80 dark:border-slate-700/40",
+  "bg-gradient-to-br from-white via-emerald-500/[0.03] to-teal-500/[0.04] dark:from-[#17241e] dark:via-[#131d18] dark:to-[#0e1612] border-border/80 dark:border-emerald-900/35",
+]
+
 export function Services() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   return (
@@ -44,6 +53,7 @@ export function Services() {
           {s.services.map((svc, i) => {
             const Icon = ICONS[svc.icon] || Wrench
             const bgUrl = svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"]
+            const cardGrad = CARD_GRADIENTS[i % CARD_GRADIENTS.length]
 
             return (
               <motion.div
@@ -55,7 +65,7 @@ export function Services() {
                 whileHover={{ y: -5 }}
                 className="h-full"
               >
-                <div className="group relative h-full min-h-[220px] sm:min-h-[235px] rounded-2xl overflow-hidden border border-border/80 dark:border-white/10 bg-card p-5 sm:p-6 shadow-sm hover:shadow-2xl hover:border-amber-400/50 hover:shadow-amber-500/10 transition-all duration-500 flex flex-col justify-between">
+                <div className={`group relative h-full min-h-[220px] sm:min-h-[235px] rounded-2xl overflow-hidden border ${cardGrad} p-5 sm:p-6 shadow-sm hover:shadow-2xl hover:border-amber-400/60 hover:shadow-amber-500/10 transition-all duration-500 flex flex-col justify-between`}>
                   {/* Side-view image that expands to full background on hover, and returns to side on hover out */}
                   <div className="absolute right-3.5 top-3.5 bottom-3.5 w-28 sm:w-36 rounded-xl overflow-hidden shadow-xs transition-all duration-500 ease-out group-hover:top-0 group-hover:right-0 group-hover:bottom-0 group-hover:left-0 group-hover:w-full group-hover:h-full group-hover:rounded-2xl z-0 pointer-events-none">
                     <img

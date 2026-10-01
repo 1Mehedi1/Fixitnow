@@ -73,7 +73,7 @@ export function ComparisonTable() {
                 <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 flex items-start gap-2.5 text-xs font-semibold text-foreground">
                   <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-primary font-bold mr-1">Fixitnow (Direct):</span>
+                    <span className="text-primary font-bold mr-1">{s.brand} (Direct):</span>
                     {row.fixitnow}
                   </div>
                 </div>
@@ -98,7 +98,7 @@ export function ComparisonTable() {
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 w-1/3">
                     <span className="flex items-center gap-1.5">
-                      <UserCheck className="h-4 w-4" /> Fixitnow (Direct)
+                      <UserCheck className="h-4 w-4" /> {s.brand} (Direct)
                     </span>
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">

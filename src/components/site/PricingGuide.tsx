@@ -204,7 +204,7 @@ export function PricingGuide() {
                   <ShieldCheck className="h-5 w-5" />
                 </div>
                 <h4 className="font-display font-black text-base sm:text-lg text-foreground">
-                  What is always included in every Fixitnow quote?
+                  What is always included in every {s.brand} quote?
                 </h4>
               </div>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm text-foreground/85 pt-1">

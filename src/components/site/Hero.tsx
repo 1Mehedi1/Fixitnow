@@ -126,27 +126,27 @@ export function Hero() {
               <motion.div
                 id="hero-rating-badge"
                 animate={badge1Controls}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 backdrop-blur px-3 py-1.5 text-xs font-semibold text-foreground/80 shadow-2xs shrink-0 hover:border-primary/40 hover:scale-105 transition-all"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-amber-500/40 bg-card/95 dark:bg-[#201e28] px-3.5 py-1.5 text-xs sm:text-sm font-bold text-foreground shadow-sm shrink-0 hover:border-amber-500/70 hover:scale-105 transition-all"
               >
                 <span className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
+                    <Star key={i} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                   ))}
                 </span>
-                <span className="font-bold text-foreground">{s.rating}</span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-[11px] sm:text-xs">{s.happyClients}+ happy clients</span>
+                <span className="font-black text-foreground text-xs sm:text-sm">4.5</span>
+                <span className="text-muted-foreground/60 font-bold">·</span>
+                <span className="text-xs sm:text-sm font-extrabold text-foreground/90">{s.happyClients || 320}+ happy clients</span>
               </motion.div>
 
-              {/* Professional MOM license badge without outline — natural breathing (shrink & expand) */}
+              {/* Professional MOM license badge — brighter, high-contrast, natural breathing (shrink & expand) */}
               <div
                 id="hero-license-badge"
-                className="animate-breathe inline-flex items-center gap-2 rounded-xl bg-emerald-500/15 dark:bg-emerald-950/40 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-300 shadow-xs cursor-default"
+                className="animate-breathe inline-flex items-center gap-2 rounded-xl bg-emerald-500/20 dark:bg-emerald-500/25 border-2 border-emerald-500/40 dark:border-emerald-400/40 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-200 shadow-sm cursor-default"
               >
-                <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-300 shrink-0" />
                 <span className="truncate">
                   MOM Licensed ·{" "}
-                  <span className="font-bold">
+                  <span className="font-black text-emerald-950 dark:text-emerald-100">
                     <span id="hero-license-4r">4R</span>
                     {s.companyName.startsWith("4R") ? s.companyName.slice(2) : ` ${s.companyName}`}
                   </span>

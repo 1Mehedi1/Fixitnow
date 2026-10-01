@@ -22,12 +22,18 @@ interface ConstructionTruckAnimationProps {
 export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruckAnimationProps) {
   const [mounted, setMounted] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
+  const [isEligible, setIsEligible] = useState(false)
   
   // Animation Phase:
   // "idle" -> "dropping" -> "driving" -> "struggling" -> "coughing" -> "walking" -> "waving"
   const [phase, setPhase] = useState<
     "idle" | "dropping" | "driving" | "struggling" | "coughing" | "walking" | "waving"
   >("idle")
+  const phaseRef = useRef<string>("idle")
+
+  useEffect(() => {
+    phaseRef.current = phase
+  }, [phase])
 
   const [wheelAngle, setWheelAngle] = useState(0)
   const [phrase, setPhrase] = useState("On the way! ⚡")
@@ -54,6 +60,7 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
   const phraseIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Measure exact coordinates between navbar logo, badges, and the "4R" text
+  // CRITICAL: Verifies both badges are side-by-side on the same row. If wrapped or stacked, returns null!
   const measureCoordinates = useCallback(() => {
     if (typeof window === "undefined") return null
 
@@ -63,13 +70,22 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     const badge2El = document.getElementById("hero-license-badge")
     const badge4rEl = document.getElementById("hero-license-4r")
 
-    if (!trackEl || !badge1El) return null
+    if (!trackEl || !badge1El || !badge2El) return null
 
     const trackRect = trackEl.getBoundingClientRect()
     const badge1Rect = badge1El.getBoundingClientRect()
-    const badge2Rect = badge2El ? badge2El.getBoundingClientRect() : null
+    const badge2Rect = badge2El.getBoundingClientRect()
     const logoRect = logoEl ? logoEl.getBoundingClientRect() : null
     const fourRRect = badge4rEl ? badge4rEl.getBoundingClientRect() : null
+
+    // Check if badges are side-by-side:
+    // They must be on the same horizontal row (vertical offset < 14px) and badge2 must be to the right of badge1.
+    // If the screen narrows and badge2 wraps below badge1, this returns false immediately!
+    const areSideBySide =
+      Math.abs(badge1Rect.top - badge2Rect.top) < 14 &&
+      badge2Rect.left >= (badge1Rect.right - 15)
+
+    if (!areSideBySide) return null
 
     // Mechanical truck dimensions (larger, heavier)
     const truckWidth = 84
@@ -91,22 +107,16 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     const landingY = badge1Rect.top - trackRect.top - truckHeight + 6
 
     // Right edge of Badge 2
-    const edgeX = badge2Rect
-      ? badge2Rect.left - trackRect.left + badge2Rect.width - truckWidth + 6
-      : badge1Rect.left - trackRect.left + badge1Rect.width - truckWidth + 6
-    const edgeY = badge2Rect
-      ? badge2Rect.top - trackRect.top - truckHeight + 6
-      : landingY
+    const edgeX = badge2Rect.left - trackRect.left + badge2Rect.width - truckWidth + 6
+    const edgeY = badge2Rect.top - trackRect.top - truckHeight + 6
 
     // Resting place for the handyman on Badge 2, EXACTLY right above the word "4R"!
     const manRestX = fourRRect
       ? fourRRect.left - trackRect.left + (fourRRect.width - manWidth) / 2
-      : (badge2Rect ? badge2Rect.left - trackRect.left + 36 : landingX + 40)
-    const manRestY = badge2Rect
-      ? badge2Rect.top - trackRect.top - manHeight + 6
-      : landingY - 24
+      : badge2Rect.left - trackRect.left + 36
+    const manRestY = badge2Rect.top - trackRect.top - manHeight + 6
 
-    return { startX, startY, landingX, landingY, edgeX, edgeY, manRestX, manRestY, manWidth, manHeight }
+    return { startX, startY, landingX, landingY, edgeX, edgeY, manRestX, manRestY, manWidth, manHeight, areSideBySide: true }
   }, [])
 
   // Canvas loop: bold, heavy spreading and vaporizing white diesel smoke
@@ -212,6 +222,53 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     }
   }, [isDesktop])
 
+  // Dynamic Layout & Resize Observer:
+  // Automatically detects when window shrinks, screen zooms, or badges wrap vertically.
+  // If badges wrap, hides animation immediately. If side-by-side, recalculates positions smoothly!
+  useEffect(() => {
+    if (!mounted) return
+
+    const evaluateLayout = () => {
+      if (typeof window === "undefined") return
+      const desktop = window.innerWidth >= 768
+      setIsDesktop(desktop)
+      if (!desktop) {
+        setIsEligible(false)
+        return
+      }
+
+      const c = measureCoordinates()
+      if (!c) {
+        setIsEligible(false)
+        return
+      }
+
+      setIsEligible(true)
+
+      // If animation has reached resting waving pose, keep truck and handyman perfectly synced
+      if (phaseRef.current === "waving") {
+        manControls.set({ x: c.manRestX, y: c.manRestY })
+        phraseControls.set({ x: c.manRestX - 28, y: c.manRestY - 44 })
+        truckControls.set({ x: c.edgeX, y: c.edgeY })
+      }
+    }
+
+    evaluateLayout()
+    window.addEventListener("resize", evaluateLayout)
+
+    const trackEl = document.getElementById("hero-badges-track")
+    let ro: ResizeObserver | null = null
+    if (trackEl && typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(evaluateLayout)
+      ro.observe(trackEl)
+    }
+
+    return () => {
+      window.removeEventListener("resize", evaluateLayout)
+      if (ro) ro.disconnect()
+    }
+  }, [mounted, measureCoordinates, manControls, phraseControls, truckControls])
+
   // Master Animation Sequence - Replays on Every Page Refresh on Desktop!
   useEffect(() => {
     setMounted(true)
@@ -223,7 +280,11 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
 
     const timer = setTimeout(async () => {
       const c = measureCoordinates()
-      if (!c || cancelled) return
+      if (!c || cancelled) {
+        setIsEligible(false)
+        return
+      }
+      setIsEligible(true)
 
       // --- PHASE 1: THE DROP & HEAVY SPRING IMPACT ---
       setPhase("dropping")
@@ -498,8 +559,8 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     }
   }, [isDesktop, measureCoordinates, truckControls, manControls, waveControls, phraseControls, badge1Controls])
 
-  // DESKTOP ONLY: If not desktop or not mounted, render nothing!
-  if (!mounted || !isDesktop) return null
+  // DESKTOP & SIDE-BY-SIDE ONLY: If not desktop, not mounted, or badges wrapped, render nothing!
+  if (!mounted || !isDesktop || !isEligible) return null
 
   return (
     <div className="hidden md:block absolute inset-0 pointer-events-none z-30 overflow-visible">
@@ -779,16 +840,48 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
           <rect x="14" y="42.5" width="5.5" height="3" rx="1" fill="#451A03" />
 
           {/* Left Arm Resting at Side */}
-          <path d="M8.5 20 L6.5 28 L7.5 30" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" />
-          <circle cx="7.5" cy="30" r="1.2" fill="#FDE047" />
+          <path d="M7.5 19.5 L5 25 L5.5 30" stroke="#EA580C" strokeWidth="3.2" strokeLinecap="round" />
+          <line x1="5.5" y1="23.5" x2="6.8" y2="24" stroke="#F8FAFC" strokeWidth="1.2" />
+          <circle cx="5.5" cy="30.5" r="1.5" fill="#FEF08A" stroke="#D97706" strokeWidth="0.6" />
 
-          {/* Right Arm: Raising & Waving Warmly at the Visitor! */}
-          <g transform="translate(19, 20)">
-            <motion.g animate={waveControls}>
-              <path d="M0.5 0 L4 -5 L5 -11" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" />
-              {/* Waving Hand with Work Glove */}
-              <circle cx="5" cy="-11.5" r="2" fill="#F8FAFC" stroke="#F59E0B" strokeWidth="0.6" />
-              <line x1="5" y1="-13" x2="6" y2="-15" stroke="#F8FAFC" strokeWidth="1" strokeLinecap="round" />
+          {/* Right Arm: Securely Attached Shoulder, Sleeve & Smooth Waving Glove */}
+          {/* Permanent Seamless Shoulder Pad attached to Orange Vest */}
+          <circle cx="20" cy="19.5" r="2.2" fill="#EA580C" />
+          {/* Upper Arm Sleeve with Reflective Stripe extending up to elbow */}
+          <path d="M20 19.5 L23.5 14" stroke="#EA580C" strokeWidth="3.4" strokeLinecap="round" />
+          <line x1="21.5" y1="16.8" x2="23" y2="15.2" stroke="#F8FAFC" strokeWidth="1.2" />
+          {/* Elbow Joint Cap */}
+          <circle cx="23.5" cy="14" r="1.8" fill="#EA580C" />
+
+          {/* Forearm & Waving Glove pivots smoothly around the elbow at (23.5, 14) */}
+          <g transform="translate(23.5, 14)">
+            <motion.g animate={waveControls} style={{ transformOrigin: "0px 0px" }}>
+              {/* Forearm sleeve */}
+              <path d="M0 0 L1 -6" stroke="#EA580C" strokeWidth="3.2" strokeLinecap="round" />
+              {/* Silver reflective wrist cuff */}
+              <line x1="-0.2" y1="-5.5" x2="2.2" y2="-5.5" stroke="#F8FAFC" strokeWidth="1.2" />
+              
+              {/* Detailed 5-Finger Work Glove with Thumb and Palm */}
+              {/* Glove Palm */}
+              <path
+                d="M-0.6 -7 Q1 -6.2 2.6 -7.2 Q3.6 -8.2 3.2 -10.2 Q2.6 -11.6 1 -11 Q-0.6 -10.5 -0.6 -7 Z"
+                fill="#FEF08A"
+                stroke="#D97706"
+                strokeWidth="0.7"
+              />
+              {/* Glove Thumb */}
+              <path
+                d="M-0.5 -8 Q-2.4 -9.2 -1.4 -11.2 Q-0.4 -10.4 0.3 -8.8"
+                fill="#FEF08A"
+                stroke="#D97706"
+                strokeWidth="0.7"
+                strokeLinecap="round"
+              />
+              {/* 4 Waving Fingers */}
+              <path d="M0.2 -11 L0.2 -14" stroke="#D97706" strokeWidth="1.1" strokeLinecap="round" />
+              <path d="M1.3 -11.2 L1.3 -14.8" stroke="#D97706" strokeWidth="1.1" strokeLinecap="round" />
+              <path d="M2.3 -11 L2.3 -14.2" stroke="#D97706" strokeWidth="1.1" strokeLinecap="round" />
+              <path d="M3.2 -10.2 L3.4 -13" stroke="#D97706" strokeWidth="1.1" strokeLinecap="round" />
             </motion.g>
           </g>
         </svg>

@@ -114,78 +114,78 @@ export function About() {
             ))}
           </div>
 
-          {/* Celebratory breathing card with rich champagne/amber/emerald tones */}
-          <div className="relative overflow-visible rounded-2xl sm:rounded-3xl animate-celebrate-card border-2 border-amber-500/35 dark:border-amber-400/30 bg-gradient-to-br from-amber-500/[0.09] via-emerald-500/[0.04] to-yellow-500/[0.09] dark:from-[#23202b] dark:via-[#1e2324] dark:to-[#252029] p-6 sm:p-8 lg:p-10 shadow-lg shadow-amber-500/10">
-            {/* Ambient inner celebratory glow */}
-            <div className="absolute top-0 right-1/4 w-80 h-32 bg-amber-400/10 dark:bg-amber-400/5 blur-3xl pointer-events-none" />
+          {/* Celebratory breathing card with slight greenish award-winning vibe in both day and night mode */}
+          <div className="relative overflow-visible rounded-2xl sm:rounded-3xl animate-celebrate-card border-2 border-emerald-600/40 dark:border-emerald-400/50 bg-gradient-to-br from-emerald-500/[0.14] via-teal-500/[0.08] to-emerald-600/[0.15] dark:from-[#0d2317] dark:via-[#12281b] dark:to-[#0a1c12] p-6 sm:p-8 lg:p-10 shadow-xl shadow-emerald-500/10 dark:shadow-[0_8px_35px_rgba(16,185,129,0.22)]">
+            {/* Ambient inner celebratory emerald glow */}
+            <div className="absolute top-0 right-1/4 w-80 h-32 bg-emerald-400/20 dark:bg-emerald-400/15 blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-amber-500/20 dark:border-amber-400/20">
+            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-emerald-600/25 dark:border-emerald-400/25">
               <div className="flex items-center gap-3.5">
-                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-amber-500/25 to-emerald-500/25 border border-amber-500/35 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 shadow-sm">
+                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border-2 border-emerald-600/40 dark:border-emerald-400/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 shrink-0 shadow-md">
                   <ShieldCheck className="h-7 w-7 sm:h-8 sm:w-8" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* Celebratory badge with golden sheen */}
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500/25 via-yellow-400/20 to-amber-500/25 text-amber-900 dark:text-amber-200 border border-amber-500/40 px-3.5 py-1 text-xs font-black shadow-xs">
-                      <span className="text-amber-500 text-sm">🏆</span>
+                    {/* Award-winning celebratory badge */}
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-400 text-white dark:text-slate-950 border border-emerald-500/40 px-3.5 py-1 text-xs font-black shadow-sm">
+                      <span className="text-amber-300 dark:text-amber-800 text-sm">🏆</span>
                       Verified Singapore Entity
                     </span>
-                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                    <span className="text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-500/20 dark:bg-emerald-500/25 border border-emerald-600/30 dark:border-emerald-400/40 px-2.5 py-0.5 rounded-full">
                       MOM & ACRA Recognized
                     </span>
                   </div>
-                  <h3 className="font-display text-lg sm:text-2xl font-black tracking-tight mt-1 text-foreground">
+                  <h3 className="font-display text-lg sm:text-2xl font-black tracking-tight mt-1 text-emerald-950 dark:text-white">
                     Licensed & Regulated Trade Specialist
                   </h3>
                 </div>
               </div>
-              <div className="text-left sm:text-right bg-gradient-to-r from-amber-500/15 via-yellow-400/10 to-amber-500/15 border-2 border-amber-500/35 rounded-xl px-4 py-2 shrink-0 shadow-xs">
-                <div className="text-[10px] uppercase tracking-wider text-amber-800 dark:text-amber-300 font-extrabold">Unique Entity Number</div>
-                <div className="font-mono text-base sm:text-lg font-black text-foreground tracking-wider">{s.companyUen || "202143324G"}</div>
+              <div className="text-left sm:text-right bg-emerald-500/15 dark:bg-[#153422] border-2 border-emerald-600/40 dark:border-emerald-400/50 rounded-xl px-4 py-2 shrink-0 shadow-sm">
+                <div className="text-[10px] uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-extrabold">Unique Entity Number</div>
+                <div className="font-mono text-base sm:text-lg font-black text-emerald-950 dark:text-emerald-100 tracking-wider">{s.companyUen || "202143324G"}</div>
               </div>
             </div>
 
-            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 py-5 border-b border-amber-500/20 dark:border-amber-400/20">
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 py-5 border-b border-emerald-600/25 dark:border-emerald-400/25">
               <div className="space-y-1">
-                <div className="text-xs text-amber-700 dark:text-amber-300/80 uppercase tracking-wider font-bold">Registered Company</div>
+                <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Registered Company</div>
                 <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.companyName || "4R ENGINEERING PTE. LTD."}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-emerald-500 font-bold">✓</span> Singapore ACRA Registered
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> Singapore ACRA Registered
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-amber-700 dark:text-amber-300/80 uppercase tracking-wider font-bold">Lead Trade Specialist</div>
+                <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Lead Trade Specialist</div>
                 <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.workerName || "Ahmed Mohammod Tanbir"}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-emerald-500 font-bold">✓</span> MOM Construction Authorized
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> MOM Construction Authorized
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-amber-700 dark:text-amber-300/80 uppercase tracking-wider font-bold">Regulatory Authority</div>
+                <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Regulatory Authority</div>
                 <div className="font-display font-bold text-foreground text-sm sm:text-base">Ministry of Manpower (MOM)</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-emerald-500 font-bold">✓</span> EFMA Compliant & Regulated
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> EFMA Compliant & Regulated
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-amber-700 dark:text-amber-300/80 uppercase tracking-wider font-bold">Trade Capabilities</div>
+                <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Trade Capabilities</div>
                 <div className="font-display font-bold text-foreground text-sm sm:text-base">Electrical · Plumbing · Renovation</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-emerald-500 font-bold">✓</span> BCA & Safety Code Compliant
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> BCA & Safety Code Compliant
                 </div>
               </div>
             </div>
 
             <div className="relative z-10 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground">
-              <p className="max-w-2xl leading-relaxed text-foreground/80">
+              <p className="max-w-2xl leading-relaxed text-foreground/85">
                 All structural works, electrical installations, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by itemized quotes and genuine workmanship warranty.
               </p>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 dark:bg-amber-400/15 border border-amber-500/25 px-2.5 py-1 font-bold text-amber-900 dark:text-amber-200 text-[11px]">
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 dark:bg-emerald-400/20 border border-emerald-600/30 dark:border-emerald-400/40 px-2.5 py-1 font-bold text-emerald-950 dark:text-emerald-200 text-[11px]">
                   ✨ Direct SG Execution
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-500/25 px-2.5 py-1 font-bold text-emerald-800 dark:text-emerald-200 text-[11px]">
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 dark:bg-emerald-400/20 border border-emerald-600/30 dark:border-emerald-400/40 px-2.5 py-1 font-bold text-emerald-950 dark:text-emerald-200 text-[11px]">
                   🛡️ Workmanship Guaranteed
                 </span>
               </div>
@@ -238,24 +238,24 @@ export function About() {
           </div>
         </motion.div>
 
-        {/* Trust grid */}
-        <div className="grid sm:grid-cols-2 gap-5 mb-16">
+        {/* Trust grid — Smaller, sleeker, compact cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mb-14">
           {trustPoints.map((t, i) => (
             <motion.div
               key={t.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
+              transition={{ duration: 0.45, delay: i * 0.06 }}
             >
-              <Card className="h-full border-border/60 hover:border-primary/40 hover:shadow-md transition-all">
-                <CardContent className="p-6 flex gap-4">
-                  <div className="shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <t.icon className="h-5 w-5" />
+              <Card className="h-full border border-border/80 dark:border-white/10 bg-card/95 hover:border-emerald-500/50 hover:shadow-md transition-all">
+                <CardContent className="p-4 sm:p-4.5 flex flex-col gap-2.5">
+                  <div className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <t.icon className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-base mb-1.5">{t.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{t.body}</p>
+                    <h3 className="font-display font-bold text-sm text-foreground mb-1 leading-snug">{t.title}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{t.body}</p>
                   </div>
                 </CardContent>
               </Card>

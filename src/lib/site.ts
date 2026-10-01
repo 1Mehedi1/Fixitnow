@@ -114,7 +114,7 @@ const DEFAULT_SERVICES: ServiceItem[] = [
 ]
 
 export const defaultSiteConfig: SiteSettingsT = {
-  brand: process.env.NEXT_PUBLIC_BRAND || "Ahmad HomeWorks",
+  brand: process.env.NEXT_PUBLIC_BRAND || "Fixitnow",
   tagline: "Singapore's Trusted Handyman",
   workerName: process.env.NEXT_PUBLIC_WORKER_NAME || "Ahmad Rahman",
   phone: process.env.NEXT_PUBLIC_PHONE || "+65 9123 4567",
@@ -124,7 +124,7 @@ export const defaultSiteConfig: SiteSettingsT = {
   yearsExperience: 12,
   jobsCompleted: 540,
   happyClients: 320,
-  rating: 4.9,
+  rating: 4.5,
   heroHeadline: "Your home, expertly handled.",
   heroSubtext:
     "Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works.",
