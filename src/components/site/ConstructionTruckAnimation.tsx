@@ -30,11 +30,14 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
   >("idle")
 
   const [wheelAngle, setWheelAngle] = useState(0)
+  const [phrase, setPhrase] = useState("On the way! ⚡")
+  const [phraseVisible, setPhraseVisible] = useState(false)
 
   // Motion controls
   const truckControls = useAnimation()
   const manControls = useAnimation()
   const waveControls = useAnimation()
+  const phraseControls = useAnimation()
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
@@ -48,8 +51,9 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     smokeIntensity: "none",
   })
   const animFrameRef = useRef<number | null>(null)
+  const phraseIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Measure exact coordinates between navbar logo and badges
+  // Measure exact coordinates between navbar logo, badges, and the "4R" text
   const measureCoordinates = useCallback(() => {
     if (typeof window === "undefined") return null
 
@@ -57,6 +61,7 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     const logoEl = document.getElementById("navbar-brand-logo")
     const badge1El = document.getElementById("hero-rating-badge")
     const badge2El = document.getElementById("hero-license-badge")
+    const badge4rEl = document.getElementById("hero-license-4r")
 
     if (!trackEl || !badge1El) return null
 
@@ -64,10 +69,15 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
     const badge1Rect = badge1El.getBoundingClientRect()
     const badge2Rect = badge2El ? badge2El.getBoundingClientRect() : null
     const logoRect = logoEl ? logoEl.getBoundingClientRect() : null
+    const fourRRect = badge4rEl ? badge4rEl.getBoundingClientRect() : null
 
     // Mechanical truck dimensions (larger, heavier)
     const truckWidth = 84
     const truckHeight = 48
+
+    // Handyman dimensions (significantly larger and fully visible!)
+    const manWidth = 42
+    const manHeight = 72
 
     const startX = logoRect
       ? logoRect.left - trackRect.left + (logoRect.width - truckWidth) / 2
@@ -82,17 +92,21 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
 
     // Right edge of Badge 2
     const edgeX = badge2Rect
-      ? badge2Rect.left - trackRect.left + badge2Rect.width - truckWidth + 8
+      ? badge2Rect.left - trackRect.left + badge2Rect.width - truckWidth + 6
       : badge1Rect.left - trackRect.left + badge1Rect.width - truckWidth + 6
     const edgeY = badge2Rect
       ? badge2Rect.top - trackRect.top - truckHeight + 6
       : landingY
 
-    // Resting place for the handyman on Badge 1
-    const manRestX = badge1Rect.left - trackRect.left + badge1Rect.width / 2 - 12
-    const manRestY = badge1Rect.top - trackRect.top - 38
+    // Resting place for the handyman on Badge 2, EXACTLY right above the word "4R"!
+    const manRestX = fourRRect
+      ? fourRRect.left - trackRect.left + (fourRRect.width - manWidth) / 2
+      : (badge2Rect ? badge2Rect.left - trackRect.left + 36 : landingX + 40)
+    const manRestY = badge2Rect
+      ? badge2Rect.top - trackRect.top - manHeight + 6
+      : landingY - 24
 
-    return { startX, startY, landingX, landingY, edgeX, edgeY, manRestX, manRestY }
+    return { startX, startY, landingX, landingY, edgeX, edgeY, manRestX, manRestY, manWidth, manHeight }
   }, [])
 
   // Canvas loop: bold, heavy spreading and vaporizing white diesel smoke
@@ -214,6 +228,15 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       // --- PHASE 1: THE DROP & HEAVY SPRING IMPACT ---
       setPhase("dropping")
       truckPosRef.current = { x: c.startX, y: c.startY, smokeIntensity: "none" }
+      setPhrase("On the way! ⚡")
+      setPhraseVisible(true)
+
+      phraseControls.set({
+        x: c.startX - 15,
+        y: c.startY - 38,
+        opacity: 0,
+        scale: 0.8,
+      })
 
       truckControls.set({
         x: c.startX,
@@ -224,6 +247,7 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       })
 
       // Pop out of navbar logo
+      phraseControls.start({ opacity: 1, scale: 1, transition: { duration: 0.25 } })
       await truckControls.start({
         opacity: 1,
         scale: 1,
@@ -232,7 +256,15 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       })
       if (cancelled) return
 
-      // Heavy gravity acceleration fall
+      // Heavy gravity acceleration fall with phrase following
+      phraseControls.start({
+        x: c.landingX - 15,
+        y: c.landingY - 38,
+        transition: {
+          duration: 0.65,
+          ease: [0.55, 0.055, 0.675, 0.19],
+        },
+      })
       await truckControls.start({
         x: c.landingX,
         y: c.landingY,
@@ -252,6 +284,8 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
         })
       }
 
+      setPhrase("Coming to fix your home! 🛠️")
+
       // Heavy truck rebound & suspension bounce
       await truckControls.start({
         y: [c.landingY, c.landingY - 18, c.landingY],
@@ -267,15 +301,15 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       })
       if (cancelled) return
 
-      await new Promise((r) => setTimeout(r, 250))
+      await new Promise((r) => setTimeout(r, 200))
       if (cancelled) return
 
-      // --- PHASE 2: DRIVE ACROSS BADGES WITH DENSE DIESEL SMOKE ---
+      // --- PHASE 2: DRIVE ACROSS BADGES WITH DENSE DIESEL SMOKE & PUNCHY PHRASES ---
       setPhase("driving")
       truckPosRef.current = { x: c.landingX, y: c.landingY, smokeIntensity: "heavy" }
 
       const driveStart = performance.now()
-      const driveDuration = 2400
+      const driveDuration = 2300
 
       const drivePromise = new Promise<void>((resolve) => {
         const step = (now: number) => {
@@ -291,6 +325,20 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
           truckPosRef.current.x = curX
           truckPosRef.current.y = curY
           setWheelAngle(p * 1440) // Physical wheel spin
+
+          // Update punchy phrase along the trajectory
+          if (p < 0.35) {
+            setPhrase("Coming to fix your home! 🛠️")
+          } else if (p < 0.72) {
+            setPhrase("Plumbing, Leaks & Power! 🔧")
+          } else {
+            setPhrase("Fast, Clean & Guaranteed! 💯")
+          }
+
+          phraseControls.set({
+            x: curX - 15,
+            y: curY - 38 + bumpY,
+          })
 
           truckControls.set({
             x: curX,
@@ -310,45 +358,17 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       await drivePromise
       if (cancelled) return
 
-      // --- PHASE 3: SHORT STRUGGLE TO BREAK THROUGH LIMIT (2 SECONDS) ---
+      // --- PHASE 3: QUICK PUNCHY BRAKE TAP (NO LONG STRUGGLE) ---
       setPhase("struggling")
       truckPosRef.current.smokeIntensity = "heavy"
+      setPhrase("Here we are! 🛑")
+      phraseControls.set({ x: c.edgeX - 15, y: c.edgeY - 38 })
 
-      const struggleStart = performance.now()
-      const struggleDuration = 2200
-
-      const strugglePromise = new Promise<void>((resolve) => {
-        const step = (now: number) => {
-          if (cancelled) return resolve()
-          const elapsed = now - struggleStart
-          const p = Math.min(elapsed / struggleDuration, 1)
-
-          // Rocking push against the right edge
-          const cycle = Math.sin(elapsed * 0.015)
-          const pushX = c.edgeX + Math.max(0, cycle * 7)
-          const rockY = c.edgeY + (cycle > 0 ? 1 : 0)
-          const rockRot = cycle * 3.5
-
-          truckPosRef.current.x = pushX
-          truckPosRef.current.y = rockY
-          setWheelAngle((prev) => prev + 12)
-
-          truckControls.set({
-            x: pushX,
-            y: rockY,
-            rotate: rockRot,
-          })
-
-          if (p < 1) {
-            requestAnimationFrame(step)
-          } else {
-            resolve()
-          }
-        }
-        requestAnimationFrame(step)
+      await truckControls.start({
+        x: [c.edgeX, c.edgeX + 4, c.edgeX],
+        rotate: [0, 2.5, 0],
+        transition: { duration: 0.38, ease: "easeOut" },
       })
-
-      await strugglePromise
       if (cancelled) return
 
       // --- PHASE 4: ENGINE CUTS OFF WITH LARGE COUGHING SMOKE BURST ---
@@ -356,43 +376,47 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       truckPosRef.current.smokeIntensity = "burst"
 
       await truckControls.start({
-        x: [c.edgeX + 4, c.edgeX - 3, c.edgeX],
-        y: [c.edgeY + 2, c.edgeY - 1, c.edgeY],
-        rotate: [4, -2, 0],
-        transition: { duration: 0.6, ease: "easeOut" },
+        y: [c.edgeY, c.edgeY + 1.5, c.edgeY],
+        rotate: [0, -1.5, 0],
+        transition: { duration: 0.35, ease: "easeOut" },
       })
       if (cancelled) return
 
-      // Allow the large smoke cloud to billow high
-      await new Promise((r) => setTimeout(r, 600))
+      await new Promise((r) => setTimeout(r, 350))
       truckPosRef.current.smokeIntensity = "low"
       if (cancelled) return
 
-      // --- PHASE 5: HANDYMAN GETS OUT OF TRUCK & STEPS BACK TO BADGE 1 ---
+      // --- PHASE 5: HANDYMAN GETS OUT OF TRUCK CAB ON BADGE 2 ---
       setPhase("walking")
-      // Handyman starts at truck cab door
-      const manStartX = c.edgeX + 46
-      const manStartY = c.edgeY + 12
+      // Handyman starts at truck cab door on Badge 2
+      const manStartX = c.edgeX + 22
+      const manStartY = c.manRestY
 
       manControls.set({
         x: manStartX,
         y: manStartY,
-        scale: 0.6,
+        scale: 0.7,
         opacity: 0,
+      })
+
+      setPhrase("I got you! 💪")
+      phraseControls.set({
+        x: manStartX - 28,
+        y: c.manRestY - 44,
       })
 
       // Step out of the cab
       await manControls.start({
         opacity: 1,
         scale: 1,
-        y: c.edgeY + 6,
-        transition: { duration: 0.4, ease: "easeOut" },
+        y: c.manRestY,
+        transition: { duration: 0.35, ease: "easeOut" },
       })
       if (cancelled) return
 
-      // Walk leftward across to Badge 1
+      // Walk 3 steps back on Badge 2, stopping right above the word "4R"!
       const walkStart = performance.now()
-      const walkDuration = 2200
+      const walkDuration = 1050
 
       const walkPromise = new Promise<void>((resolve) => {
         const step = (now: number) => {
@@ -401,12 +425,17 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
           const p = Math.min(elapsed / walkDuration, 1)
 
           const curX = manStartX + (c.manRestX - manStartX) * p
-          // Walking step bobbing
-          const stepBob = -Math.abs(Math.sin(p * Math.PI * 8)) * 3
+          // Walking step bobbing (3 steps)
+          const stepBob = -Math.abs(Math.sin(p * Math.PI * 3)) * 3
 
           manControls.set({
             x: curX,
             y: c.manRestY + stepBob,
+          })
+
+          phraseControls.set({
+            x: curX - 28,
+            y: c.manRestY + stepBob - 44,
           })
 
           if (p < 1) {
@@ -421,7 +450,7 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       await walkPromise
       if (cancelled) return
 
-      // --- PHASE 6: PROUD WELCOMING POSE & FRIENDLY CONTINUOUS HAND WAVE ---
+      // --- PHASE 6: PROUD WELCOMING POSE RIGHT ABOVE "4R" & CONTINUOUS HAND WAVE ---
       setPhase("waving")
       truckPosRef.current.smokeIntensity = "low"
 
@@ -430,9 +459,14 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
         y: c.manRestY,
       })
 
+      phraseControls.set({
+        x: c.manRestX - 28,
+        y: c.manRestY - 44,
+      })
+
       // Wave arm loop
       waveControls.start({
-        rotate: [-14, 22, -14],
+        rotate: [-14, 24, -14],
         transition: {
           duration: 1.1,
           repeat: Infinity,
@@ -440,14 +474,29 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
           ease: "easeInOut",
         },
       })
+
+      // Cycle friendly speech phrases while standing and waving
+      const phrases = [
+        "I got you! 💪",
+        "Ready to help! 👋",
+        "Direct SG Contractor! 🇸🇬",
+        "Tap WhatsApp anytime! 📲",
+      ]
+      let pIdx = 0
+      phraseIntervalRef.current = setInterval(() => {
+        if (cancelled) return
+        pIdx = (pIdx + 1) % phrases.length
+        setPhrase(phrases[pIdx])
+      }, 3200)
     }, 350)
 
     return () => {
       cancelled = true
       clearTimeout(timer)
+      if (phraseIntervalRef.current) clearInterval(phraseIntervalRef.current)
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
-  }, [isDesktop, measureCoordinates, truckControls, manControls, waveControls, badge1Controls])
+  }, [isDesktop, measureCoordinates, truckControls, manControls, waveControls, phraseControls, badge1Controls])
 
   // DESKTOP ONLY: If not desktop or not mounted, render nothing!
   if (!mounted || !isDesktop) return null
@@ -680,12 +729,12 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
       </motion.div>
 
       {/* The Construction Handyman Character */}
-      {/* Steps out of the truck, walks back to Badge 1, and warmly waves at the visitor! */}
+      {/* Steps out of the truck, takes 3 steps back on Badge 2, stands above "4R", and warmly waves! */}
       <motion.div
         animate={manControls}
         initial={{ opacity: 0 }}
-        className="absolute top-0 left-0 w-[24px] h-[40px] will-change-transform z-40 pointer-events-none"
-        style={{ filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.3))" }}
+        className="absolute top-0 left-0 w-[42px] h-[72px] will-change-transform z-40 pointer-events-none"
+        style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.4))" }}
       >
         <svg
           viewBox="0 0 28 48"
@@ -744,6 +793,21 @@ export function ConstructionTruckAnimation({ badge1Controls }: ConstructionTruck
           </g>
         </svg>
       </motion.div>
+
+      {/* Punchy Bold Animated Speech Phrase Bubble */}
+      {phraseVisible && (
+        <motion.div
+          animate={phraseControls}
+          initial={{ opacity: 0, scale: 0.8 }}
+          className="absolute top-0 left-0 z-50 pointer-events-none will-change-transform"
+        >
+          <div className="relative bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-slate-950 font-black text-[11px] sm:text-xs px-3 py-1.5 rounded-full shadow-[0_4px_12px_rgba(245,158,11,0.45)] border-2 border-white/90 flex items-center gap-1.5 whitespace-nowrap tracking-tight">
+            <span>{phrase}</span>
+            {/* Comic speech bubble downward tail */}
+            <div className="absolute -bottom-2 left-5 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-amber-400" />
+          </div>
+        </motion.div>
+      )}
     </div>
   )
 }

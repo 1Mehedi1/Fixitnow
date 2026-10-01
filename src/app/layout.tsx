@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
+import { Plus_Jakarta_Sans, Outfit, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
@@ -12,12 +12,12 @@ export const viewport: Viewport = {
   maximumScale: 5,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: dark)", color: "#141318" },
   ],
 }
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
 })
@@ -28,7 +28,7 @@ const geistMono = Geist_Mono({
   display: "swap",
 })
 
-const playfair = Playfair_Display({
+const outfit = Outfit({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["500", "600", "700", "800", "900"],
@@ -103,7 +103,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground`}
+        className={`${jakartaSans.variable} ${geistMono.variable} ${outfit.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
           {children}

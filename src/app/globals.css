@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -80,39 +80,39 @@
   --sidebar-ring: oklch(0.61 0.18 50);
 }
 
-/* Dark theme — rich charcoal + amber glow. */
+/* Dark theme — warm creamy-orangey charcoal, highly visible cards and bright text (never pitch black). */
 .dark {
-  --background: oklch(0.16 0.008 60);
-  --foreground: oklch(0.96 0.005 70);
-  --card: oklch(0.2 0.01 60);
-  --card-foreground: oklch(0.96 0.005 70);
-  --popover: oklch(0.2 0.01 60);
-  --popover-foreground: oklch(0.96 0.005 70);
-  --primary: oklch(0.72 0.17 55);
-  --primary-foreground: oklch(0.18 0.01 60);
-  --secondary: oklch(0.26 0.012 60);
-  --secondary-foreground: oklch(0.96 0.005 70);
-  --muted: oklch(0.26 0.012 60);
-  --muted-foreground: oklch(0.7 0.012 60);
-  --accent: oklch(0.3 0.05 50);
-  --accent-foreground: oklch(0.95 0.01 70);
+  --background: oklch(0.19 0.016 52);       /* warm creamy amber-charcoal */
+  --foreground: oklch(0.985 0.005 70);      /* crisp bright text */
+  --card: oklch(0.24 0.022 52);             /* visibly brighter, warmer card surfaces */
+  --card-foreground: oklch(0.985 0.005 70);
+  --popover: oklch(0.24 0.022 52);
+  --popover-foreground: oklch(0.985 0.005 70);
+  --primary: oklch(0.74 0.18 55);           /* vibrant luminous amber */
+  --primary-foreground: oklch(0.16 0.01 60);
+  --secondary: oklch(0.28 0.02 52);
+  --secondary-foreground: oklch(0.98 0.005 70);
+  --muted: oklch(0.27 0.018 52);
+  --muted-foreground: oklch(0.82 0.015 65); /* much brighter and legible secondary text */
+  --accent: oklch(0.32 0.05 48);
+  --accent-foreground: oklch(0.98 0.01 70);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.17 55);
-  --chart-1: oklch(0.72 0.17 55);
-  --chart-2: oklch(0.7 0.13 160);
-  --chart-3: oklch(0.6 0.14 230);
-  --chart-4: oklch(0.78 0.18 80);
-  --chart-5: oklch(0.65 0.2 350);
-  --sidebar: oklch(0.2 0.01 60);
-  --sidebar-foreground: oklch(0.96 0.005 70);
-  --sidebar-primary: oklch(0.72 0.17 55);
-  --sidebar-primary-foreground: oklch(0.18 0.01 60);
-  --sidebar-accent: oklch(0.3 0.05 50);
-  --sidebar-accent-foreground: oklch(0.95 0.01 70);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.17 55);
+  --border: oklch(1 0 0 / 16%);             /* crisp visible borders */
+  --input: oklch(1 0 0 / 20%);
+  --ring: oklch(0.74 0.18 55);
+  --chart-1: oklch(0.74 0.18 55);
+  --chart-2: oklch(0.72 0.13 160);
+  --chart-3: oklch(0.65 0.14 230);
+  --chart-4: oklch(0.8 0.18 80);
+  --chart-5: oklch(0.68 0.2 350);
+  --sidebar: oklch(0.23 0.018 52);
+  --sidebar-foreground: oklch(0.98 0.005 70);
+  --sidebar-primary: oklch(0.74 0.18 55);
+  --sidebar-primary-foreground: oklch(0.16 0.01 60);
+  --sidebar-accent: oklch(0.32 0.05 48);
+  --sidebar-accent-foreground: oklch(0.98 0.01 70);
+  --sidebar-border: oklch(1 0 0 / 16%);
+  --sidebar-ring: oklch(0.74 0.18 55);
 }
 
 @layer base {
@@ -122,6 +122,11 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01", "ss02", "cv01", "cv11";
+  }
+  .dark body {
+    background-image: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(245, 158, 11, 0.08), transparent 70%),
+      radial-gradient(ellipse 70% 50% at 85% 60%, rgba(234, 88, 12, 0.04), transparent 60%);
+    background-attachment: fixed;
   }
   html { scroll-behavior: smooth; }
 }
@@ -212,4 +217,47 @@ html, body {
 .animate-breathe {
   animation: breathe-scale 3.5s ease-in-out infinite;
   transform-origin: center center;
+}
+
+/* Celebratory Singapore Entity Card Breathing Motion */
+@keyframes celebratory-breathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 30px -4px rgba(245, 158, 11, 0.12), 0 2px 10px -2px rgba(16, 185, 129, 0.08);
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 16px 45px -4px rgba(245, 158, 11, 0.24), 0 4px 18px -2px rgba(16, 185, 129, 0.16);
+  }
+}
+
+.animate-celebrate-card {
+  animation: celebratory-breathe 4.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+/* Soft glowing stars gently rising upward into the air and vanishing */
+@keyframes float-star-up {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.9;
+    transform: translate3d(var(--star-drift, 4px), -18px, 0) scale(1) rotate(40deg);
+  }
+  65% {
+    opacity: 0.75;
+    transform: translate3d(calc(var(--star-drift, 4px) * 2), -55px, 0) scale(0.85) rotate(85deg);
+  }
+  100% {
+    transform: translate3d(calc(var(--star-drift, 4px) * 3), -95px, 0) scale(0.2) rotate(140deg);
+    opacity: 0;
+  }
+}
+
+.animate-rising-star {
+  animation: float-star-up var(--star-duration, 4s) cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  animation-delay: var(--star-delay, 0s);
+  will-change: transform, opacity;
 }

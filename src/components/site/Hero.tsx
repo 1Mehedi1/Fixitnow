@@ -33,31 +33,35 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
 
   const [index, setIndex] = useState(0)
   const currentItem = items[index] || items[0]
-  const [typedHighlight, setTypedHighlight] = useState(currentItem.highlight)
+  
+  const fullText = useMemo(() => `${currentItem.prefix} ${currentItem.highlight}`, [currentItem])
+  const prefixLength = currentItem.prefix.length
+  
+  const [typedLength, setTypedLength] = useState(fullText.length)
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    const target = currentItem.highlight
     let timer: NodeJS.Timeout
 
     if (!isDeleting) {
-      if (typedHighlight.length < target.length) {
-        // Variable typing speed: deliberate strokes + rapid flow
-        const isSlowPace = (typedHighlight.length % 5 === 0) || Math.random() < 0.2
-        const delay = isSlowPace ? (100 + Math.random() * 60) : (40 + Math.random() * 30)
+      if (typedLength < fullText.length) {
+        // Variable typing speed: natural cadence with occasional subtle rhythm
+        const isSlowPace = (typedLength % 5 === 0) || Math.random() < 0.15
+        const delay = isSlowPace ? (90 + Math.random() * 50) : (35 + Math.random() * 25)
         timer = setTimeout(() => {
-          setTypedHighlight(target.slice(0, typedHighlight.length + 1))
+          setTypedLength((prev) => prev + 1)
         }, delay)
       } else {
+        // Full sentence typed out — pause so user can comfortably read it
         timer = setTimeout(() => {
           setIsDeleting(true)
-        }, 2400)
+        }, 2600)
       }
     } else {
-      if (typedHighlight.length > 0) {
-        const delay = 25 + Math.random() * 15
+      if (typedLength > 0) {
+        const delay = 18 + Math.random() * 12
         timer = setTimeout(() => {
-          setTypedHighlight(target.slice(0, typedHighlight.length - 1))
+          setTypedLength((prev) => prev - 1)
         }, delay)
       } else {
         setIsDeleting(false)
@@ -66,15 +70,27 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
     }
 
     return () => clearTimeout(timer)
-  }, [typedHighlight, isDeleting, currentItem, items])
+  }, [typedLength, isDeleting, fullText, items.length])
+
+  // Derive typed prefix and typed highlight from current typedLength
+  const typedPrefix = fullText.slice(0, Math.min(typedLength, prefixLength))
+  const hasReachedHighlight = typedLength > prefixLength
+  const typedHighlight = hasReachedHighlight
+    ? fullText.slice(prefixLength + 1, typedLength)
+    : ""
 
   return (
     <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance leading-snug sm:leading-tight break-words min-h-[2.4em] sm:min-h-[2.2em]">
-      <span>{currentItem.prefix}</span>{" "}
-      <br className="hidden xs:inline" />
-      <span className="gradient-text underline underline-offset-6 decoration-red-500 decoration-2 drop-shadow-[0_2px_10px_rgba(239,68,68,0.55)]">
-        {typedHighlight}
-      </span>
+      <span>{typedPrefix}</span>
+      {hasReachedHighlight && (
+        <>
+          {" "}
+          <br className="hidden xs:inline" />
+          <span className="gradient-text underline underline-offset-6 decoration-red-500 decoration-2 drop-shadow-[0_2px_10px_rgba(239,68,68,0.55)]">
+            {typedHighlight}
+          </span>
+        </>
+      )}
       <span className="inline-block w-[2.5px] sm:w-[3px] h-[0.85em] bg-primary ml-1.5 align-baseline animate-pulse shadow-xs shadow-primary" />
     </h1>
   )
@@ -129,7 +145,11 @@ export function Hero() {
               >
                 <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">
-                  MOM Licensed · <span className="font-bold">{s.companyName}</span>
+                  MOM Licensed ·{" "}
+                  <span className="font-bold">
+                    <span id="hero-license-4r">4R</span>
+                    {s.companyName.startsWith("4R") ? s.companyName.slice(2) : ` ${s.companyName}`}
+                  </span>
                 </span>
               </div>
             </div>

@@ -71,8 +71,8 @@ export function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 backdrop-blur-2xl backdrop-saturate-150 ${
         scrolled
-          ? "bg-background/85 dark:bg-black/80 border-b border-border/80 dark:border-white/15 shadow-lg shadow-black/5"
-          : "bg-background/75 dark:bg-black/70 border-b border-border/50 dark:border-white/10 shadow-sm"
+          ? "bg-background/85 dark:bg-[#1a1820]/90 border-b border-border/80 dark:border-white/15 shadow-lg shadow-black/10"
+          : "bg-background/75 dark:bg-[#1a1820]/75 border-b border-border/50 dark:border-white/10 shadow-sm"
       }`}
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

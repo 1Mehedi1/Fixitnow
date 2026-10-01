@@ -95,74 +95,100 @@ export function PricingGuide() {
           </div>
         </motion.div>
 
-        {/* Trade Tab Switcher — Segmented pill with sliding active indicator */}
-        <div className="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl bg-muted/60 dark:bg-zinc-900/80 border border-border/70 dark:border-white/10 max-w-2xl mx-auto mb-10 shadow-xs">
+        {/* Trade Tab Switcher — High-visibility pill with glowing active indicator */}
+        <div className="flex flex-wrap justify-center gap-2 p-2 rounded-2xl bg-muted/80 dark:bg-[#1c1a24] border border-border/80 dark:border-white/15 max-w-3xl mx-auto mb-10 shadow-sm">
           {categories.map((cat) => {
             const Icon = cat.icon
             const isActive = currentCatId === cat.id
+            const count = cat.rates?.length || 0
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveTab(cat.id)}
-                className={`relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+                className={`relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                   isActive
-                    ? "text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? "text-slate-950 shadow-md"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60 dark:hover:bg-white/5"
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activePricingTab"
-                    className="absolute inset-0 bg-primary rounded-xl shadow-xs"
+                    className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 rounded-xl shadow-md shadow-amber-500/20"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
-                <Icon className="h-4 w-4 relative z-10" />
+                <Icon className="h-4 w-4 relative z-10 shrink-0" />
                 <span className="relative z-10">{cat.label}</span>
+                <span
+                  className={`relative z-10 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full ${
+                    isActive
+                      ? "bg-slate-950/15 text-slate-950"
+                      : "bg-muted dark:bg-white/10 text-muted-foreground"
+                  }`}
+                >
+                  {count}
+                </span>
               </button>
             )
           })}
         </div>
 
-        {/* Rate Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-4xl mx-auto mb-10">
+        {/* Rate Cards Grid — Executive-grade, high-visibility layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12">
           {(currentCat?.rates || []).map((rate, i) => (
             <motion.div
               key={`${rate.name}-${i}`}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: i * 0.05 }}
-              className="rounded-2xl border border-border/80 dark:border-white/10 bg-card dark:bg-zinc-950/70 p-5 sm:p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 transition-all flex flex-col justify-between group"
+              className="rounded-2xl border-2 border-border/80 dark:border-white/12 bg-card dark:bg-[#1e1c26] p-5 sm:p-6 shadow-sm hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/5 transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="font-semibold text-sm sm:text-base text-foreground leading-snug">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <h3 className="font-display font-bold text-base sm:text-lg text-foreground leading-snug">
                     {rate.name}
                   </h3>
-                  <div className="text-right shrink-0">
-                    <span className="font-display font-black text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
+                  <div className="text-right shrink-0 bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-500/30 px-3 py-1.5 rounded-xl shadow-xs">
+                    <span className="font-display font-black text-lg sm:text-xl text-emerald-600 dark:text-emerald-300 block">
                       {rate.price}
                     </span>
-                    <span className="text-[11px] text-muted-foreground block">{rate.unit}</span>
+                    <span className="text-[10px] font-extrabold text-emerald-700/80 dark:text-emerald-300/80 block uppercase tracking-wider">
+                      {rate.unit}
+                    </span>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {rate.details}
                 </p>
+
+                {/* Scope inclusion micro-badges */}
+                <div className="flex flex-wrap items-center gap-1.5 mt-3.5 mb-2">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                    <Check className="h-3 w-3 text-emerald-500" /> Fixed quote
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 dark:text-amber-200 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                    <ShieldCheck className="h-3 w-3 text-amber-500" /> 7-Day warranty
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground bg-muted/60 dark:bg-white/5 border border-border/60 px-2 py-0.5 rounded-md">
+                    Tools & clean-up included
+                  </span>
+                </div>
               </div>
 
-              <div className="pt-3 mt-3 border-t border-border/40 flex items-center justify-between">
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                  <Check className="h-3 w-3" /> Fixed itemized quote
+              {/* Direct Instant WhatsApp Booking Action */}
+              <div className="pt-4 mt-3 border-t border-border/60 dark:border-white/10 flex items-center justify-between gap-3">
+                <span className="text-[11px] text-muted-foreground font-medium hidden sm:inline">
+                  Direct contractor rate
                 </span>
                 <a
-                  href={whatsappLink(s, `Hi ${s.workerName}, I would like to get a quote for ${rate.name}.`)}
+                  href={whatsappLink(s, `Hi ${s.workerName}, I would like to get a quote for ${rate.name} (${rate.price} ${rate.unit}).`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-bold text-xs transition-all shadow-xs"
                 >
-                  <span>Book this</span>
-                  <ArrowRight className="h-3 w-3" />
+                  <span>Book this rate</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>
             </motion.div>
@@ -170,35 +196,37 @@ export function PricingGuide() {
         </div>
 
         {/* "What's Always Included" Guarantee Box */}
-        <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-5 sm:p-7 max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <h4 className="font-display font-bold text-sm sm:text-base text-foreground">
+        <div className="rounded-2xl border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-950/20 dark:via-[#1e2324] dark:to-transparent p-6 sm:p-8 max-w-5xl mx-auto shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <h4 className="font-display font-black text-base sm:text-lg text-foreground">
                   What is always included in every Fixitnow quote?
                 </h4>
               </div>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground pt-1">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs sm:text-sm text-foreground/85 pt-1">
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>Labor, transport and professional tools</span>
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>Labor, transport and professional diagnostic tools</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
                   <span>Floor & furniture protective coverings</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>Full testing and site clean-up</span>
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>Full testing and complete site clean-up</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>7-Day workmanship warranty</span>
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>7-Day workmanship warranty with zero hassle</span>
                 </li>
               </ul>
             </div>
-            <Button asChild className="bg-[#25D366] hover:bg-[#1ebe5d] text-white shrink-0 font-bold h-11 px-6 shadow-sm">
+            <Button asChild className="bg-[#25D366] hover:bg-[#1ebe5d] text-white shrink-0 font-extrabold h-12 px-7 text-sm shadow-md rounded-xl">
               <a
                 href={whatsappLink(s, `Hi ${s.workerName}, can you give me a quote for my job?`)}
                 target="_blank"
