@@ -102,7 +102,7 @@ export function BeforeAfterSection({ posts }: Props) {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid md:grid-cols-2 gap-5 lg:gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {filtered.map((post, i) => {
             const before = post.images.find((img) => img.kind === "before")
             const after = post.images.find((img) => img.kind === "after")
@@ -114,10 +114,10 @@ export function BeforeAfterSection({ posts }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: Math.min(i * 0.06, 0.4) }}
-                className="cursor-pointer group"
+                className="cursor-pointer group h-full"
                 onClick={() => openPost(post)}
               >
-                <Card className="overflow-hidden border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full">
+                <Card className="overflow-hidden border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between">
                   {/* Image / slider */}
                   {hasSlider ? (
                     <div onClick={(e) => e.stopPropagation()} className="relative">
@@ -126,7 +126,7 @@ export function BeforeAfterSection({ posts }: Props) {
                         after={after!.url}
                         alt={post.title}
                       />
-                      <Badge className="absolute top-3 right-3 z-30 bg-black/70 text-white border-0 backdrop-blur pointer-events-none">
+                      <Badge className="absolute top-3 right-3 z-30 bg-black/70 text-white border-0 backdrop-blur pointer-events-none text-[10px]">
                         Drag to compare
                       </Badge>
                     </div>
@@ -145,24 +145,26 @@ export function BeforeAfterSection({ posts }: Props) {
                   )}
 
                   {/* Body */}
-                  <CardContent className="p-5">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      {post.category && (
-                        <Badge variant="secondary" className="text-[10px]">{post.category}</Badge>
+                  <CardContent className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                        {post.category && (
+                          <Badge variant="secondary" className="text-[10px] px-2 py-0.5">{post.category}</Badge>
+                        )}
+                        {post.featured && (
+                          <Badge className="bg-primary/10 text-primary border-0 text-[10px] px-2 py-0.5">Featured</Badge>
+                        )}
+                        <span className="text-[10px] text-muted-foreground ml-auto">
+                          {new Date(post.createdAt).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                      </div>
+                      <h3 className="font-display font-bold text-sm sm:text-base leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+                        {post.title}
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2">{post.excerpt}</p>
                       )}
-                      {post.featured && (
-                        <Badge className="bg-primary/10 text-primary border-0 text-[10px]">Featured</Badge>
-                      )}
-                      <span className="text-[10px] text-muted-foreground ml-auto">
-                        {new Date(post.createdAt).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })}
-                      </span>
                     </div>
-                    <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h3>
-                    {post.excerpt && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{post.excerpt}</p>
-                    )}
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
                         {post.views} views

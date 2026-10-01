@@ -7,7 +7,7 @@ const IMG = {
   paint2: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1200&auto=format&fit=crop&q=70",
   reno1: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&auto=format&fit=crop&q=70",
   reno2: "https://images.unsplash.com/photo-1505873242700-f289a29e1e0f?w=1200&auto=format&fit=crop&q=70",
-  electric1: "https://images.unsplash.com/photo-1621905251918-48416b573323?w=1200&auto=format&fit=crop&q=70",
+  electric1: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=70",
   electric2: "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=1200&auto=format&fit=crop&q=70",
   interior1: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=1200&auto=format&fit=crop&q=70",
   kitchen: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=1200&auto=format&fit=crop&q=70",

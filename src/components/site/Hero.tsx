@@ -72,7 +72,7 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
     <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-balance leading-snug sm:leading-tight break-words min-h-[2.4em] sm:min-h-[2.2em]">
       <span>{currentItem.prefix}</span>{" "}
       <br className="hidden xs:inline" />
-      <span className="gradient-text underline underline-offset-6 decoration-amber-500/75 decoration-2">
+      <span className="gradient-text underline underline-offset-6 decoration-red-500 decoration-2 drop-shadow-[0_2px_10px_rgba(239,68,68,0.55)]">
         {typedHighlight}
       </span>
       <span className="inline-block w-[2.5px] sm:w-[3px] h-[0.85em] bg-primary ml-1.5 align-baseline animate-pulse shadow-xs shadow-primary" />
@@ -88,10 +88,9 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-accent/30 pt-4 pb-10 sm:py-16 w-full max-w-full">
-      {/* Architectural Atmospheric Lighting with Subtle Craft Grid */}
+      {/* Smooth Atmospheric Lighting - Clean background without grid */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-10%,rgba(245,158,11,0.12),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-15%,rgba(245,158,11,0.08),rgba(0,0,0,0))]" />
-        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:36px_36px]" />
       </div>
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative w-full max-w-full">

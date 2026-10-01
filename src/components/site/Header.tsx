@@ -43,6 +43,13 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  const toggleTheme = () => {
+    try {
+      localStorage.setItem("user_toggled_theme", "true")
+    } catch {}
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
+
   const scrollToAnchor = (id: string) => {
     if (view !== "home") {
       setView("home")
@@ -126,7 +133,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={toggleTheme}
                 aria-label="Toggle theme"
                 className="rounded-full hover:bg-primary/15 hover:text-primary hover:scale-110 active:scale-90 transition-all duration-200 border border-transparent hover:border-primary/25 cursor-pointer"
               >
@@ -226,7 +233,7 @@ export function Header() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                      onClick={toggleTheme}
                       className="text-xs font-bold bg-primary/10 text-primary hover:bg-primary/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                     >
                       {mounted && theme === "dark" ? "Day View" : "Night View"}

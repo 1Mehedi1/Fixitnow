@@ -12,7 +12,7 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [isInView, setIsInView] = useState(false)
+  const [isInView, setIsInView] = useState(true)
 
   // IntersectionObserver: Only load/stream video when the logo is in viewport
   // This avoids loading 3 instances simultaneously and saves 1.6MB bandwidth on mobile!

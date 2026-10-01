@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload } from "lucide-react"
+import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { defaultSiteConfig, type ServiceItem, DEFAULT_SERVICE_IMAGES } from "@/lib/site"
+import { defaultSiteConfig, type ServiceItem, type RateItem, DEFAULT_SERVICE_IMAGES, DEFAULT_SERVICE_RATES } from "@/lib/site"
 
 const ICON_OPTIONS = [
   "Wrench", "PaintRoller", "Hammer", "Zap", "Sofa", "Settings",
@@ -61,6 +61,12 @@ export function SettingsManager() {
             if (Array.isArray(parsed) && parsed.length > 0) heroImgs = parsed
           } catch {}
 
+          let loadedServices = Array.isArray(d.services) && d.services.length > 0 ? d.services : [...defaultSiteConfig.services]
+          loadedServices = loadedServices.map((svc: any) => ({
+            ...svc,
+            rates: Array.isArray(svc.rates) && svc.rates.length > 0 ? svc.rates : (DEFAULT_SERVICE_RATES[svc.key] || []),
+          }))
+
           setForm({
             brand: d.settings.brand || defaultSiteConfig.brand,
             tagline: d.settings.tagline || defaultSiteConfig.tagline,
@@ -77,7 +83,7 @@ export function SettingsManager() {
             heroSubtext: d.settings.heroSubtext || defaultSiteConfig.heroSubtext,
             aboutTitle: d.settings.aboutTitle || defaultSiteConfig.aboutTitle,
             aboutBody: d.settings.aboutBody || defaultSiteConfig.aboutBody,
-            services: Array.isArray(d.services) && d.services.length > 0 ? d.services : [...defaultSiteConfig.services],
+            services: loadedServices,
             heroImages: heroImgs,
             companyName: d.settings.companyName || defaultSiteConfig.companyName,
             companyUen: d.settings.companyUen || defaultSiteConfig.companyUen,
@@ -184,6 +190,14 @@ export function SettingsManager() {
           icon: "Wrench",
           desc: "Describe this service.",
           bgImage: DEFAULT_SERVICE_IMAGES["repair"],
+          rates: [
+            {
+              name: "Standard Service / Repair Task",
+              price: "$60 – $120",
+              unit: "per set",
+              details: "Standard parts, labor and safety test included.",
+            },
+          ],
         },
       ],
     })
@@ -191,6 +205,40 @@ export function SettingsManager() {
 
   const removeService = (i: number) => {
     setForm({ ...form, services: form.services.filter((_, idx) => idx !== i) })
+  }
+
+  const updateRateItem = (serviceIndex: number, rateIndex: number, field: keyof RateItem, value: string) => {
+    const next = [...form.services]
+    const svc = { ...next[serviceIndex] }
+    const rates = [...(svc.rates || [])]
+    rates[rateIndex] = { ...rates[rateIndex], [field]: value }
+    svc.rates = rates
+    next[serviceIndex] = svc
+    setForm({ ...form, services: next })
+  }
+
+  const addRateItem = (serviceIndex: number) => {
+    const next = [...form.services]
+    const svc = { ...next[serviceIndex] }
+    const rates = [...(svc.rates || [])]
+    rates.push({
+      name: "New Service / Repair Task",
+      price: "$60 – $120",
+      unit: "per set",
+      details: "Standard parts, on-site labor and testing included.",
+    })
+    svc.rates = rates
+    next[serviceIndex] = svc
+    setForm({ ...form, services: next })
+  }
+
+  const removeRateItem = (serviceIndex: number, rateIndex: number) => {
+    const next = [...form.services]
+    const svc = { ...next[serviceIndex] }
+    const rates = (svc.rates || []).filter((_, idx) => idx !== rateIndex)
+    svc.rates = rates
+    next[serviceIndex] = svc
+    setForm({ ...form, services: next })
   }
 
   if (loading) {
@@ -487,6 +535,121 @@ export function SettingsManager() {
               No services yet. Click "Add service" to create one.
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Singapore Rate Card (2026) Rates & Pricing Editor */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> Singapore Rate Card (2026) — Rates & Pricing
+              </CardTitle>
+              <CardDescription>
+                Edit prices, units, and item descriptions for each service shown in the Rate Card section. Add or remove items as needed.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {form.services.map((svc, sIdx) => {
+            const rates = svc.rates || []
+            return (
+              <div key={svc.key || sIdx} className="rounded-xl border border-border/80 p-4 space-y-4 bg-muted/20">
+                <div className="flex items-center justify-between flex-wrap gap-2 border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm text-foreground flex items-center gap-1.5">
+                      <span>{svc.label}</span>
+                      <span className="text-xs text-muted-foreground font-normal">({svc.key})</span>
+                    </span>
+                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                      {rates.length} {rates.length === 1 ? "rate item" : "rate items"}
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addRateItem(sIdx)}
+                    className="h-8 text-xs font-semibold cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1" /> Add Rate Item
+                  </Button>
+                </div>
+
+                {rates.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic py-2">
+                    No rate items added for this service yet. Click &quot;Add Rate Item&quot; to publish pricing.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {rates.map((rate, rIdx) => (
+                      <div
+                        key={rIdx}
+                        className="rounded-lg border border-border/70 p-3 bg-background/80 space-y-2.5 relative group"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Item #{rIdx + 1}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeRateItem(sIdx, rIdx)}
+                            className="text-destructive hover:text-destructive h-6 w-6 p-0 cursor-pointer"
+                            title="Delete rate item"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+
+                        <div className="grid sm:grid-cols-12 gap-2.5">
+                          <div className="sm:col-span-6 space-y-1">
+                            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Task / Service Name</Label>
+                            <Input
+                              value={rate.name}
+                              onChange={(e) => updateRateItem(sIdx, rIdx, "name", e.target.value)}
+                              placeholder="Leaking Tap or Valve Replacement"
+                              className="text-xs h-8"
+                            />
+                          </div>
+                          <div className="sm:col-span-3 space-y-1">
+                            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Price Range</Label>
+                            <Input
+                              value={rate.price}
+                              onChange={(e) => updateRateItem(sIdx, rIdx, "price", e.target.value)}
+                              placeholder="$60 – $110"
+                              className="text-xs h-8 font-semibold text-emerald-600 dark:text-emerald-400"
+                            />
+                          </div>
+                          <div className="sm:col-span-3 space-y-1">
+                            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Unit</Label>
+                            <Input
+                              value={rate.unit}
+                              onChange={(e) => updateRateItem(sIdx, rIdx, "unit", e.target.value)}
+                              placeholder="per set"
+                              className="text-xs h-8"
+                            />
+                          </div>
+                          <div className="sm:col-span-12 space-y-1">
+                            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">What&apos;s Included / Scope Details</Label>
+                            <Input
+                              value={rate.details}
+                              onChange={(e) => updateRateItem(sIdx, rIdx, "details", e.target.value)}
+                              placeholder="Includes new washer/valves, thread sealing and testing"
+                              className="text-xs h-8"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </CardContent>
       </Card>
 

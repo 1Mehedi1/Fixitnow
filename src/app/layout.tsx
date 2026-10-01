@@ -77,23 +77,24 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               (function() {
                 try {
                   var saved = localStorage.getItem('theme');
+                  var userToggled = localStorage.getItem('user_toggled_theme');
                   var isMobile = (window.innerWidth < 768) || /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                  if (!saved) {
-                    if (isMobile) {
-                      localStorage.setItem('theme', 'dark');
-                      document.documentElement.classList.add('dark');
-                      document.documentElement.style.colorScheme = 'dark';
-                    } else {
-                      localStorage.setItem('theme', 'light');
-                      document.documentElement.classList.remove('dark');
-                      document.documentElement.style.colorScheme = 'light';
-                    }
+                  
+                  if (isMobile && !userToggled) {
+                    // Mobile default is strictly DARK MODE
+                    localStorage.setItem('theme', 'dark');
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
                   } else if (saved === 'dark') {
                     document.documentElement.classList.add('dark');
                     document.documentElement.style.colorScheme = 'dark';
                   } else if (saved === 'light') {
                     document.documentElement.classList.remove('dark');
                     document.documentElement.style.colorScheme = 'light';
+                  } else if (isMobile) {
+                    localStorage.setItem('theme', 'dark');
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
                   }
                 } catch (e) {}
               })();

@@ -164,7 +164,7 @@ function BeforeAfterPreview({
           </button>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-5 lg:gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {posts.map((post, i) => {
             const before = post.images.find((img) => img.kind === "before")
             const after = post.images.find((img) => img.kind === "after")
@@ -172,18 +172,18 @@ function BeforeAfterPreview({
             return (
               <div key={post.id}>
                 <div
-                  className="cursor-pointer group"
+                  className="cursor-pointer group h-full"
                   onClick={() => openPost(post)}
                 >
-                  <div className="overflow-hidden rounded-2xl border border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
+                  <div className="overflow-hidden rounded-xl border border-border/80 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between">
                     <div onClick={(e) => e.stopPropagation()} className="relative">
                       <BeforeAfterSliderInline before={before.url} after={after.url} alt={post.title} />
                     </div>
-                    <div className="p-5 bg-card">
-                      <h3 className="font-display font-bold text-base mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                    <div className="p-3.5 sm:p-4 bg-card flex-1">
+                      <h3 className="font-display font-bold text-sm sm:text-base mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                         {post.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-1">
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                         {post.excerpt}
                       </p>
                     </div>

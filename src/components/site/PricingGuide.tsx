@@ -1,70 +1,70 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Check, ShieldCheck, Zap, Wrench, PaintRoller, Hammer, Clock, ArrowRight } from "lucide-react"
-import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import {
+  Check,
+  ShieldCheck,
+  Zap,
+  Wrench,
+  PaintRoller,
+  Hammer,
+  Clock,
+  ArrowRight,
+  Sofa,
+  Settings,
+  Droplet,
+  Brush,
+  Home,
+  Lightbulb,
+  DoorOpen,
+  ShowerHead,
+  type LucideIcon,
+} from "lucide-react"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_SERVICE_RATES, type RateItem } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 import { Button } from "@/components/ui/button"
 
-interface RateItem {
-  name: string
-  price: string
-  unit: string
-  details: string
+const ICON_MAP: Record<string, LucideIcon> = {
+  Wrench,
+  Zap,
+  PaintRoller,
+  Hammer,
+  Sofa,
+  Settings,
+  Droplet,
+  Brush,
+  Home,
+  Lightbulb,
+  DoorOpen,
+  ShowerHead,
 }
 
-const CATEGORIES: { id: string; label: string; icon: any; rates: RateItem[] }[] = [
-  {
-    id: "plumbing",
-    label: "Plumbing",
-    icon: Wrench,
-    rates: [
-      { name: "Leaking Tap or Valve Replacement", price: "$60 – $110", unit: "per set", details: "Includes new washer/valves, thread sealing and testing" },
-      { name: "Toilet Bowl Flush Mechanism Repair", price: "$80 – $140", unit: "per set", details: "Syphon replacement, inlet valve and water level tune" },
-      { name: "Kitchen or Basin Bottle Trap Clear / Replace", price: "$70 – $130", unit: "per point", details: "Clearing stubborn chokes, replacing PVC/chrome traps" },
-      { name: "Storage or Instant Water Heater Install", price: "$120 – $220", unit: "per unit", details: "Secure mounting, pipe connection and leak inspection" },
-    ],
-  },
-  {
-    id: "electrical",
-    label: "Electrical",
-    icon: Zap,
-    rates: [
-      { name: "Lighting Fixture / Ceiling Fan Replacement", price: "$50 – $100", unit: "per point", details: "Safe mounting, wiring termination and switch test" },
-      { name: "Power Socket Replacement (Single/Double)", price: "$45 – $85", unit: "per point", details: "Safety standard compliant, earthing verification" },
-      { name: "Circuit Breaker / DB Box Trip Troubleshooting", price: "$90 – $160", unit: "per job", details: "Isolating faulty appliances or shorted cables" },
-      { name: "Switch & Dimmer Replacement", price: "$45 – $75", unit: "per gang", details: "Standard or designer switch installation" },
-    ],
-  },
-  {
-    id: "painting",
-    label: "Painting",
-    icon: PaintRoller,
-    rates: [
-      { name: "Single Room Refresh / Water Mark Patch", price: "$180 – $320", unit: "per room", details: "Surface prep, sealer and 2 coats premium Nippon/Dulux" },
-      { name: "HDB 3-Room Full Unit Painting", price: "$750 – $950", unit: "full flat", details: "Walls, ceilings, door frames with dust protection" },
-      { name: "HDB 4-Room Full Unit Painting", price: "$950 – $1,250", unit: "full flat", details: "Full masking, cracks filling, premium low-VOC paint" },
-      { name: "HDB 5-Room / Executive Painting", price: "$1,200 – $1,600", unit: "full flat", details: "Complete interior makeover with 1-year paint warranty" },
-    ],
-  },
-  {
-    id: "repairs",
-    label: "Carpentry & Repairs",
-    icon: Hammer,
-    rates: [
-      { name: "Door Lock & Handle Replacement", price: "$75 – $140", unit: "per set", details: "Mortise locks, lever handles, cylinder replacement" },
-      { name: "Cabinet Soft-Close Hinges Replacement", price: "$60 – $120", unit: "per set (4 pcs)", details: "Aligning sagging cabinet doors and smooth operation" },
-      { name: "Bathroom Silicone Mould Removal & Resealing", price: "$70 – $130", unit: "per perimeter", details: "Anti-fungal sanitary grade silicone, clean straight beads" },
-      { name: "Wall Drilling & Heavy Mounting", price: "$50 – $90", unit: "first 2 items", details: "Mirrors, TV brackets, shelves with wall plug anchors" },
-    ],
-  },
+const DEFAULT_CATEGORIES: { id: string; label: string; icon: LucideIcon; rates: RateItem[] }[] = [
+  { id: "plumbing", label: "Plumbing", icon: Wrench, rates: DEFAULT_SERVICE_RATES.plumbing },
+  { id: "electrical", label: "Electrical", icon: Zap, rates: DEFAULT_SERVICE_RATES.electrical },
+  { id: "painting", label: "Painting", icon: PaintRoller, rates: DEFAULT_SERVICE_RATES.painting },
+  { id: "repair", label: "Carpentry & Repairs", icon: Hammer, rates: DEFAULT_SERVICE_RATES.repair },
 ]
 
 export function PricingGuide() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
-  const [activeTab, setActiveTab] = useState("plumbing")
-  const currentCat = CATEGORIES.find((c) => c.id === activeTab) || CATEGORIES[0]
+  
+  const categories = useMemo(() => {
+    const list = (s.services || [])
+      .filter((svc) => Array.isArray(svc.rates) && svc.rates.length > 0)
+      .map((svc) => ({
+        id: svc.key,
+        label: svc.label,
+        icon: ICON_MAP[svc.icon] || Wrench,
+        rates: svc.rates || [],
+      }))
+    return list.length > 0 ? list : DEFAULT_CATEGORIES
+  }, [s.services])
+
+  const [activeTab, setActiveTab] = useState("")
+  const currentCatId = activeTab || categories[0]?.id || "plumbing"
+  const currentCat = categories.find((c) => c.id === currentCatId) || categories[0]
 
   return (
     <section className="py-12 sm:py-20 lg:py-24 bg-background relative overflow-hidden" id="pricing">
@@ -74,7 +74,7 @@ export function PricingGuide() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-8 sm:mb-12 max-w-2xl mx-auto"
+          className="text-center mb-8 sm:mb-12 max-w-3xl mx-auto"
         >
           <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-3 uppercase tracking-wider">
             Singapore Rate Card (2026)
@@ -85,13 +85,21 @@ export function PricingGuide() {
           <p className="text-xs sm:text-base text-muted-foreground mt-2.5 sm:mt-3 leading-relaxed">
             Direct contractor rates across Singapore. Every quote is itemized and confirmed before work begins — no surprise invoices.
           </p>
+
+          {/* Negotiable pricing highlight notice */}
+          <div className="mt-4 flex justify-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 dark:bg-amber-400/15 border border-amber-500/30 dark:border-amber-400/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm font-semibold shadow-xs">
+              <span className="text-amber-600 dark:text-amber-400 text-base shrink-0">💡</span>
+              <span>All prices are negotiable based on site inspection, multiple jobs, or custom scope.</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Trade Tab Switcher — Segmented pill with sliding active indicator */}
-        <div className="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl bg-muted/60 dark:bg-zinc-900/80 border border-border/70 dark:border-white/10 max-w-xl mx-auto mb-10 shadow-xs">
-          {CATEGORIES.map((cat) => {
+        <div className="flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl bg-muted/60 dark:bg-zinc-900/80 border border-border/70 dark:border-white/10 max-w-2xl mx-auto mb-10 shadow-xs">
+          {categories.map((cat) => {
             const Icon = cat.icon
-            const isActive = activeTab === cat.id
+            const isActive = currentCatId === cat.id
             return (
               <button
                 key={cat.id}
@@ -118,9 +126,9 @@ export function PricingGuide() {
 
         {/* Rate Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-4xl mx-auto mb-10">
-          {currentCat.rates.map((rate, i) => (
+          {(currentCat?.rates || []).map((rate, i) => (
             <motion.div
-              key={rate.name}
+              key={`${rate.name}-${i}`}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: i * 0.05 }}
