@@ -11,6 +11,8 @@ import { Testimonials } from "@/components/site/Testimonials"
 import { About } from "@/components/site/About"
 import { Footer } from "@/components/site/Footer"
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat"
+import { MobileBottomDock } from "@/components/site/MobileBottomDock"
+import { WhatsAppPhotoQuote } from "@/components/site/WhatsAppPhotoQuote"
 import { PostDetailModal } from "@/components/site/PostDetailModal"
 import { PortfolioSection } from "@/components/site/PortfolioSection"
 import { QuickQuoteCalculator } from "@/components/site/QuickQuoteCalculator"
@@ -85,7 +87,7 @@ export function HomeView({
 
   return (
     <SiteSettingsProvider settings={settings}>
-      <div className="min-h-screen flex flex-col bg-background overflow-x-clip w-full max-w-full">
+      <div className="min-h-screen flex flex-col bg-background overflow-x-clip w-full max-w-full pb-16 md:pb-0">
         <Header />
         <div className="h-[96px] sm:h-[98px] w-full shrink-0" aria-hidden="true" />
 
@@ -93,6 +95,7 @@ export function HomeView({
           {view === "home" && (
             <>
               <Hero />
+              <WhatsAppPhotoQuote />
               <QuickQuoteCalculator />
               <FeaturedJobs
                 posts={portfolioPosts}
@@ -125,6 +128,7 @@ export function HomeView({
 
         <Footer />
         <WhatsAppFloat />
+        <MobileBottomDock />
         <PostDetailModal />
       </div>
     </SiteSettingsProvider>

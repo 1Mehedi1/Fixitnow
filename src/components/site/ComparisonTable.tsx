@@ -8,33 +8,33 @@ import { useSiteSettings } from "@/components/site-settings-context"
 const COMPARISON = [
   {
     feature: "Pricing Transparency",
-    fixitnow: "Direct contractor pricing (0% middleman markup)",
-    others: "25% to 40% markup added by Interior Designer / Main-con",
+    fixitnow: "Direct contractor trade rates (0% middleman markup)",
+    others: "25% to 35% broker markup added by aggregator platforms & IDs",
   },
   {
-    feature: "On-Site Communication",
-    fixitnow: "Speak directly to the technician doing the job",
-    others: "Relayed through sales agents, causing miscommunication",
+    feature: "Who Actually Does the Work?",
+    fixitnow: "Executed directly by MOM-licensed entity (4R ENGINEERING PTE. LTD.)",
+    others: "Subcontracted out to unknown random third-party freelancers",
+  },
+  {
+    feature: "Direct Technical Communication",
+    fixitnow: "Direct WhatsApp with master trade specialist Tanbir",
+    others: "Relayed through non-technical customer service call centers",
   },
   {
     feature: "Warranty Accountability",
-    fixitnow: "1 Worker, 1 Phone Number, 1 Direct Warranty",
-    others: "Finger-pointing between subcontractors when issues arise",
+    fixitnow: "1 Direct Specialist, 1 Phone Number, 1 Firm Workmanship Warranty",
+    others: "Finger-pointing between platform customer service and subcontractors",
   },
   {
-    feature: "Scheduling & Turnaround",
-    fixitnow: "Fast same-day or next-day dispatch islandwide",
-    others: "1 to 2 weeks coordination delay waiting for available sub-cons",
-  },
-  {
-    feature: "Site Protection & Cleanliness",
-    fixitnow: "Padded floor sheets, dust masking & full cleanup",
-    others: "Often left dirty for homeowner to clean after the job",
+    feature: "Turnaround & Scheduling",
+    fixitnow: "Same-day emergency response or scheduled weekend slots islandwide",
+    others: "Coordination delays waiting for an available subcontractor",
   },
   {
     feature: "Legal Singapore Entity",
-    fixitnow: "ACRA registered, MOM construction sector authorized",
-    others: "Unregistered freelancers with no insurance or recourse",
+    fixitnow: "ACRA Registered UEN: 202143324G · MOM Construction Sector Authorized",
+    others: "Often disclaim on-site liability in platform fine print terms",
   },
 ]
 
@@ -52,13 +52,13 @@ export function ComparisonTable() {
           className="text-center mb-10 sm:mb-14 max-w-2xl mx-auto"
         >
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            Why Choose Direct Contractor
+            Direct Trade Specialist vs Platform Middlemen
           </div>
           <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-balance">
-            Direct Trade Specialist vs. Renovation Middleman
+            Direct MOM Contractor vs. Aggregator Brokers
           </h2>
           <p className="text-xs sm:text-base text-muted-foreground mt-2.5 sm:mt-3 leading-relaxed">
-            Why pay 30% more for middleman sales commissions? Deal directly with the registered craftsman who actually does the work.
+            Why pay 25%–35% extra for aggregator platform fees and outsourced middlemen? Deal directly with the registered Singapore trade specialist who actually executes your work.
           </p>
         </motion.div>
 
@@ -80,7 +80,7 @@ export function ComparisonTable() {
                 <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 flex items-start gap-2.5 text-xs text-muted-foreground">
                   <X className="h-4 w-4 text-destructive/70 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-medium mr-1 text-foreground/80">Traditional ID:</span>
+                    <span className="font-medium mr-1 text-foreground/80">Platform Brokers / Middlemen:</span>
                     {row.others}
                   </div>
                 </div>
@@ -98,11 +98,11 @@ export function ComparisonTable() {
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 w-1/3">
                     <span className="flex items-center gap-1.5">
-                      <UserCheck className="h-4 w-4" /> {s.brand} (Direct)
+                      <UserCheck className="h-4 w-4" /> {s.brand} (Direct MOM Contractor)
                     </span>
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">
-                    Traditional ID / Subcontractors
+                    Aggregator Platforms / Broker Middlemen
                   </th>
                 </tr>
               </thead>
