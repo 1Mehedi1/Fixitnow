@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign } from "lucide-react"
+import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign, Type, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { defaultSiteConfig, type ServiceItem, type RateItem, DEFAULT_SERVICE_IMAGES, DEFAULT_SERVICE_RATES } from "@/lib/site"
+import { defaultSiteConfig, type ServiceItem, type RateItem, DEFAULT_SERVICE_IMAGES, DEFAULT_SERVICE_RATES, DEFAULT_TYPEWRITER_SENTENCES } from "@/lib/site"
 
 const ICON_OPTIONS = [
   "Wrench", "PaintRoller", "Hammer", "Zap", "Sofa", "Settings",
@@ -32,6 +32,7 @@ interface FormState {
   rating: number
   heroHeadline: string
   heroSubtext: string
+  typewriterSentences: string[]
   aboutTitle: string
   aboutBody: string
   services: ServiceItem[]
@@ -44,6 +45,7 @@ interface FormState {
 export function SettingsManager() {
   const [form, setForm] = useState<FormState>({
     ...defaultSiteConfig,
+    typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
     services: [...defaultSiteConfig.services],
     heroImages: [...defaultSiteConfig.heroImages],
   })
@@ -67,6 +69,10 @@ export function SettingsManager() {
             rates: Array.isArray(svc.rates) && svc.rates.length > 0 ? svc.rates : (DEFAULT_SERVICE_RATES[svc.key] || []),
           }))
 
+          let loadedSentences = Array.isArray(d.typewriterSentences) && d.typewriterSentences.length > 0
+            ? d.typewriterSentences
+            : (Array.isArray(d.settings.typewriterSentences) ? d.settings.typewriterSentences : [...(defaultSiteConfig.typewriterSentences || [])])
+
           setForm({
             brand: d.settings.brand || defaultSiteConfig.brand,
             tagline: d.settings.tagline || defaultSiteConfig.tagline,
@@ -81,6 +87,7 @@ export function SettingsManager() {
             rating: d.settings.rating ?? defaultSiteConfig.rating,
             heroHeadline: d.settings.heroHeadline || defaultSiteConfig.heroHeadline,
             heroSubtext: d.settings.heroSubtext || defaultSiteConfig.heroSubtext,
+            typewriterSentences: loadedSentences,
             aboutTitle: d.settings.aboutTitle || defaultSiteConfig.aboutTitle,
             aboutBody: d.settings.aboutBody || defaultSiteConfig.aboutBody,
             services: loadedServices,
@@ -104,6 +111,7 @@ export function SettingsManager() {
           ...form,
           servicesJson: form.services,
           heroImagesJson: form.heroImages,
+          typewriterSentencesJson: form.typewriterSentences,
         }),
       })
       if (!res.ok) throw new Error("Save failed")
@@ -121,6 +129,7 @@ export function SettingsManager() {
     if (!confirm("Reset all settings to defaults? Your custom values will be lost.")) return
     setForm({
       ...defaultSiteConfig,
+      typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
       services: [...defaultSiteConfig.services],
       heroImages: [...defaultSiteConfig.heroImages],
     })
@@ -241,6 +250,39 @@ export function SettingsManager() {
     setForm({ ...form, services: next })
   }
 
+  const handleSentenceChange = (idx: number, val: string) => {
+    const next = [...form.typewriterSentences]
+    next[idx] = val
+    setForm({ ...form, typewriterSentences: next })
+  }
+
+  const handleAddSentence = () => {
+    setForm({
+      ...form,
+      typewriterSentences: [
+        ...form.typewriterSentences,
+        "Fast & reliable handyman repairs, done right the first time.",
+      ],
+    })
+  }
+
+  const handleRemoveSentence = (idx: number) => {
+    if (form.typewriterSentences.length <= 1) {
+      toast.error("You must have at least one rotating sentence.")
+      return
+    }
+    const next = form.typewriterSentences.filter((_, i) => i !== idx)
+    setForm({ ...form, typewriterSentences: next })
+  }
+
+  const handleResetSentences = () => {
+    setForm({
+      ...form,
+      typewriterSentences: [...DEFAULT_TYPEWRITER_SENTENCES],
+    })
+    toast.info("Typewriter sentences reset to Singapore trade defaults.")
+  }
+
   if (loading) {
     return <div className="py-24 text-center text-muted-foreground">Loading settings…</div>
   }
@@ -315,30 +357,111 @@ export function SettingsManager() {
         </CardContent>
       </Card>
 
-      {/* Hero text */}
+      {/* Hero Section & Typewriter Headline */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" /> Hero Section
-          </CardTitle>
-          <CardDescription>The big headline and subtext at the top of the homepage.</CardDescription>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" /> Hero Section & Typewriter Headlines
+              </CardTitle>
+              <CardDescription>
+                Customize the animated typewriter sentences, primary headline, and introductory about paragraph.
+              </CardDescription>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleResetSentences}
+              className="text-xs h-8 border-primary/30 hover:border-primary"
+            >
+              <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset Sentences
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <Field
-            label="Hero headline"
+            label="Hero fallback headline"
             value={form.heroHeadline}
             onChange={(v) => setForm({ ...form, heroHeadline: v })}
             placeholder="Your home, expertly handled."
-            hint="Tip: include a comma. Text before the comma is line 1; text after is line 2 (highlighted)."
+            hint="Static fallback if typewriter is disabled or initial render."
           />
-          <div className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wider">Hero subtext</Label>
+
+          {/* Typewriter Rotating Sentences List */}
+          <div className="space-y-3 rounded-xl border border-primary/20 bg-muted/20 p-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs uppercase tracking-wider font-bold flex items-center gap-1.5">
+                <Type className="h-3.5 w-3.5 text-primary" /> Rotating Typewriter Sentences ({form.typewriterSentences.length})
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddSentence}
+                className="text-xs h-7 px-2.5 bg-primary/10 border-primary/30 hover:bg-primary/20 text-primary font-semibold"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Sentence
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              These sentences continuously type out on the home page. <span className="font-semibold text-foreground">Format rule:</span> use a comma (e.g., <code>&quot;Plumbing &amp; leaks, fixed fast &amp; cleanly.&quot;</code>) — words before the comma appear on line 1, and words after the comma appear as the bold red-underlined punchline.
+            </p>
+
+            <div className="space-y-2 mt-2">
+              {form.typewriterSentences.map((sentence, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-muted-foreground w-6 text-right shrink-0">
+                    {idx + 1}.
+                  </span>
+                  <Input
+                    value={sentence}
+                    onChange={(e) => handleSentenceChange(idx, e.target.value)}
+                    placeholder="e.g. Electrical &amp; wiring, EMA licensed."
+                    className="text-sm h-9 bg-background"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveSentence(idx)}
+                    className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    title="Delete sentence"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Hero Subtext / About Text */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs uppercase tracking-wider font-bold flex items-center gap-1.5">
+                <MessageSquare className="h-3.5 w-3.5 text-primary" /> Hero Introductory About Text
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The introductory description displayed directly beneath the hero headline.
+            </p>
             <Textarea
               value={form.heroSubtext}
               onChange={(e) => setForm({ ...form, heroSubtext: e.target.value })}
-              rows={2}
-              placeholder="Singapore's trusted handyman for plumbing, painting, renovation…"
+              rows={3}
+              placeholder="Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works."
+              className="text-sm bg-background leading-relaxed"
             />
+            {/* Live Preview Box */}
+            <div className="mt-2 rounded-lg border border-border/60 bg-muted/30 p-3 text-xs">
+              <span className="font-semibold text-muted-foreground block mb-1">Live Hero Text Preview:</span>
+              <p className="text-foreground leading-relaxed">
+                {form.heroSubtext}{" "}
+                <span className="font-semibold text-primary">{form.yearsExperience} years</span> experience.{" "}
+                <span className="font-semibold text-primary">{form.jobsCompleted}+ jobs</span> completed across Singapore.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

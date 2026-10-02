@@ -243,28 +243,42 @@ html, body {
   transform-origin: center center;
 }
 
-/* Soft glowing stars gently rising upward into the air and vanishing */
-@keyframes float-star-up {
-  0% {
-    transform: translate3d(0, 0, 0) scale(0.2) rotate(0deg);
-    opacity: 0;
-  }
-  18% {
-    opacity: 0.9;
-    transform: translate3d(var(--star-drift, 4px), -18px, 0) scale(1) rotate(40deg);
-  }
-  65% {
-    opacity: 0.75;
-    transform: translate3d(calc(var(--star-drift, 4px) * 2), -55px, 0) scale(0.85) rotate(85deg);
-  }
-  100% {
-    transform: translate3d(calc(var(--star-drift, 4px) * 3), -95px, 0) scale(0.2) rotate(140deg);
-    opacity: 0;
-  }
+/* Technical Micro-Grid & Scattered Background Utilities */
+.tech-grid-amber {
+  background-image:
+    radial-gradient(rgba(217, 119, 6, 0.14) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245, 158, 11, 0.12), transparent 70%);
+  background-size: 24px 24px, 100% 100%;
+}
+.dark .tech-grid-amber {
+  background-image:
+    radial-gradient(rgba(251, 191, 36, 0.14) 1px, transparent 1px),
+    radial-gradient(ellipse 85% 60% at 50% -15%, rgba(245, 158, 11, 0.16), transparent 75%);
+  background-size: 24px 24px, 100% 100%;
 }
 
-.animate-rising-star {
-  animation: float-star-up var(--star-duration, 4s) cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: var(--star-delay, 0s);
-  will-change: transform, opacity;
+.tech-grid-slate {
+  background-image:
+    radial-gradient(rgba(100, 116, 139, 0.12) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 50% at 85% 20%, rgba(14, 165, 233, 0.05), transparent 60%);
+  background-size: 28px 28px, 100% 100%;
+}
+.dark .tech-grid-slate {
+  background-image:
+    radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    radial-gradient(ellipse 75% 55% at 85% 20%, rgba(14, 165, 233, 0.08), transparent 65%);
+  background-size: 28px 28px, 100% 100%;
+}
+
+.tech-grid-emerald {
+  background-image:
+    radial-gradient(rgba(16, 185, 129, 0.14) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(16, 185, 129, 0.08), transparent 70%);
+  background-size: 24px 24px, 100% 100%;
+}
+.dark .tech-grid-emerald {
+  background-image:
+    radial-gradient(rgba(52, 211, 153, 0.14) 1px, transparent 1px),
+    radial-gradient(ellipse 85% 65% at 50% 50%, rgba(16, 185, 129, 0.14), transparent 75%);
+  background-size: 24px 24px, 100% 100%;
 }

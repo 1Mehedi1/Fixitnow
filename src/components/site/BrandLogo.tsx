@@ -12,38 +12,8 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [isInView, setIsInView] = useState(true)
-
-  // IntersectionObserver: Only load/stream video when the logo is in viewport
-  // This avoids loading 3 instances simultaneously and saves 1.6MB bandwidth on mobile!
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    // If IntersectionObserver is not supported, just set true
-    if (!("IntersectionObserver" in window)) {
-      setIsInView(true)
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsInView(true)
-            observer.disconnect()
-          }
-        })
-      },
-      { rootMargin: "150px" }
-    )
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
 
   useEffect(() => {
-    if (!isInView) return
     const video = videoRef.current
     if (!video) return
 
@@ -55,32 +25,57 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
 
     const playSafe = () => {
       if (video && video.paused) {
-        video.play().then(() => setIsLoaded(true)).catch(() => {})
+        const promise = video.play()
+        if (promise !== undefined) {
+          promise.then(() => setIsLoaded(true)).catch(() => {})
+        }
       }
     }
 
+    // Try playing immediately
     playSafe()
 
-    // Resume cleanly if mobile browser throttles background tabs
-    const onVisibilityChange = () => {
+    // Mobile WebKit loop watchdog: auto-restart on ended/pause
+    const handleEnded = () => {
+      video.currentTime = 0
+      playSafe()
+    }
+
+    const handlePause = () => {
       if (!document.hidden) {
         playSafe()
       }
     }
 
-    // Single passive touch gesture fallback in case browser policy blocked autoplay initially
-    const onFirstTouch = () => {
-      playSafe()
+    video.addEventListener("ended", handleEnded)
+    video.addEventListener("pause", handlePause)
+
+    // Watchdog interval: if mobile throttles or stops the video while visible, resume it
+    const interval = setInterval(() => {
+      if (!document.hidden && video.paused) {
+        playSafe()
+      }
+    }, 1500)
+
+    // Resume when page becomes visible or user touches/scrolls on mobile
+    const onVisibilityChange = () => {
+      if (!document.hidden) playSafe()
     }
+    const onUserInteraction = () => playSafe()
 
     document.addEventListener("visibilitychange", onVisibilityChange)
-    window.addEventListener("touchstart", onFirstTouch, { once: true, passive: true })
+    window.addEventListener("touchstart", onUserInteraction, { passive: true })
+    window.addEventListener("scroll", onUserInteraction, { passive: true })
 
     return () => {
+      clearInterval(interval)
+      video.removeEventListener("ended", handleEnded)
+      video.removeEventListener("pause", handlePause)
       document.removeEventListener("visibilitychange", onVisibilityChange)
-      window.removeEventListener("touchstart", onFirstTouch)
+      window.removeEventListener("touchstart", onUserInteraction)
+      window.removeEventListener("scroll", onUserInteraction)
     }
-  }, [isInView])
+  }, [])
 
   const sizeClasses = {
     sm: "h-8 w-8 rounded-lg",
@@ -108,23 +103,23 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
         }`}
       />
 
-      {/* Video animation with native HTML5 continuous looping */}
-      {isInView && (
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          onCanPlay={() => setIsLoaded(true)}
-          onLoadedData={() => setIsLoaded(true)}
-          onPlay={() => setIsLoaded(true)}
-          className="w-full h-full object-cover relative z-10"
-        >
-          <source src="/logo-animation.mp4" type="video/mp4" />
-        </video>
-      )}
+      {/* Video animation with native HTML5 continuous looping & low-power reliability */}
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        disablePictureInPicture
+        disableRemotePlayback
+        onCanPlay={() => setIsLoaded(true)}
+        onLoadedData={() => setIsLoaded(true)}
+        onPlay={() => setIsLoaded(true)}
+        className="w-full h-full object-cover relative z-10"
+      >
+        <source src="/logo-animation.mp4" type="video/mp4" />
+      </video>
     </motion.div>
   )
 }

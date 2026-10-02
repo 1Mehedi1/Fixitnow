@@ -9,14 +9,20 @@ export async function GET() {
   if (!settings) {
     settings = await db.siteSettings.create({ data: { id: "singleton" } })
   }
-  // Parse services JSON for client convenience
+  // Parse services JSON and typewriter sentences for client convenience
   let services: any[] = []
   try {
     services = JSON.parse(settings.servicesJson || "[]")
   } catch {
     services = []
   }
-  return NextResponse.json({ settings, services })
+  let typewriterSentences: string[] = []
+  try {
+    typewriterSentences = JSON.parse((settings as any).typewriterSentencesJson || "[]")
+  } catch {
+    typewriterSentences = []
+  }
+  return NextResponse.json({ settings, services, typewriterSentences })
 }
 
 /** Admin only — update site settings. */
@@ -29,7 +35,7 @@ export async function PUT(req: NextRequest) {
     "brand", "tagline", "workerName", "phone", "whatsapp", "email", "location",
     "yearsExperience", "jobsCompleted", "happyClients", "rating",
     "heroHeadline", "heroSubtext", "aboutTitle", "aboutBody",
-    "servicesJson", "heroImagesJson", "companyName", "companyUen", "licenseInfo",
+    "servicesJson", "heroImagesJson", "typewriterSentencesJson", "companyName", "companyUen", "licenseInfo",
   ]
 
   const data: any = {}
@@ -39,7 +45,7 @@ export async function PUT(req: NextRequest) {
         data[k] = parseInt(body[k], 10) || 0
       } else if (k === "rating") {
         data[k] = parseFloat(body[k]) || 0
-      } else if (k === "servicesJson" || k === "heroImagesJson") {
+      } else if (k === "servicesJson" || k === "heroImagesJson" || k === "typewriterSentencesJson") {
         // Accept either a string or an array
         data[k] = typeof body[k] === "string" ? body[k] : JSON.stringify(body[k] || [])
       } else {

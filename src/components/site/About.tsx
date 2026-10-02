@@ -74,39 +74,35 @@ export function About() {
           transition={{ duration: 0.6 }}
           className="mb-10 sm:mb-12 relative"
         >
-          {/* Continuous softly rising little glowing sparkle stars */}
+          {/* Static celebratory golden sparkle stars */}
           <div className="absolute inset-0 pointer-events-none overflow-visible z-20">
             {[
-              { id: 1, left: "7%", top: "15%", delay: "0s", duration: "4.2s", drift: "-6px", size: "w-3 h-3" },
-              { id: 2, left: "15%", top: "35%", delay: "-1.4s", duration: "3.8s", drift: "8px", size: "w-3.5 h-3.5" },
-              { id: 3, left: "24%", top: "10%", delay: "-2.6s", duration: "4.6s", drift: "-4px", size: "w-2.5 h-2.5" },
-              { id: 4, left: "33%", top: "28%", delay: "-0.8s", duration: "3.5s", drift: "10px", size: "w-3 h-3" },
-              { id: 5, left: "44%", top: "18%", delay: "-3.1s", duration: "4.8s", drift: "-8px", size: "w-3.5 h-3.5" },
-              { id: 6, left: "55%", top: "38%", delay: "-1.9s", duration: "3.9s", drift: "6px", size: "w-2.5 h-2.5" },
-              { id: 7, left: "64%", top: "12%", delay: "-2.2s", duration: "4.4s", drift: "-5px", size: "w-3.5 h-3.5" },
-              { id: 8, left: "73%", top: "26%", delay: "-0.4s", duration: "3.6s", drift: "9px", size: "w-3 h-3" },
-              { id: 9, left: "82%", top: "14%", delay: "-2.8s", duration: "4.5s", drift: "-7px", size: "w-3.5 h-3.5" },
-              { id: 10, left: "91%", top: "32%", delay: "-1.1s", duration: "4.1s", drift: "5px", size: "w-2.5 h-2.5" },
-              { id: 11, left: "96%", top: "20%", delay: "-3.5s", duration: "4.7s", drift: "-4px", size: "w-3 h-3" },
-              { id: 12, left: "19%", top: "52%", delay: "-0.7s", duration: "4.0s", drift: "6px", size: "w-3 h-3" },
-              { id: 13, left: "50%", top: "58%", delay: "-2.4s", duration: "4.3s", drift: "-6px", size: "w-3.5 h-3.5" },
-              { id: 14, left: "78%", top: "50%", delay: "-1.6s", duration: "3.7s", drift: "7px", size: "w-2.5 h-2.5" },
+              { id: 1, left: "7%", top: "15%", size: "w-3 h-3" },
+              { id: 2, left: "15%", top: "35%", size: "w-3.5 h-3.5" },
+              { id: 3, left: "24%", top: "10%", size: "w-2.5 h-2.5" },
+              { id: 4, left: "33%", top: "28%", size: "w-3 h-3" },
+              { id: 5, left: "44%", top: "18%", size: "w-3.5 h-3.5" },
+              { id: 6, left: "55%", top: "38%", size: "w-2.5 h-2.5" },
+              { id: 7, left: "64%", top: "12%", size: "w-3.5 h-3.5" },
+              { id: 8, left: "73%", top: "26%", size: "w-3 h-3" },
+              { id: 9, left: "82%", top: "14%", size: "w-3.5 h-3.5" },
+              { id: 10, left: "91%", top: "32%", size: "w-2.5 h-2.5" },
+              { id: 11, left: "96%", top: "20%", size: "w-3 h-3" },
+              { id: 12, left: "19%", top: "52%", size: "w-3 h-3" },
+              { id: 13, left: "50%", top: "58%", size: "w-3.5 h-3.5" },
+              { id: 14, left: "78%", top: "50%", size: "w-2.5 h-2.5" },
             ].map((star) => (
               <div
                 key={star.id}
-                className="absolute pointer-events-none animate-rising-star"
+                className="absolute pointer-events-none opacity-85 hover:opacity-100 transition-opacity"
                 style={{
                   left: star.left,
                   top: star.top,
-                  // @ts-expect-error CSS variable
-                  "--star-delay": star.delay,
-                  "--star-duration": star.duration,
-                  "--star-drift": star.drift,
                 }}
               >
                 <svg
                   viewBox="0 0 24 24"
-                  className={`${star.size} text-amber-400 dark:text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.85)] fill-current opacity-90`}
+                  className={`${star.size} text-amber-400 dark:text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.85)] fill-current`}
                 >
                   <path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z" />
                 </svg>

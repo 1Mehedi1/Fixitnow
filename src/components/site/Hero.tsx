@@ -1,12 +1,11 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { motion, useAnimation } from "framer-motion"
+import { motion } from "framer-motion"
 import { ArrowRight, Star, MapPin, ShieldCheck, Clock, Award, Building2 } from "lucide-react"
-import { ConstructionTruckAnimation } from "@/components/site/ConstructionTruckAnimation"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/store/useStore"
-import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_HERO_IMAGES } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_HERO_IMAGES, DEFAULT_TYPEWRITER_SENTENCES } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 
 interface RotatingTrade {
@@ -14,27 +13,38 @@ interface RotatingTrade {
   highlight: string
 }
 
-const DEFAULT_ROTATING_ITEMS: RotatingTrade[] = [
-  { prefix: "Your home,", highlight: "expertly handled." },
-  { prefix: "Plumbing & leaks,", highlight: "fixed fast & cleanly." },
-  { prefix: "HDB & condo painting,", highlight: "dust-free prep guaranteed." },
-  { prefix: "Full home renovation,", highlight: "one accountable warranty." },
-  { prefix: "Licensed electrical works,", highlight: "EMA & LEW compliant." },
-  { prefix: "Trusted craftsmanship,", highlight: "islandwide across Singapore." },
-]
-
-function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) {
-  const items = useMemo(() => {
-    if (fallbackHeadline && !fallbackHeadline.includes("expertly handled")) {
-      return [{ prefix: fallbackHeadline, highlight: "expertly handled." }, ...DEFAULT_ROTATING_ITEMS]
+function parseSentence(sentence: string): RotatingTrade {
+  if (sentence.includes(",")) {
+    const parts = sentence.split(",")
+    return {
+      prefix: parts[0].trim() + ",",
+      highlight: parts.slice(1).join(",").trim(),
     }
-    return DEFAULT_ROTATING_ITEMS
-  }, [fallbackHeadline])
+  }
+  return { prefix: sentence, highlight: "" }
+}
+
+function TypewriterHeadline({
+  fallbackHeadline,
+  sentences,
+}: {
+  fallbackHeadline: string
+  sentences?: string[]
+}) {
+  const items: RotatingTrade[] = useMemo(() => {
+    if (sentences && sentences.length > 0) {
+      return sentences.map(parseSentence)
+    }
+    if (fallbackHeadline && !fallbackHeadline.includes("expertly handled")) {
+      return [parseSentence(fallbackHeadline), ...DEFAULT_TYPEWRITER_SENTENCES.map(parseSentence)]
+    }
+    return DEFAULT_TYPEWRITER_SENTENCES.map(parseSentence)
+  }, [sentences, fallbackHeadline])
 
   const [index, setIndex] = useState(0)
   const currentItem = items[index] || items[0]
   
-  const fullText = useMemo(() => `${currentItem.prefix} ${currentItem.highlight}`, [currentItem])
+  const fullText = useMemo(() => `${currentItem.prefix} ${currentItem.highlight}`.trim(), [currentItem])
   const prefixLength = currentItem.prefix.length
   
   const [typedLength, setTypedLength] = useState(fullText.length)
@@ -98,15 +108,17 @@ function TypewriterHeadline({ fallbackHeadline }: { fallbackHeadline: string }) 
 
 export function Hero() {
   const { setView } = useStore()
-  const badge1Controls = useAnimation()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   const heroPhotos = s.heroImages && s.heroImages.length >= 4 ? s.heroImages : DEFAULT_HERO_IMAGES
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-accent/30 pt-4 pb-10 sm:py-16 w-full max-w-full">
-      {/* Smooth Atmospheric Lighting - Clean background without grid */}
+    <section className="relative overflow-hidden bg-gradient-to-b from-background via-amber-500/[0.04] to-background pt-3 pb-10 sm:py-16 w-full max-w-full">
+      {/* Scattered Architectural Technical Grid & Luminous Amber Aura */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-10%,rgba(245,158,11,0.12),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-15%,rgba(245,158,11,0.08),rgba(0,0,0,0))]" />
+        {/* Crisp Technical Micro-Grid Pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.14] dark:opacity-[0.18]" />
+        {/* Soft Radial Ambient Aura */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-amber-500/15 via-orange-500/5 to-transparent blur-3xl" />
       </div>
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative w-full max-w-full">
@@ -118,35 +130,32 @@ export function Hero() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full"
           >
-            {/* Top badges: rating + professional breathing MOM license card box with construction truck */}
+            {/* Top badges: un-bolded, elegant celebratory style */}
             <div id="hero-badges-track" className="relative flex flex-wrap items-center gap-3 w-full">
-              {/* Realistic Construction Truck Animation */}
-              <ConstructionTruckAnimation badge1Controls={badge1Controls} />
-
-              <motion.div
+              {/* Rating badge — refined celebratory styling */}
+              <div
                 id="hero-rating-badge"
-                animate={badge1Controls}
-                className="inline-flex items-center gap-2 rounded-full border-2 border-amber-500/40 bg-card/95 dark:bg-[#201e28] px-3.5 py-1.5 text-xs sm:text-sm font-bold text-foreground shadow-sm shrink-0 hover:border-amber-500/70 hover:scale-105 transition-all"
+                className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-gradient-to-r from-amber-500/10 via-card/95 to-amber-500/15 dark:from-amber-500/15 dark:via-[#1e1c26] dark:to-amber-500/20 px-3.5 py-1.5 text-xs sm:text-sm font-medium text-foreground shadow-xs shrink-0 hover:border-amber-500/70 hover:scale-[1.02] transition-all"
               >
                 <span className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                    <Star key={i} className="h-3.5 w-3.5 fill-amber-500 text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
                   ))}
                 </span>
-                <span className="font-black text-foreground text-xs sm:text-sm">4.5</span>
-                <span className="text-muted-foreground/60 font-bold">·</span>
-                <span className="text-xs sm:text-sm font-extrabold text-foreground/90">{s.happyClients || 320}+ happy clients</span>
-              </motion.div>
+                <span className="font-semibold text-foreground text-xs sm:text-sm">4.5</span>
+                <span className="text-muted-foreground/60 font-normal">·</span>
+                <span className="text-xs sm:text-sm font-medium text-foreground/90">{s.happyClients || 320}+ happy clients</span>
+              </div>
 
-              {/* Professional MOM license badge — brighter, high-contrast, natural breathing (shrink & expand) */}
+              {/* MOM license badge — un-bolded celebratory prestige style */}
               <div
                 id="hero-license-badge"
-                className="animate-breathe inline-flex items-center gap-2 rounded-xl bg-emerald-500/20 dark:bg-emerald-500/25 border-2 border-emerald-500/40 dark:border-emerald-400/40 px-4 py-1.5 text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-200 shadow-sm cursor-default"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-teal-500/15 dark:from-emerald-950/60 dark:via-[#14231b] dark:to-teal-950/50 border border-emerald-500/40 dark:border-emerald-400/35 px-3.5 py-1.5 text-xs sm:text-sm font-medium text-emerald-950 dark:text-emerald-200 shadow-xs cursor-default hover:border-emerald-500/60 transition-all"
               >
-                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-300 shrink-0" />
+                <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">
                   MOM Licensed ·{" "}
-                  <span className="font-black text-emerald-950 dark:text-emerald-100">
+                  <span className="font-semibold text-emerald-950 dark:text-emerald-100">
                     <span id="hero-license-4r">4R</span>
                     {s.companyName.startsWith("4R") ? s.companyName.slice(2) : ` ${s.companyName}`}
                   </span>
@@ -156,7 +165,7 @@ export function Hero() {
 
             {/* Headline with Typewriter animation */}
             <div className="space-y-2 sm:space-y-3 w-full min-w-0">
-              <TypewriterHeadline fallbackHeadline={s.heroHeadline} />
+              <TypewriterHeadline fallbackHeadline={s.heroHeadline} sentences={s.typewriterSentences} />
               <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-xl text-pretty leading-relaxed break-words">
                 {s.heroSubtext} <span className="font-semibold text-foreground">{s.yearsExperience} years</span> experience. <span className="font-semibold text-foreground">{s.jobsCompleted}+ jobs</span> completed across Singapore.
               </p>

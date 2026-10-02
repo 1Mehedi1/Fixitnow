@@ -48,7 +48,7 @@ export function ProcessSection() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   return (
-    <section className="py-12 sm:py-20 lg:py-24 bg-muted/20 border-y border-border/50 relative overflow-hidden">
+    <section className="py-12 sm:py-20 lg:py-24 tech-grid-emerald border-y border-border/50 relative overflow-hidden">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

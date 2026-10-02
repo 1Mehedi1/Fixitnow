@@ -67,7 +67,7 @@ export function PricingGuide() {
   const currentCat = categories.find((c) => c.id === currentCatId) || categories[0]
 
   return (
-    <section className="py-12 sm:py-20 lg:py-24 bg-background relative overflow-hidden" id="pricing">
+    <section className="py-12 sm:py-20 lg:py-24 tech-grid-amber relative overflow-hidden" id="pricing">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

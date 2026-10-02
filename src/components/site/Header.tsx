@@ -68,20 +68,38 @@ export function Header() {
   }
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 backdrop-blur-2xl backdrop-saturate-150 ${
-        scrolled
-          ? "bg-background/85 dark:bg-[#1a1820]/90 border-b border-border/80 dark:border-white/15 shadow-lg shadow-black/10"
-          : "bg-background/75 dark:bg-[#1a1820]/75 border-b border-border/50 dark:border-white/10 shadow-sm"
-      }`}
-    >
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
-          {/* Logo */}
-          <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left cursor-pointer transition-transform hover:scale-[1.02]">
-            <div id="navbar-brand-logo" className="shrink-0 flex items-center justify-center">
-              <BrandLogo size="md" />
-            </div>
+    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
+      {/* Top High-Vis Orange Announcement Bar - Direct Line for Fast Quote */}
+      <div className="w-full bg-[#f95700] hover:bg-[#ea4f00] text-white py-1.5 px-3 sm:px-4 text-xs sm:text-sm font-medium tracking-wide transition-colors shadow-xs">
+        <div className="container mx-auto max-w-7xl flex items-center justify-center gap-2 text-center">
+          <Phone className="h-3.5 w-3.5 fill-current shrink-0 animate-pulse" />
+          <span>
+            Call our direct line for a fast quote:{" "}
+            <a
+              href={`tel:${s.phone.replace(/[^0-9+]/g, "")}`}
+              className="underline font-bold underline-offset-2 hover:text-amber-100 transition-colors ml-1"
+            >
+              {s.phone}
+            </a>
+          </span>
+        </div>
+      </div>
+
+      {/* Apple-style Frosted Glass Navigation Bar */}
+      <div
+        className={`w-full transition-all duration-300 backdrop-blur-xl backdrop-saturate-150 border-b ${
+          scrolled
+            ? "bg-background/60 dark:bg-[#14121b]/65 border-border/40 dark:border-white/10 shadow-md shadow-black/5"
+            : "bg-background/45 dark:bg-[#14121b]/50 border-border/25 dark:border-white/5 shadow-xs"
+        }`}
+      >
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-4">
+            {/* Logo */}
+            <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left cursor-pointer transition-transform hover:scale-[1.02]">
+              <div id="navbar-brand-logo" className="shrink-0 flex items-center justify-center">
+                <BrandLogo size="md" />
+              </div>
             <div className="text-left leading-tight">
               <div className="font-display font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-amber-600 via-primary to-amber-500 bg-clip-text text-transparent group-hover:from-primary group-hover:to-amber-400 transition-all duration-300 drop-shadow-xs">
                 {s.brand}
@@ -252,6 +270,7 @@ export function Header() {
             </Sheet>
           </div>
         </div>
+      </div>
       </div>
     </header>
   )

@@ -110,9 +110,10 @@ model SiteSettings {
   heroSubtext     String   @default("Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works.")
   aboutTitle      String   @default("Built on trust. Delivered with care.")
   aboutBody       String   @default("We are a Singapore-based home-services company with over a decade of hands-on experience across HDB flats, condominiums and landed homes. Our commitment is simple: show up when we say, do the job properly, and stand behind our work.")
-  servicesJson    String   @default("[]") // JSON array of {key,label,icon,desc}
-  heroImagesJson  String   @default("[]") // JSON array of 4 image URLs
-  companyName     String   @default("4R ENGINEERING PTE. LTD.")
+  servicesJson           String   @default("[]") // JSON array of {key,label,icon,desc}
+  heroImagesJson         String   @default("[]") // JSON array of 4 image URLs
+  typewriterSentencesJson String   @default("[]") // JSON array of rotating sentences
+  companyName            String   @default("4R ENGINEERING PTE. LTD.")
   companyUen      String   @default("202143324G")
   licenseInfo     String   @default("MOM Registered Work Permit · Construction Sector")
   updatedAt       DateTime @updatedAt

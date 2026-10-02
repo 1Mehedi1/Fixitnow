@@ -74,6 +74,15 @@ export const DEFAULT_SERVICE_RATES: Record<string, RateItem[]> = {
   ],
 }
 
+export const DEFAULT_TYPEWRITER_SENTENCES: string[] = [
+  "Your home, expertly handled.",
+  "Plumbing & leaks, fixed fast & cleanly.",
+  "HDB & condo painting, dust-free prep guaranteed.",
+  "Full home renovation, one accountable warranty.",
+  "Licensed electrical works, EMA & LEW compliant.",
+  "Trusted craftsmanship, islandwide across Singapore.",
+]
+
 export interface SiteSettingsT {
   brand: string
   tagline: string
@@ -88,6 +97,7 @@ export interface SiteSettingsT {
   rating: number
   heroHeadline: string
   heroSubtext: string
+  typewriterSentences?: string[]
   aboutTitle: string
   aboutBody: string
   services: ServiceItem[]
@@ -128,6 +138,7 @@ export const defaultSiteConfig: SiteSettingsT = {
   heroHeadline: "Your home, expertly handled.",
   heroSubtext:
     "Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works.",
+  typewriterSentences: DEFAULT_TYPEWRITER_SENTENCES,
   aboutTitle: "Built on trust. Delivered with care.",
   aboutBody:
     "We are a Singapore-based home-services company with over a decade of hands-on experience across HDB flats, condominiums and landed homes. Our commitment is simple: show up when we say, do the job properly, and stand behind our work.",
@@ -197,6 +208,16 @@ export async function loadSiteSettings(): Promise<SiteSettingsT> {
     // keep defaults
   }
 
+  let typewriterSentences: string[] = DEFAULT_TYPEWRITER_SENTENCES
+  try {
+    const parsedSentences = JSON.parse((row as any).typewriterSentencesJson || "[]")
+    if (Array.isArray(parsedSentences) && parsedSentences.length > 0) {
+      typewriterSentences = parsedSentences
+    }
+  } catch {
+    // keep defaults
+  }
+
   return {
     brand: row.brand || defaultSiteConfig.brand,
     tagline: row.tagline || defaultSiteConfig.tagline,
@@ -211,6 +232,7 @@ export async function loadSiteSettings(): Promise<SiteSettingsT> {
     rating: row.rating ?? defaultSiteConfig.rating,
     heroHeadline: row.heroHeadline || defaultSiteConfig.heroHeadline,
     heroSubtext: row.heroSubtext || defaultSiteConfig.heroSubtext,
+    typewriterSentences,
     aboutTitle: row.aboutTitle || defaultSiteConfig.aboutTitle,
     aboutBody: row.aboutBody || defaultSiteConfig.aboutBody,
     services,

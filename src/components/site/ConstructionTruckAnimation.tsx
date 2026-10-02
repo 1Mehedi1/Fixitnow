@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
-import { motion, useAnimation, type AnimationControls } from "framer-motion"
+import { motion, useAnimation } from "framer-motion"
+type AnimationControls = ReturnType<typeof useAnimation>
 
 interface Particle {
   x: number
