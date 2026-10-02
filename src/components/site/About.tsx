@@ -67,54 +67,9 @@ export function About() {
         </motion.div>
 
         {/* Verified Singapore Licensing & Credentials Card — Celebratory, breathing, with softly rising glowing stars */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6 }}
-          className="mb-10 sm:mb-12 relative"
-        >
-          {/* Static celebratory golden sparkle stars */}
-          <div className="absolute inset-0 pointer-events-none overflow-visible z-20">
-            {[
-              { id: 1, left: "7%", top: "15%", size: "w-3 h-3" },
-              { id: 2, left: "15%", top: "35%", size: "w-3.5 h-3.5" },
-              { id: 3, left: "24%", top: "10%", size: "w-2.5 h-2.5" },
-              { id: 4, left: "33%", top: "28%", size: "w-3 h-3" },
-              { id: 5, left: "44%", top: "18%", size: "w-3.5 h-3.5" },
-              { id: 6, left: "55%", top: "38%", size: "w-2.5 h-2.5" },
-              { id: 7, left: "64%", top: "12%", size: "w-3.5 h-3.5" },
-              { id: 8, left: "73%", top: "26%", size: "w-3 h-3" },
-              { id: 9, left: "82%", top: "14%", size: "w-3.5 h-3.5" },
-              { id: 10, left: "91%", top: "32%", size: "w-2.5 h-2.5" },
-              { id: 11, left: "96%", top: "20%", size: "w-3 h-3" },
-              { id: 12, left: "19%", top: "52%", size: "w-3 h-3" },
-              { id: 13, left: "50%", top: "58%", size: "w-3.5 h-3.5" },
-              { id: 14, left: "78%", top: "50%", size: "w-2.5 h-2.5" },
-            ].map((star) => (
-              <div
-                key={star.id}
-                className="absolute pointer-events-none opacity-85 hover:opacity-100 transition-opacity"
-                style={{
-                  left: star.left,
-                  top: star.top,
-                }}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className={`${star.size} text-amber-400 dark:text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.85)] fill-current`}
-                >
-                  <path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z" />
-                </svg>
-              </div>
-            ))}
-          </div>
-
-          {/* Celebratory breathing card with slight greenish award-winning vibe in both day and night mode */}
-          <div className="relative overflow-visible rounded-2xl sm:rounded-3xl animate-celebrate-card border-2 border-emerald-600/40 dark:border-emerald-400/50 bg-gradient-to-br from-emerald-500/[0.14] via-teal-500/[0.08] to-emerald-600/[0.15] dark:from-[#0d2317] dark:via-[#12281b] dark:to-[#0a1c12] p-6 sm:p-8 lg:p-10 shadow-xl shadow-emerald-500/10 dark:shadow-[0_8px_35px_rgba(16,185,129,0.22)]">
-            {/* Ambient inner celebratory emerald glow */}
-            <div className="absolute top-0 right-1/4 w-80 h-32 bg-emerald-400/20 dark:bg-emerald-400/15 blur-3xl pointer-events-none" />
-
+        {/* Verified Singapore Licensing & Credentials Card — Clean, high-performance, zero-lag static card */}
+        <div className="mb-10 sm:mb-12 relative">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-2 border-emerald-600/40 dark:border-emerald-400/50 bg-gradient-to-br from-emerald-500/[0.14] via-teal-500/[0.08] to-emerald-600/[0.15] dark:from-[#0d2317] dark:via-[#12281b] dark:to-[#0a1c12] p-6 sm:p-8 lg:p-10 shadow-lg shadow-emerald-500/5 dark:shadow-[0_4px_25px_rgba(16,185,129,0.18)]">
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-emerald-600/25 dark:border-emerald-400/25">
               <div className="flex items-center gap-3.5">
                 <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border-2 border-emerald-600/40 dark:border-emerald-400/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 shrink-0 shadow-md">
@@ -187,7 +142,7 @@ export function About() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Dynamic Smaller Stats Cards in varied random sizes */}
         <motion.div

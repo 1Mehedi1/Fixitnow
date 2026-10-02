@@ -123,13 +123,8 @@ export function Hero() {
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative w-full max-w-full">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[auto] lg:min-h-[82vh] w-full min-w-0">
-          {/* Left — content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full"
-          >
+          {/* Left — content: Render instantly with 100% opacity on mobile and desktop */}
+          <div className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full">
             {/* Top badges: un-bolded, elegant celebratory style */}
             <div id="hero-badges-track" className="relative flex flex-wrap items-center gap-3 w-full">
               {/* Rating badge — refined celebratory styling */}
@@ -234,7 +229,7 @@ export function Hero() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right — desktop image collage */}
           <motion.div
