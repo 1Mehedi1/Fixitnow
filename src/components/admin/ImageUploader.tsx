@@ -129,10 +129,10 @@ export function ImageUploader({ images, onChange }: Props) {
           ) : (
             <Upload className="h-8 w-8 text-primary" />
           )}
-          <p className="text-sm font-medium">
+          <p className="text-sm font-semibold text-slate-200">
             {uploading ? "Compressing & uploading…" : "Drop images here, or click to select"}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-400 font-medium">
             Auto-compressed to {MAX_SIZE_MB}MB / {MAX_DIMENSION}px · converted to WebP where possible
           </p>
         </div>

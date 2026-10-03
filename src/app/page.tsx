@@ -4,9 +4,7 @@ import { HomeView } from "@/components/HomeView"
 import { FALLBACK_POSTS, FALLBACK_TESTIMONIALS } from "@/lib/fallback-data"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
 
-// Cache at Vercel Edge for instant TTFB (<100ms) on mobile across Singapore & worldwide.
-// Automatically revalidates in the background every 60 seconds (or immediately on admin saves).
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 import { getStoredPosts } from "@/lib/posts-store"
 

@@ -17,8 +17,6 @@ import { useSiteSettings } from "@/components/site-settings-context"
 import { defaultSiteConfig } from "@/lib/site"
 import { ImageUploader, type UploadedImage } from "./ImageUploader"
 import type { Post, PostImage } from "@prisma/client"
-import type { CustomSection } from "@/lib/sections-store"
-
 interface FormState {
   title: string
   excerpt: string
@@ -30,15 +28,12 @@ interface FormState {
   published: boolean
   coverImage: string
   images: UploadedImage[]
-  customSectionId: string
 }
 
 export function PostEditor() {
-  const { editingPostId, editorOpen, closeEditor } = useStore()
+  const { editingPostId, editorOpen, closeEditor, upsertCustomPost, deleteCustomPost } = useStore()
   const settings = useSiteSettings() ?? defaultSiteConfig
   const CATEGORIES = settings.services.map((s) => s.label)
-
-  const [availableSections, setAvailableSections] = useState<CustomSection[]>([])
 
   const EMPTY: FormState = {
     title: "",
@@ -51,24 +46,11 @@ export function PostEditor() {
     published: true,
     coverImage: "",
     images: [],
-    customSectionId: "none",
   }
 
   const [form, setForm] = useState<FormState>(EMPTY)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-
-  // Fetch custom sections for assignment dropdown
-  useEffect(() => {
-    fetch("/api/sections")
-      .then((r) => r.json())
-      .then((d) => {
-        if (Array.isArray(d.sections)) {
-          setAvailableSections(d.sections)
-        }
-      })
-      .catch(() => {})
-  }, [editorOpen])
 
   useEffect(() => {
     if (!editorOpen) return
@@ -81,7 +63,7 @@ export function PostEditor() {
       .then((r) => r.json())
       .then((d) => {
         if (d.post) {
-          const p = d.post as Post & { images: PostImage[]; customSectionId?: string | null }
+          const p = d.post as Post & { images: PostImage[] }
           setForm({
             title: p.title || "",
             excerpt: p.excerpt || "",
@@ -92,7 +74,6 @@ export function PostEditor() {
             featured: Boolean(p.featured),
             published: p.published !== false,
             coverImage: p.coverImage || "",
-            customSectionId: p.customSectionId || "none",
             images: Array.isArray(p.images)
               ? p.images
                   .sort((a, b) => a.position - b.position)
@@ -116,8 +97,7 @@ export function PostEditor() {
     try {
       const payload = {
         ...form,
-        customSectionId: form.customSectionId === "none" ? null : form.customSectionId,
-        coverImage: form.coverImage || form.images[0]?.url || null,
+        coverImage: form.coverImage || form.images.find(img => img.kind === "after")?.url || form.images[0]?.url || null,
       }
       const isNew = editingPostId === "new" || !editingPostId
       const url = isNew ? "/api/posts" : `/api/posts/${editingPostId}`
@@ -131,11 +111,15 @@ export function PostEditor() {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || "Save failed")
 
-      toast.success(isNew ? "Post created successfully!" : "Post updated successfully!")
-      // Smooth reload to apply site-wide
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      const savedPost = data.post || {
+        ...payload,
+        id: isNew ? data.post?.id || `post_${Date.now()}` : editingPostId,
+        createdAt: new Date().toISOString(),
+      }
+
+      upsertCustomPost(savedPost)
+      toast.success(isNew ? "Post created! It is live on the site." : "Post saved! Updates are live on the site.")
+      closeEditor()
     } catch (e: any) {
       toast.error("Save failed", { description: e.message })
     } finally {
@@ -150,10 +134,9 @@ export function PostEditor() {
     try {
       const res = await fetch(`/api/posts/${editingPostId}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Delete failed")
+      deleteCustomPost(editingPostId)
       toast.success("Post deleted")
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      closeEditor()
     } catch {
       toast.error("Delete failed")
     } finally {
@@ -163,7 +146,7 @@ export function PostEditor() {
 
   return (
     <Dialog open={editorOpen} onOpenChange={(o) => !o && closeEditor()}>
-      <DialogContent className="max-w-4xl w-[95vw] h-[92vh] max-h-[92vh] p-0 gap-0 flex flex-col bg-slate-900 border-slate-800 text-slate-100 rounded-2xl overflow-hidden shadow-2xl">
+      <DialogContent className="dark max-w-4xl w-[95vw] h-[92vh] max-h-[92vh] p-0 gap-0 flex flex-col bg-slate-900 border-slate-800 text-slate-100 rounded-2xl overflow-hidden shadow-2xl [&_.text-muted-foreground]:text-slate-300 [&_label]:text-slate-200">
         {/* Fixed Header with Top Save Button */}
         <DialogHeader className="px-6 py-3.5 border-b border-slate-800 flex-row items-center justify-between space-y-0 bg-slate-950/80 shrink-0">
           <div>
@@ -232,53 +215,26 @@ export function PostEditor() {
                 />
               </div>
 
-              {/* Category & Custom Section Assignment */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-xs uppercase tracking-wider font-bold text-slate-300">
-                    Trade Category
-                  </Label>
-                  <Select
-                    value={form.category}
-                    onValueChange={(v) => setForm({ ...form, category: v })}
-                  >
-                    <SelectTrigger className="bg-slate-950/60 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
-                      {CATEGORIES.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center gap-1.5">
-                    <Layers className="h-3.5 w-3.5 text-primary" /> Assign to Homepage Section
-                  </Label>
-                  <Select
-                    value={form.customSectionId}
-                    onValueChange={(v) => setForm({ ...form, customSectionId: v })}
-                  >
-                    <SelectTrigger className="bg-slate-950/60 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
-                      <SelectItem value="none">Standard Portfolio (Selected Work)</SelectItem>
-                      {availableSections.map((sec) => (
-                        <SelectItem key={sec.id} value={sec.id}>
-                          ⭐ {sec.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[11px] text-slate-400">
-                    Choose which homepage section this post appears under.
-                  </p>
-                </div>
+              {/* Category */}
+              <div className="space-y-1.5">
+                <Label className="text-xs uppercase tracking-wider font-bold text-slate-200">
+                  Trade Category
+                </Label>
+                <Select
+                  value={form.category}
+                  onValueChange={(v) => setForm({ ...form, category: v })}
+                >
+                  <SelectTrigger className="bg-slate-950/60 border-slate-700 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-slate-800 text-slate-100">
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Tags */}

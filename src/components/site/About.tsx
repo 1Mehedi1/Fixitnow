@@ -83,11 +83,11 @@ export function About() {
                       Verified Singapore Entity
                     </span>
                     <span className="text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-500/20 dark:bg-emerald-500/25 border border-emerald-600/30 dark:border-emerald-400/40 px-2.5 py-0.5 rounded-full">
-                      ACRA Recognized & Regulated Entity
+                      ACRA Recognized Entity
                     </span>
                   </div>
                   <h3 className="font-display text-lg sm:text-2xl font-black tracking-tight mt-1 text-emerald-950 dark:text-white">
-                    Licensed & Regulated Trade Specialist
+                    Company: {s.companyName || "4R ENGINEERING PTE. LTD."}
                   </h3>
                 </div>
               </div>

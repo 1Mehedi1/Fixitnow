@@ -13,7 +13,6 @@ import { useStore, type AdminTab } from "@/store/useStore"
 import { AdminLogin } from "./AdminLogin"
 import { PostList } from "./PostList"
 import { PostEditor } from "./PostEditor"
-import { CustomSectionsManager } from "./CustomSectionsManager"
 import { TestimonialManager } from "./TestimonialManager"
 import { AnalyticsDashboard } from "./AnalyticsDashboard"
 import { SettingsManager } from "./SettingsManager"
@@ -27,7 +26,6 @@ interface Props {
 const NAV: { key: AdminTab; label: string; icon: any }[] = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard },
   { key: "posts", label: "Posts", icon: FileText },
-  { key: "sections", label: "Custom Sections", icon: Layers },
   { key: "testimonials", label: "Testimonials", icon: MessageSquare },
   { key: "analytics", label: "Analytics", icon: BarChart3 },
   { key: "settings", label: "Site Settings", icon: Settings },
@@ -35,7 +33,8 @@ const NAV: { key: AdminTab; label: string; icon: any }[] = [
 
 export function AdminPanel({ posts, testimonials }: Props) {
   const { data: session, status } = useSession()
-  const { adminTab, setAdminTab, setView, openEditor } = useStore()
+  const { adminTab, setAdminTab, setView, openEditor, customPosts } = useStore()
+  const activePosts = customPosts || posts
 
   // Show login screen if unauthenticated
   if (status === "loading") {
@@ -50,21 +49,13 @@ export function AdminPanel({ posts, testimonials }: Props) {
   }
 
   const counts = {
-    posts: posts.length,
-    portfolio: posts.filter((p) => p.type === "portfolio").length,
+    posts: activePosts.length,
+    portfolio: activePosts.filter((p) => p.type === "portfolio").length,
     testimonials: testimonials.length,
   }
 
-  const postsCountBySection: Record<string, number> = {}
-  posts.forEach((p) => {
-    const secId = (p as any).customSectionId
-    if (secId) {
-      postsCountBySection[secId] = (postsCountBySection[secId] || 0) + 1
-    }
-  })
-
   return (
-    <div className="bg-slate-950 text-slate-100 min-h-screen flex flex-col md:flex-row">
+    <div className="dark bg-slate-950 text-slate-100 min-h-screen flex flex-col md:flex-row [&_.text-muted-foreground]:text-slate-300 [&_label]:text-slate-200">
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-slate-800 bg-slate-900/60 p-4 sticky top-0 h-screen shadow-lg">
         <div className="mb-6 px-2 flex items-center justify-between">
@@ -190,9 +181,6 @@ export function AdminPanel({ posts, testimonials }: Props) {
                     <Button variant="outline" onClick={() => setAdminTab("posts")} className="border-slate-700 bg-slate-800 text-slate-200 hover:text-white cursor-pointer">
                       <FileText className="h-4 w-4 mr-1.5" /> Manage posts
                     </Button>
-                    <Button variant="outline" onClick={() => setAdminTab("sections")} className="border-slate-700 bg-slate-800 text-slate-200 hover:text-white cursor-pointer">
-                      <Layers className="h-4 w-4 mr-1.5" /> Custom sections
-                    </Button>
                     <Button variant="outline" onClick={() => setAdminTab("testimonials")} className="border-slate-700 bg-slate-800 text-slate-200 hover:text-white cursor-pointer">
                       <MessageSquare className="h-4 w-4 mr-1.5" /> Testimonials
                     </Button>
@@ -208,7 +196,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
                 <CardContent className="p-5">
                   <h3 className="font-semibold text-sm mb-3 text-white">Recent posts</h3>
                   <div className="space-y-2">
-                    {posts.slice(0, 5).map((p) => (
+                    {activePosts.slice(0, 5).map((p) => (
                       <button
                         key={p.id}
                         onClick={() => openEditor(p.id)}
@@ -229,8 +217,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
             </div>
           )}
 
-          {adminTab === "posts" && <PostList posts={posts} />}
-          {adminTab === "sections" && <CustomSectionsManager postsCountBySection={postsCountBySection} />}
+          {adminTab === "posts" && <PostList posts={activePosts} />}
           {adminTab === "testimonials" && <TestimonialManager testimonials={testimonials} />}
           {adminTab === "analytics" && <AnalyticsDashboard />}
           {adminTab === "settings" && <SettingsManager />}

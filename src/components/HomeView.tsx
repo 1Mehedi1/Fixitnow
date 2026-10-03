@@ -23,12 +23,12 @@ import { FaqSection } from "@/components/site/FaqSection"
 import { TradePartnership } from "@/components/site/TradePartnership"
 import { ScrollToTop } from "@/components/site/ScrollToTop"
 import { AdminPanel } from "@/components/admin/AdminPanel"
+import { ArrowRight } from "lucide-react"
+import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider"
 import { SiteSettingsProvider, useSiteSettings } from "@/components/site-settings-context"
-import { defaultSiteConfig } from "@/lib/site"
+import { defaultSiteConfig, whatsappLink } from "@/lib/site"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
 import type { SiteSettingsT } from "@/lib/site"
-import type { CustomSection } from "@/lib/sections-store"
-
 interface Props {
   settings: SiteSettingsT
   posts: (Post & { images: PostImage[] })[]
@@ -42,26 +42,36 @@ interface Props {
 export function HomeView({
   settings,
   posts,
-  portfolioPosts,
-  beforeAfterPosts,
+  portfolioPosts: initialPortfolioPosts,
+  beforeAfterPosts: initialBeforeAfterPosts,
   testimonials,
   allPosts,
   allTestimonials,
 }: Props) {
-  const { view, setView, openPost } = useStore()
-  const [customSections, setCustomSections] = useState<CustomSection[]>([])
+  const { view, setView, openPost, customPosts, setCustomPosts } = useStore()
 
-  // Load enabled custom sections
+  // Hydrate client-side posts on mount (with localStorage fallback for instant admin updates)
   useEffect(() => {
-    fetch("/api/sections")
-      .then((r) => r.json())
-      .then((d) => {
-        if (Array.isArray(d.sections)) {
-          setCustomSections(d.sections.filter((s: any) => s.enabled))
+    try {
+      const stored = localStorage.getItem("fixitnow_client_posts")
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCustomPosts(parsed)
+          return
         }
-      })
-      .catch(() => {})
-  }, [])
+      }
+    } catch {}
+    if (!customPosts && posts && posts.length > 0) {
+      setCustomPosts(posts)
+    }
+  }, [posts, customPosts, setCustomPosts])
+
+  const activePosts = (customPosts && customPosts.length > 0) ? customPosts : posts
+  const portfolioPosts = activePosts.filter((p) => p.published !== false && p.type === "portfolio")
+  const beforeAfterPosts = activePosts.filter(
+    (p) => p.published !== false && p.images && p.images.some((img: any) => img.kind === "before") && p.images.some((img: any) => img.kind === "after")
+  )
 
   // Sync view state from URL ?view= on mount
   useEffect(() => {
@@ -143,21 +153,6 @@ export function HomeView({
               {beforeAfterPosts.length > 0 && (
                 <BeforeAfterPreview posts={beforeAfterPosts.slice(0, 4)} onSeeAll={() => setView("beforeAfter")} />
               )}
-              {/* Dynamic Custom Sections created by Admin (e.g. "Our Blog", "Handyman Guides", etc.) */}
-              {customSections.map((sec) => {
-                const secPosts = posts.filter(
-                  (p) => (p as any).customSectionId === sec.id && p.published
-                )
-                if (secPosts.length === 0) return null
-                return (
-                  <DynamicCustomSection
-                    key={sec.id}
-                    section={sec}
-                    posts={secPosts}
-                    onOpenPost={openPost}
-                  />
-                )
-              })}
               <Services />
               <ProcessSection />
               <ComparisonTable />
@@ -198,6 +193,8 @@ function BeforeAfterPreview({
   onSeeAll: () => void
 }) {
   const { openPost } = useStore()
+  const s = useSiteSettings() ?? defaultSiteConfig
+
   return (
     <section id="before-after-section" className="py-12 sm:py-20 lg:py-24 bg-muted/30">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -215,7 +212,7 @@ function BeforeAfterPreview({
           </div>
           <button
             onClick={onSeeAll}
-            className="self-start sm:self-auto text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
+            className="self-start sm:self-auto text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
             See all
             <ArrowRight className="h-4 w-4" />
@@ -223,7 +220,7 @@ function BeforeAfterPreview({
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-          {posts.map((post, i) => {
+          {posts.map((post) => {
             const before = post.images.find((img) => img.kind === "before")
             const after = post.images.find((img) => img.kind === "after")
             if (!before || !after) return null
@@ -233,17 +230,42 @@ function BeforeAfterPreview({
                   className="cursor-pointer group h-full"
                   onClick={() => openPost(post)}
                 >
-                  <div className="overflow-hidden rounded-xl border border-border/80 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between">
+                  <div className="overflow-hidden rounded-xl border border-border/80 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between bg-card">
                     <div onClick={(e) => e.stopPropagation()} className="relative">
-                      <BeforeAfterSliderInline before={before.url} after={after.url} alt={post.title} />
+                      <BeforeAfterSlider before={before.url} after={after.url} alt={post.title} />
                     </div>
-                    <div className="p-3.5 sm:p-4 bg-card flex-1">
-                      <h3 className="font-display font-bold text-sm sm:text-base mb-1 line-clamp-1 group-hover:text-primary transition-colors">
-                        {post.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-                        {post.excerpt}
-                      </p>
+                    <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-display font-bold text-sm sm:text-base mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                          {post.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                          {post.excerpt}
+                        </p>
+                      </div>
+
+                      {/* Outside View WhatsApp Button */}
+                      <div className="pt-2.5 mt-2.5 border-t border-border/50 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const text = `Hi, I saw your work "${post.title}" on Fixitnow. Can I get a quote for a similar job?`
+                            window.open(whatsappLink(s, text), "_blank", "noopener,noreferrer")
+                            fetch("/api/analytics", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ eventType: "whatsapp_click", postId: post.id }),
+                            }).catch(() => {})
+                          }}
+                          className="inline-flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-[#25D366] text-emerald-700 dark:text-emerald-400 hover:text-white font-bold text-xs transition-all hover:scale-[1.02] border border-emerald-500/30 hover:border-[#25D366] shadow-xs cursor-pointer"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current shrink-0">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                          </svg>
+                          <span>WhatsApp for Quote</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -256,89 +278,4 @@ function BeforeAfterPreview({
   )
 }
 
-// Inline import to avoid circular dep
-import { BeforeAfterSlider as BeforeAfterSliderInline } from "@/components/site/BeforeAfterSlider"
-import { ArrowRight } from "lucide-react"
-
-/** Renders an admin-created custom section dynamically on the homepage */
-function DynamicCustomSection({
-  section,
-  posts,
-  onOpenPost,
-}: {
-  section: CustomSection
-  posts: (Post & { images: PostImage[] })[]
-  onOpenPost: (p: Post) => void
-}) {
-  return (
-    <section className="py-12 sm:py-20 lg:py-24 bg-card/60 border-t border-border/50">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            {section.badge || "Articles & Updates"}
-          </div>
-          <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight text-balance text-foreground">
-            {section.title}
-          </h2>
-          {section.subtitle && (
-            <p className="text-sm sm:text-base text-muted-foreground mt-2.5 leading-relaxed">
-              {section.subtitle}
-            </p>
-          )}
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => {
-            const cover = post.coverImage || post.images[0]?.url
-            return (
-              <div
-                key={post.id}
-                onClick={() => onOpenPost(post)}
-                className="group rounded-2xl overflow-hidden border border-border/80 bg-card hover:border-primary/50 hover:shadow-xl transition-all cursor-pointer flex flex-col"
-              >
-                {cover && (
-                  <div className="aspect-[16/10] overflow-hidden bg-muted relative">
-                    <img
-                      src={cover}
-                      alt={post.title}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    {post.category && (
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold">
-                        {post.category}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                  <div>
-                    <h3 className="font-display font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-                    {post.excerpt && (
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 line-clamp-3 leading-relaxed">
-                        {post.excerpt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      {new Date(post.createdAt).toLocaleDateString("en-SG", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                    <span className="font-semibold text-primary group-hover:underline">Read details →</span>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
 

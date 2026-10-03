@@ -73,49 +73,49 @@ export function TestimonialManager({ testimonials }: Props) {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight">Testimonials</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-white">Testimonials</h2>
+          <p className="text-sm text-slate-200 font-semibold mt-1">
             {testimonials.length} total · {testimonials.filter((t) => t.published).length} shown on site
           </p>
         </div>
-        <Button onClick={() => setOpen(true)}>
+        <Button onClick={() => setOpen(true)} className="font-bold">
           <Plus className="h-4 w-4 mr-1.5" /> Add testimonial
         </Button>
       </div>
 
       {testimonials.length === 0 ? (
-        <Card><CardContent className="py-16 text-center text-muted-foreground">No testimonials yet.</CardContent></Card>
+        <Card className="bg-slate-900 border-slate-800"><CardContent className="py-16 text-center text-slate-200 font-semibold">No testimonials yet.</CardContent></Card>
       ) : (
         <div className="grid gap-3">
           {testimonials.map((t, i) => (
             <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-              <Card className={t.published ? "" : "opacity-60"}>
+              <Card className={t.published ? "bg-slate-900/90 border-slate-700/80" : "bg-slate-900/50 border-slate-800 opacity-60"}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-display font-bold shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center font-display font-bold shrink-0">
                       {t.name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-semibold text-sm">{t.name}</span>
-                        {t.role && <span className="text-xs text-muted-foreground">· {t.role}</span>}
+                        <span className="font-semibold text-sm text-white">{t.name}</span>
+                        {t.role && <span className="text-xs text-slate-300 font-medium">· {t.role}</span>}
                         <div className="flex">
                           {Array.from({ length: 5 }).map((_, idx) => (
-                            <Star key={idx} className={`h-3 w-3 ${idx < t.rating ? "fill-primary text-primary" : "fill-muted text-muted"}`} />
+                            <Star key={idx} className={`h-3 w-3 ${idx < t.rating ? "fill-amber-400 text-amber-400" : "fill-slate-700 text-slate-700"}`} />
                           ))}
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{t.content}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                      <p className="text-sm text-slate-200 line-clamp-2">{t.content}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
                         <span>{new Date(t.createdAt).toLocaleDateString("en-SG")}</span>
                       </div>
                     </div>
                     <div className="flex flex-col gap-1 shrink-0">
                       <div className="flex items-center gap-1 text-xs">
                         <Switch checked={t.published} onCheckedChange={() => togglePublish(t)} />
-                        <span className="text-muted-foreground">{t.published ? "Live" : "Hidden"}</span>
+                        <span className="text-slate-300 font-medium">{t.published ? "Live" : "Hidden"}</span>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => del(t.id)} className="text-destructive hover:text-destructive h-7">
+                      <Button variant="ghost" size="sm" onClick={() => del(t.id)} className="text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 h-7">
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>

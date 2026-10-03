@@ -33,7 +33,7 @@ const COMPARISON = [
   },
   {
     feature: "Legal Singapore Entity",
-    fixitnow: "ACRA Registered UEN: 202143324G · Regulated Trade Specialist",
+    fixitnow: "ACRA Registered UEN: 202143324G · Company: 4R ENGINEERING PTE. LTD.",
     others: "Often disclaim on-site liability in platform fine print terms",
   },
 ]

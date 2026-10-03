@@ -68,11 +68,11 @@ export function PostDetailModal() {
 
   return (
     <Dialog open={detailOpen} onOpenChange={(o) => !o && closePost()}>
-      <DialogContent className="max-w-4xl w-[95vw] max-h-[92vh] p-0 overflow-hidden gap-0 rounded-2xl border-border/80 shadow-2xl">
+      <DialogContent showCloseButton={false} className="w-[95vw] max-w-[95vw] sm:max-w-3xl md:max-w-4xl max-h-[92vh] p-0 overflow-hidden gap-0 rounded-2xl border-border/80 shadow-2xl">
         <DialogTitle className="sr-only">{full?.title || "Project Details"}</DialogTitle>
-        <ScrollArea className="h-[92vh] scroll-area-thin">
+        <ScrollArea className="h-[92vh] overflow-x-hidden scroll-area-thin">
           {full && (
-            <article className="pb-8">
+            <article className="pb-8 max-w-full overflow-x-hidden">
               {/* Hero image header */}
               {cover && (
                 <div className="relative aspect-[16/9] max-h-[420px] bg-muted overflow-hidden">
@@ -85,8 +85,8 @@ export function PostDetailModal() {
                   >
                     <X className="h-5 w-5" />
                   </button>
-                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 text-white z-10">
-                    <div className="flex gap-2 mb-2.5 flex-wrap">
+                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 text-white z-10">
+                    <div className="flex gap-2 mb-2 flex-wrap">
                       {full.featured && (
                         <Badge className="bg-amber-500 text-stone-950 font-bold border-0 text-xs">
                           ⭐ Featured Work
@@ -98,16 +98,16 @@ export function PostDetailModal() {
                         </Badge>
                       )}
                     </div>
-                    <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white text-balance drop-shadow-md">
+                    <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white text-balance drop-shadow-md">
                       {full.title}
                     </h1>
                   </div>
                 </div>
               )}
 
-              <div className="p-6 sm:p-8 space-y-6">
+              <div className="p-5 sm:p-7 space-y-6 max-w-full overflow-x-hidden">
                 {/* Meta strip */}
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-muted-foreground pb-2 border-b border-border/50">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-muted-foreground pb-2 border-b border-border/50">
                   <span className="flex items-center gap-1.5 font-medium">
                     <Calendar className="h-4 w-4 text-primary" />
                     {new Date(full.createdAt).toLocaleDateString("en-SG", {
@@ -128,7 +128,7 @@ export function PostDetailModal() {
 
                 {/* Excerpt */}
                 {full.excerpt && (
-                  <p className="text-base sm:text-lg text-foreground/90 font-medium leading-relaxed bg-muted/30 p-4 rounded-xl border border-border/40">
+                  <p className="text-sm sm:text-base text-foreground/90 font-medium leading-relaxed bg-muted/30 p-4 rounded-xl border border-border/40">
                     {full.excerpt}
                   </p>
                 )}
@@ -137,7 +137,7 @@ export function PostDetailModal() {
                 {hasSlider && before && after && (
                   <div className="space-y-3 pt-2">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-display font-bold text-lg text-foreground">Before & After Transformation</h3>
+                      <h3 className="font-display font-bold text-base sm:text-lg text-foreground">Before & After Transformation</h3>
                       <span className="text-xs text-muted-foreground">Drag slider to compare</span>
                     </div>
                     <div className="rounded-2xl overflow-hidden border border-border/70 shadow-md">
@@ -148,7 +148,7 @@ export function PostDetailModal() {
 
                 {/* Body content */}
                 {full.content && (
-                  <div className="prose prose-stone dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed py-2">
+                  <div className="prose prose-stone dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed py-2 break-words">
                     <ReactMarkdown>{full.content}</ReactMarkdown>
                   </div>
                 )}
@@ -156,7 +156,7 @@ export function PostDetailModal() {
                 {/* Gallery images */}
                 {gallery.length > 0 && !hasSlider && (
                   <div className="space-y-3">
-                    <h3 className="font-display font-bold text-lg text-foreground">Project Photos</h3>
+                    <h3 className="font-display font-bold text-base sm:text-lg text-foreground">Project Photos</h3>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {gallery.map((img) => (
                         <div key={img.id} className="aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-sm">
@@ -167,30 +167,30 @@ export function PostDetailModal() {
                   </div>
                 )}
 
-                <Separator className="my-6" />
+                <Separator className="my-5" />
 
-                {/* High-Converting Direct WhatsApp & Call Action Card */}
-                <div className="rounded-2xl bg-gradient-to-br from-emerald-950/20 via-background to-emerald-900/10 border-2 border-emerald-500/30 p-5 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-lg">
-                  <div className="space-y-1.5">
+                {/* Compact, Short Card Sized Direct WhatsApp & Call Action Card */}
+                <div className="rounded-2xl bg-gradient-to-br from-emerald-950/20 via-background to-emerald-900/10 border-2 border-emerald-500/30 p-4 sm:p-5 space-y-3.5 shadow-md">
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                        Direct Handyman Quote · 0% Markup
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                        Direct Handyman Quote · Transparent Pricing
                       </span>
                     </div>
-                    <h4 className="font-display font-bold text-lg sm:text-xl text-foreground">
+                    <h4 className="font-display font-bold text-base sm:text-lg text-foreground">
                       Need a similar repair or renovation?
                     </h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground max-w-md">
-                      Send a photo of your job directly to {s.workerName}. Get a transparent itemized estimate within 15 minutes.
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      Send a photo of your job directly on WhatsApp. Get an honest, transparent itemized estimate.
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto shrink-0">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
                     <Button
                       asChild
-                      size="lg"
-                      className="bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold h-12 px-6 shadow-md transition-all cursor-pointer"
+                      size="default"
+                      className="bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold h-11 px-5 shadow-sm transition-all cursor-pointer flex-1 justify-center"
                     >
                       <a
                         href={whatsappLink(s, waQuoteText)}
@@ -204,7 +204,7 @@ export function PostDetailModal() {
                           }).catch(() => {})
                         }}
                       >
-                        <MessageSquare className="h-4 w-4 mr-2" />
+                        <MessageSquare className="h-4 w-4 mr-2 shrink-0" />
                         WhatsApp for Quote
                       </a>
                     </Button>
@@ -212,11 +212,11 @@ export function PostDetailModal() {
                     <Button
                       asChild
                       variant="outline"
-                      size="lg"
-                      className="h-12 px-5 border-emerald-500/40 hover:bg-emerald-500/10 text-foreground font-semibold"
+                      size="default"
+                      className="h-11 px-4 border-emerald-500/40 hover:bg-emerald-500/10 text-foreground font-semibold sm:w-auto justify-center"
                     >
                       <a href={`tel:${s.phone.replace(/[^0-9+]/g, "")}`}>
-                        <Phone className="h-4 w-4 mr-2 text-emerald-600 dark:text-emerald-400" />
+                        <Phone className="h-4 w-4 mr-2 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         Direct Call
                       </a>
                     </Button>

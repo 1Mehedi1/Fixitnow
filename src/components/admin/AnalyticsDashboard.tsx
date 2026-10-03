@@ -174,84 +174,84 @@ export function AnalyticsDashboard() {
       {/* Hero Metric Scorecards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Unique Visitors */}
-        <Card className="hover:border-primary/40 transition-all">
+        <Card className="hover:border-primary/40 transition-all bg-slate-900 border-slate-800 text-slate-100">
           <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">Unique Visitors</span>
-              <div className="h-8 w-8 rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-slate-300">Unique Visitors</span>
+              <div className="h-8 w-8 rounded-lg bg-blue-500/15 text-blue-400 flex items-center justify-center">
                 <Users className="h-4 w-4" />
               </div>
             </div>
-            <div className="font-display text-2xl sm:text-3xl font-black text-foreground">
-              {stats.totals.uniqueVisitors.toLocaleString()}
+            <div className="font-display text-2xl sm:text-3xl font-black text-white">
+              {(stats?.totals?.uniqueVisitors ?? 0).toLocaleString()}
             </div>
             <div className="flex items-center gap-1.5 mt-2 text-xs">
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
+              <span className="font-bold text-emerald-400 flex items-center">
                 <ArrowUpRight className="h-3.5 w-3.5" />
-                {stats.totals.trends.visitorsChange}
+                {stats?.totals?.trends?.visitorsChange ?? "+0%"}
               </span>
-              <span className="text-muted-foreground text-[11px]">vs previous period</span>
+              <span className="text-slate-400 text-[11px]">vs previous period</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Card 2: Total Page Views */}
-        <Card className="hover:border-primary/40 transition-all">
+        <Card className="hover:border-primary/40 transition-all bg-slate-900 border-slate-800 text-slate-100">
           <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">Page Views</span>
-              <div className="h-8 w-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-slate-300">Page Views</span>
+              <div className="h-8 w-8 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center">
                 <Eye className="h-4 w-4" />
               </div>
             </div>
-            <div className="font-display text-2xl sm:text-3xl font-black text-foreground">
-              {stats.totals.pageViews.toLocaleString()}
+            <div className="font-display text-2xl sm:text-3xl font-black text-white">
+              {(stats?.totals?.pageViews ?? 0).toLocaleString()}
             </div>
             <div className="flex items-center gap-1.5 mt-2 text-xs">
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
+              <span className="font-bold text-emerald-400 flex items-center">
                 <ArrowUpRight className="h-3.5 w-3.5" />
-                {stats.totals.trends.viewsChange}
+                {stats?.totals?.trends?.viewsChange ?? "+0%"}
               </span>
-              <span className="text-muted-foreground text-[11px]">total impressions</span>
+              <span className="text-slate-400 text-[11px]">total impressions</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Card 3: WhatsApp & Phone Leads */}
-        <Card className="hover:border-primary/40 transition-all border-emerald-500/30 bg-emerald-500/[0.02]">
+        <Card className="hover:border-primary/40 transition-all border-emerald-500/30 bg-emerald-950/20 text-slate-100">
           <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-700 dark:text-emerald-300">Total Inquiries</span>
-              <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300">Total Inquiries</span>
+              <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <MousePointerClick className="h-4 w-4" />
               </div>
             </div>
-            <div className="font-display text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
-              {stats.totals.totalConversions.toLocaleString()}
+            <div className="font-display text-2xl sm:text-3xl font-black text-emerald-400">
+              {(stats?.totals?.totalConversions ?? 0).toLocaleString()}
             </div>
-            <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
-              <span className="font-bold text-foreground">💬 {stats.totals.whatsappClicks} WA</span>
+            <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-300">
+              <span className="font-bold text-white">💬 {stats?.totals?.whatsappClicks ?? 0} WA</span>
               <span>·</span>
-              <span className="font-bold text-foreground">📞 {stats.totals.phoneCalls} Calls</span>
+              <span className="font-bold text-white">📞 {stats?.totals?.phoneCalls ?? 0} Calls</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Card 4: Conversion Rate % */}
-        <Card className="hover:border-primary/40 transition-all">
+        <Card className="hover:border-primary/40 transition-all bg-slate-900 border-slate-800 text-slate-100">
           <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">Conversion Rate</span>
-              <div className="h-8 w-8 rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-slate-300">Conversion Rate</span>
+              <div className="h-8 w-8 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center">
                 <TrendingUp className="h-4 w-4" />
               </div>
             </div>
-            <div className="font-display text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400">
-              {stats.totals.conversionRate}
+            <div className="font-display text-2xl sm:text-3xl font-black text-purple-400">
+              {stats?.totals?.conversionRate ?? "0.0%"}
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-[11px] text-muted-foreground">
-              <Clock className="h-3 w-3 text-muted-foreground" />
-              <span>Avg dwell: ~{stats.totals.avgDwellSeconds}s per visit</span>
+            <div className="flex items-center gap-1.5 mt-2 text-[11px] text-slate-300">
+              <Clock className="h-3 w-3 text-slate-400" />
+              <span>Avg dwell: ~{stats?.totals?.avgDwellSeconds ?? 60}s per visit</span>
             </div>
           </CardContent>
         </Card>
@@ -284,7 +284,7 @@ export function AnalyticsDashboard() {
         <CardContent>
           <div className="h-[280px] w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats.timeline} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+              <AreaChart data={stats?.timeline || []} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
@@ -356,33 +356,33 @@ export function AnalyticsDashboard() {
           </CardHeader>
           <CardContent className="space-y-3.5">
             {locationTab === "countries" ? (
-              stats.locations.map((loc) => (
+              (stats?.locations || []).map((loc) => (
                 <div key={loc.code} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold flex items-center gap-2">
+                    <span className="font-semibold flex items-center gap-2 text-white">
                       <span className="text-base">{loc.flag}</span>
                       <span>{loc.country}</span>
                     </span>
-                    <span className="font-mono text-muted-foreground">
-                      <span className="font-bold text-foreground">{loc.count.toLocaleString()}</span> ({loc.percentage}%)
+                    <span className="font-mono text-slate-300">
+                      <span className="font-bold text-white">{loc.count.toLocaleString()}</span> ({loc.percentage}%)
                     </span>
                   </div>
-                  <Progress value={loc.percentage} className="h-2 bg-muted/60" />
+                  <Progress value={loc.percentage} className="h-2 bg-slate-800" />
                 </div>
               ))
             ) : (
-              stats.sgRegions.map((reg) => (
+              (stats?.sgRegions || []).map((reg) => (
                 <div key={reg.name} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold flex items-center gap-2">
-                      <MapPin className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span className="font-semibold flex items-center gap-2 text-white">
+                      <MapPin className="h-3.5 w-3.5 text-emerald-400" />
                       <span>{reg.name}</span>
                     </span>
-                    <span className="font-mono text-muted-foreground">
-                      <span className="font-bold text-foreground">{reg.count}</span> ({reg.share})
+                    <span className="font-mono text-slate-300">
+                      <span className="font-bold text-white">{reg.count}</span> ({reg.share})
                     </span>
                   </div>
-                  <Progress value={parseInt(reg.share, 10)} className="h-2 bg-muted/60" />
+                  <Progress value={parseInt(reg.share, 10)} className="h-2 bg-slate-800" />
                 </div>
               ))
             )}
@@ -436,22 +436,22 @@ export function AnalyticsDashboard() {
           <CardContent className="space-y-4">
             {deviceTab === "device" && (
               <div className="space-y-4">
-                {stats.devices.map((d) => (
+                {(stats?.devices || []).map((d) => (
                   <div key={d.name} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold flex items-center gap-2">
-                        {d.type === "mobile" && <Smartphone className="h-4 w-4 text-emerald-500" />}
-                        {d.type === "desktop" && <Laptop className="h-4 w-4 text-blue-500" />}
-                        {d.type === "tablet" && <Tablet className="h-4 w-4 text-amber-500" />}
+                      <span className="font-semibold flex items-center gap-2 text-white">
+                        {d.type === "mobile" && <Smartphone className="h-4 w-4 text-emerald-400" />}
+                        {d.type === "desktop" && <Laptop className="h-4 w-4 text-blue-400" />}
+                        {d.type === "tablet" && <Tablet className="h-4 w-4 text-amber-400" />}
                         <span>{d.name}</span>
                       </span>
-                      <span className="font-mono text-muted-foreground">
-                        <span className="font-bold text-foreground">{d.count}</span> ({d.percentage}%)
+                      <span className="font-mono text-slate-300">
+                        <span className="font-bold text-white">{d.count}</span> ({d.percentage}%)
                       </span>
                     </div>
                     <Progress
                       value={d.percentage}
-                      className={`h-2.5 ${
+                      className={`h-2.5 bg-slate-800 ${
                         d.type === "mobile" ? "[&>div]:bg-emerald-500" : d.type === "desktop" ? "[&>div]:bg-blue-500" : "[&>div]:bg-amber-500"
                       }`}
                     />
@@ -462,15 +462,15 @@ export function AnalyticsDashboard() {
 
             {deviceTab === "os" && (
               <div className="space-y-3">
-                {stats.operatingSystems.map((os) => (
+                {(stats?.operatingSystems || []).map((os) => (
                   <div key={os.name} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold">{os.name}</span>
-                      <span className="font-mono text-muted-foreground">
-                        <span className="font-bold text-foreground">{os.count}</span> ({os.percentage}%)
+                      <span className="font-semibold text-white">{os.name}</span>
+                      <span className="font-mono text-slate-300">
+                        <span className="font-bold text-white">{os.count}</span> ({os.percentage}%)
                       </span>
                     </div>
-                    <Progress value={os.percentage} className="h-2 bg-muted/60" />
+                    <Progress value={os.percentage} className="h-2 bg-slate-800" />
                   </div>
                 ))}
               </div>
@@ -478,15 +478,15 @@ export function AnalyticsDashboard() {
 
             {deviceTab === "browser" && (
               <div className="space-y-3">
-                {stats.browsers.map((b) => (
+                {(stats?.browsers || []).map((b) => (
                   <div key={b.name} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold">{b.name}</span>
-                      <span className="font-mono text-muted-foreground">
-                        <span className="font-bold text-foreground">{b.count}</span> ({b.percentage}%)
+                      <span className="font-semibold text-white">{b.name}</span>
+                      <span className="font-mono text-slate-300">
+                        <span className="font-bold text-white">{b.count}</span> ({b.percentage}%)
                       </span>
                     </div>
-                    <Progress value={b.percentage} className="h-2 bg-muted/60" />
+                    <Progress value={b.percentage} className="h-2 bg-slate-800" />
                   </div>
                 ))}
               </div>
@@ -498,28 +498,28 @@ export function AnalyticsDashboard() {
       {/* Conversion Funnel & Traffic Acquisition Channels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         {/* Module 3: Conversion Funnel */}
-        <Card>
+        <Card className="bg-slate-900 border-slate-800 text-slate-100">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Layers className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
+              <Layers className="h-4 w-4 text-purple-400" />
               Customer Conversion Funnel
             </CardTitle>
-            <CardDescription>From initial visit to confirmed WhatsApp / Call inquiry</CardDescription>
+            <CardDescription className="text-slate-300">From initial visit to confirmed WhatsApp / Call inquiry</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {stats.funnel.map((step, idx) => (
-              <div key={step.step} className="p-3 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between gap-3 text-xs">
+            {(stats?.funnel || []).map((step, idx) => (
+              <div key={step.step} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className={`h-6 w-6 rounded-md flex items-center justify-center font-black text-[11px] shrink-0 ${
-                    idx === 3 ? "bg-emerald-500 text-white" : "bg-primary/10 text-primary"
+                    idx === 3 ? "bg-emerald-500 text-white" : "bg-primary/20 text-primary"
                   }`}>
                     {idx + 1}
                   </div>
-                  <span className="font-bold text-foreground truncate">{step.step}</span>
+                  <span className="font-bold text-white truncate">{step.step}</span>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="font-mono font-bold text-foreground">{step.count}</span>
-                  <span className="text-[11px] text-muted-foreground ml-1.5 font-medium">({step.percentage}%)</span>
+                  <span className="font-mono font-bold text-white">{step.count}</span>
+                  <span className="text-[11px] text-slate-300 ml-1.5 font-medium">({step.percentage}%)</span>
                 </div>
               </div>
             ))}
@@ -527,24 +527,24 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Module 4: Traffic Acquisition / Referrers */}
-        <Card>
+        <Card className="bg-slate-900 border-slate-800 text-slate-100">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold flex items-center gap-2">
-              <Share2 className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
+              <Share2 className="h-4 w-4 text-blue-400" />
               Traffic Sources & Acquisition Channels
             </CardTitle>
-            <CardDescription>Where your visitors and inquiries are coming from</CardDescription>
+            <CardDescription className="text-slate-300">Where your visitors and inquiries are coming from</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3.5">
-            {stats.referrers.map((ref) => (
+            {(stats?.referrers || []).map((ref) => (
               <div key={ref.source} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold">{ref.source}</span>
-                  <span className="font-mono text-muted-foreground">
-                    <span className="font-bold text-foreground">{ref.count}</span> ({ref.percentage}%)
+                  <span className="font-semibold text-white">{ref.source}</span>
+                  <span className="font-mono text-slate-300">
+                    <span className="font-bold text-white">{ref.count}</span> ({ref.percentage}%)
                   </span>
                 </div>
-                <Progress value={ref.percentage} className="h-2 bg-muted/60" />
+                <Progress value={ref.percentage} className="h-2 bg-slate-800" />
               </div>
             ))}
           </CardContent>
@@ -552,49 +552,49 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Module 5: Real-Time Live Activity Stream */}
-      <Card>
+      <Card className="bg-slate-900 border-slate-800 text-slate-100">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base font-bold flex items-center gap-2">
-                <Activity className="h-4 w-4 text-emerald-500 animate-pulse" />
+              <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
+                <Activity className="h-4 w-4 text-emerald-400 animate-pulse" />
                 Live Visitor Activity Stream
               </CardTitle>
-              <CardDescription>Recent visitor events, clicks, and inquiries recorded anonymously</CardDescription>
+              <CardDescription className="text-slate-300">Recent visitor events, clicks, and inquiries recorded anonymously</CardDescription>
             </div>
-            <span className="text-[11px] font-mono font-semibold text-muted-foreground">
-              Last {stats.liveFeed.length} events
+            <span className="text-[11px] font-mono font-semibold text-slate-300">
+              Last {(stats?.liveFeed || []).length} events
             </span>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="divide-y divide-border/60">
-            {stats.liveFeed.map((e) => (
+          <div className="divide-y divide-slate-800">
+            {(stats?.liveFeed || []).map((e) => (
               <div key={e.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="text-base shrink-0" title={e.country}>{e.countryFlag}</span>
                   <div className="min-w-0">
-                    <div className="font-bold text-foreground flex items-center gap-1.5 flex-wrap">
+                    <div className="font-bold text-white flex items-center gap-1.5 flex-wrap">
                       <span>{e.label}</span>
                       {e.eventType.includes("whatsapp") && (
-                        <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-0 text-[10px] py-0 px-1.5">
+                        <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-[10px] py-0 px-1.5">
                           WhatsApp
                         </Badge>
                       )}
                       {e.eventType.includes("call") && (
-                        <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border-0 text-[10px] py-0 px-1.5">
+                        <Badge className="bg-amber-500/20 text-amber-400 border-0 text-[10px] py-0 px-1.5">
                           Call
                         </Badge>
                       )}
                     </div>
-                    <div className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                    <div className="text-[11px] text-slate-300 flex items-center gap-1.5">
                       <span>{e.device}</span>
                       <span>·</span>
                       <span>{e.city}, {e.country}</span>
                     </div>
                   </div>
                 </div>
-                <div className="font-mono text-[11px] text-muted-foreground shrink-0 text-right">
+                <div className="font-mono text-[11px] text-slate-400 shrink-0 text-right">
                   {e.timeAgo}
                 </div>
               </div>

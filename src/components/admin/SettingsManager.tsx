@@ -326,7 +326,7 @@ export function SettingsManager() {
           <Field label="Company Name (Work Permit Employer)" value={form.companyName} onChange={(v) => setForm({ ...form, companyName: v })} placeholder="4R ENGINEERING PTE. LTD." hint="Shown in trust badges & licensing details" />
           <Field label="Company UEN (ACRA)" value={form.companyUen} onChange={(v) => setForm({ ...form, companyUen: v })} placeholder="202143324G" hint="Singapore Unique Entity Number" />
           <div className="sm:col-span-2">
-            <Field label="Licensing & Trust Description" value={form.licenseInfo} onChange={(v) => setForm({ ...form, licenseInfo: v })} placeholder="ACRA Registered Entity · Regulated Trade Specialist" hint="Displayed under Hero and in About section" />
+            <Field label="Licensing & Trust Description" value={form.licenseInfo} onChange={(v) => setForm({ ...form, licenseInfo: v })} placeholder="ACRA Registered Entity · Company: 4R ENGINEERING PTE. LTD." hint="Displayed under Hero and in About section" />
           </div>
         </CardContent>
       </Card>
@@ -801,9 +801,9 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider">{label}</Label>
-      <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
-      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+      <Label className="text-xs uppercase tracking-wider text-slate-200 font-semibold">{label}</Label>
+      <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 font-medium" />
+      {hint && <p className="text-[11px] text-slate-300 font-medium">{hint}</p>}
     </div>
   )
 }
@@ -817,11 +817,12 @@ function NumberField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wider">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-slate-200 font-semibold">{label}</Label>
       <Input
         type="number"
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
+        className="bg-slate-900 border-slate-700 text-white font-semibold"
       />
     </div>
   )

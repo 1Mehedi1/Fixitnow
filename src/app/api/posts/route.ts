@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
     published = true,
     coverImage,
     images = [],
-    customSectionId = null,
   } = body
 
   if (!title || !title.trim()) {
@@ -63,7 +62,6 @@ export async function POST(req: NextRequest) {
       published,
       coverImage,
       images,
-      customSectionId,
     })
 
     try {

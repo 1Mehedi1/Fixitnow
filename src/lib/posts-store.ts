@@ -5,40 +5,77 @@ import type { Post, PostImage } from "@prisma/client"
 
 export type StoredPost = Post & {
   images: PostImage[]
-  customSectionId?: string | null
 }
 
-const POSTS_FILE = path.join(process.cwd(), "data", "posts.json")
-
-function ensureDirectoryExists() {
-  const dir = path.dirname(POSTS_FILE)
-  if (!fs.existsSync(dir)) {
-    try {
-      fs.mkdirSync(dir, { recursive: true })
-    } catch {}
-  }
+declare global {
+  // eslint-disable-next-line no-var
+  var __memoryPosts: StoredPost[] | undefined
 }
 
-export async function getStoredPosts(): Promise<StoredPost[]> {
-  ensureDirectoryExists()
+const DATA_FILE = path.join(process.cwd(), "data", "posts.json")
+const TMP_FILE = path.join("/tmp", "fixitnow-posts.json")
+
+function readJsonFile(filePath: string): StoredPost[] | null {
   try {
-    if (fs.existsSync(POSTS_FILE)) {
-      const raw = fs.readFileSync(POSTS_FILE, "utf-8")
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf-8")
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed
       }
     }
-  } catch (err) {
-    console.error("Error reading stored posts:", err)
-  }
+  } catch {}
+  return null
+}
 
-  // Initialize with fallback posts
+function writeJsonFile(posts: StoredPost[]) {
+  // Update memory cache first
+  globalThis.__memoryPosts = posts
+
+  // Try writing to DATA_FILE (local dev / persistent storage)
+  let wrote = false
   try {
-    fs.writeFileSync(POSTS_FILE, JSON.stringify(FALLBACK_POSTS, null, 2), "utf-8")
+    const dir = path.dirname(DATA_FILE)
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+    fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), "utf-8")
+    wrote = true
   } catch {}
 
-  return FALLBACK_POSTS as StoredPost[]
+  // If DATA_FILE failed (e.g. read-only filesystem on Vercel lambda), write to TMP_FILE
+  try {
+    const tmpDir = path.dirname(TMP_FILE)
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+    fs.writeFileSync(TMP_FILE, JSON.stringify(posts, null, 2), "utf-8")
+    wrote = true
+  } catch {}
+
+  return wrote
+}
+
+export async function getStoredPosts(): Promise<StoredPost[]> {
+  // 1. In-memory cache
+  if (globalThis.__memoryPosts && globalThis.__memoryPosts.length > 0) {
+    return globalThis.__memoryPosts
+  }
+
+  // 2. Try /tmp/fixitnow-posts.json (serverless writable)
+  const fromTmp = readJsonFile(TMP_FILE)
+  if (fromTmp) {
+    globalThis.__memoryPosts = fromTmp
+    return fromTmp
+  }
+
+  // 3. Try data/posts.json
+  const fromData = readJsonFile(DATA_FILE)
+  if (fromData) {
+    globalThis.__memoryPosts = fromData
+    return fromData
+  }
+
+  // 4. Fallback default
+  globalThis.__memoryPosts = FALLBACK_POSTS as StoredPost[]
+  writeJsonFile(globalThis.__memoryPosts)
+  return globalThis.__memoryPosts
 }
 
 export async function getStoredPostById(id: string): Promise<StoredPost | null> {
@@ -51,7 +88,6 @@ export async function getStoredPostById(id: string): Promise<StoredPost | null> 
 }
 
 export async function saveStoredPost(data: any): Promise<StoredPost> {
-  ensureDirectoryExists()
   const posts = await getStoredPosts()
   const now = new Date()
 
@@ -104,7 +140,6 @@ export async function saveStoredPost(data: any): Promise<StoredPost> {
     createdAt: isNew ? now : data.createdAt ? new Date(data.createdAt) : now,
     updatedAt: now,
     images: formattedImages,
-    customSectionId: data.customSectionId || null,
   }
 
   const existingIndex = posts.findIndex((p) => p.id === id)
@@ -120,11 +155,7 @@ export async function saveStoredPost(data: any): Promise<StoredPost> {
     posts.unshift(postRecord)
   }
 
-  try {
-    fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2), "utf-8")
-  } catch (err) {
-    console.error("Failed writing posts to file:", err)
-  }
+  writeJsonFile(posts)
 
   // Background sync to Prisma if configured
   try {
@@ -172,13 +203,9 @@ export async function saveStoredPost(data: any): Promise<StoredPost> {
 }
 
 export async function deleteStoredPost(id: string): Promise<boolean> {
-  ensureDirectoryExists()
   const posts = await getStoredPosts()
   const filtered = posts.filter((p) => p.id !== id)
-
-  try {
-    fs.writeFileSync(POSTS_FILE, JSON.stringify(filtered, null, 2), "utf-8")
-  } catch {}
+  writeJsonFile(filtered)
 
   try {
     const hasValidPostgres =
@@ -201,8 +228,6 @@ export async function incrementPostViews(id: string): Promise<void> {
   const post = posts.find((p) => p.id === id)
   if (post) {
     post.views = (post.views || 0) + 1
-    try {
-      fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2), "utf-8")
-    } catch {}
+    writeJsonFile(posts)
   }
 }
