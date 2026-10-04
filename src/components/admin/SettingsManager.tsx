@@ -12,11 +12,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { defaultSiteConfig, type ServiceItem, type RateItem, DEFAULT_SERVICE_IMAGES, DEFAULT_SERVICE_RATES, DEFAULT_TYPEWRITER_SENTENCES } from "@/lib/site"
+import { useStore } from "@/store/useStore"
 
 const ICON_OPTIONS = [
   "Wrench", "PaintRoller", "Hammer", "Zap", "Sofa", "Settings",
   "Droplet", "Brush", "Home", "Lightbulb", "DoorOpen", "ShowerHead",
 ]
+
+function normalizeDriveUrl(url: string): string {
+  if (!url) return url
+  const trimmed = url.trim()
+  const gdMatch = trimmed.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/)
+  if (gdMatch && gdMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${gdMatch[1]}`
+  }
+  return trimmed
+}
 
 interface FormState {
   brand: string
@@ -43,11 +54,31 @@ interface FormState {
 }
 
 export function SettingsManager() {
-  const [form, setForm] = useState<FormState>({
-    ...defaultSiteConfig,
-    typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
-    services: [...defaultSiteConfig.services],
-    heroImages: [...defaultSiteConfig.heroImages],
+  const { setCustomSettings } = useStore()
+  const [form, setForm] = useState<FormState>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("fixitnow_client_settings")
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed && typeof parsed === "object") {
+            return {
+              ...defaultSiteConfig,
+              ...parsed,
+              typewriterSentences: Array.isArray(parsed.typewriterSentences) ? parsed.typewriterSentences : [...(defaultSiteConfig.typewriterSentences || [])],
+              services: Array.isArray(parsed.services) ? parsed.services : [...defaultSiteConfig.services],
+              heroImages: Array.isArray(parsed.heroImages) ? parsed.heroImages : [...defaultSiteConfig.heroImages],
+            }
+          }
+        }
+      } catch {}
+    }
+    return {
+      ...defaultSiteConfig,
+      typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
+      services: [...defaultSiteConfig.services],
+      heroImages: [...defaultSiteConfig.heroImages],
+    }
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -57,11 +88,16 @@ export function SettingsManager() {
       .then((r) => r.json())
       .then((d) => {
         if (d.settings) {
-          let heroImgs = [...defaultSiteConfig.heroImages]
+          let heroImgs = Array.isArray(d.heroImages) && d.heroImages.length > 0
+            ? d.heroImages
+            : [...defaultSiteConfig.heroImages]
           try {
-            const parsed = JSON.parse(d.settings.heroImagesJson || "[]")
-            if (Array.isArray(parsed) && parsed.length > 0) heroImgs = parsed
+            if (typeof d.settings.heroImagesJson === "string") {
+              const parsed = JSON.parse(d.settings.heroImagesJson)
+              if (Array.isArray(parsed) && parsed.length > 0) heroImgs = parsed
+            }
           } catch {}
+          heroImgs = heroImgs.map(normalizeDriveUrl)
 
           let loadedServices = Array.isArray(d.services) && d.services.length > 0 ? d.services : [...defaultSiteConfig.services]
           loadedServices = loadedServices.map((svc: any) => ({
@@ -73,7 +109,7 @@ export function SettingsManager() {
             ? d.typewriterSentences
             : (Array.isArray(d.settings.typewriterSentences) ? d.settings.typewriterSentences : [...(defaultSiteConfig.typewriterSentences || [])])
 
-          setForm({
+          const loadedData: FormState = {
             brand: d.settings.brand || defaultSiteConfig.brand,
             tagline: d.settings.tagline || defaultSiteConfig.tagline,
             workerName: d.settings.workerName || defaultSiteConfig.workerName,
@@ -95,29 +131,38 @@ export function SettingsManager() {
             companyName: d.settings.companyName || defaultSiteConfig.companyName,
             companyUen: d.settings.companyUen || defaultSiteConfig.companyUen,
             licenseInfo: d.settings.licenseInfo || defaultSiteConfig.licenseInfo,
-          })
+          }
+
+          setForm(loadedData)
+          setCustomSettings(loadedData as any)
         }
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [setCustomSettings])
 
   const save = async () => {
     setSaving(true)
     try {
+      const normalizedHeroImages = form.heroImages.map(normalizeDriveUrl)
+      const payload: FormState = {
+        ...form,
+        heroImages: normalizedHeroImages,
+      }
+      setForm(payload)
+      setCustomSettings(payload as any)
+
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
-          servicesJson: form.services,
-          heroImagesJson: form.heroImages,
-          typewriterSentencesJson: form.typewriterSentences,
+          ...payload,
+          servicesJson: payload.services,
+          heroImagesJson: payload.heroImages,
+          typewriterSentencesJson: payload.typewriterSentences,
         }),
       })
       if (!res.ok) throw new Error("Save failed")
       toast.success("Settings saved — site is now live with your changes.")
-      // Reload the page so server-rendered components pick up the new settings
-      setTimeout(() => window.location.reload(), 800)
     } catch (e: any) {
       toast.error("Save failed", { description: e.message })
     } finally {
@@ -127,18 +172,21 @@ export function SettingsManager() {
 
   const reset = () => {
     if (!confirm("Reset all settings to defaults? Your custom values will be lost.")) return
-    setForm({
+    const resetData: FormState = {
       ...defaultSiteConfig,
       typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
       services: [...defaultSiteConfig.services],
       heroImages: [...defaultSiteConfig.heroImages],
-    })
+    }
+    setForm(resetData)
+    setCustomSettings(resetData as any)
     toast.info("Form reset to defaults. Click Save to apply.")
   }
 
   const handleHeroImageChange = (index: number, url: string) => {
+    const cleaned = normalizeDriveUrl(url)
     const updated = [...form.heroImages]
-    updated[index] = url
+    updated[index] = cleaned
     setForm({ ...form, heroImages: updated })
   }
 
@@ -489,16 +537,29 @@ export function SettingsManager() {
               <div key={idx} className="border border-border/80 rounded-xl p-4 bg-muted/20 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{labels[idx]}</span>
-                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
-                    <Upload className="h-3.5 w-3.5" />
-                    <span>Upload new</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleHeroFileUpload(idx, e)}
-                    />
-                  </label>
+                  <div className="flex items-center gap-2.5">
+                    {form.heroImages[idx] ? (
+                      <button
+                        type="button"
+                        onClick={() => handleHeroImageChange(idx, "")}
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                        title="Clear photo"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span>Clear</span>
+                      </button>
+                    ) : null}
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                      <Upload className="h-3.5 w-3.5" />
+                      <span>Upload new</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleHeroFileUpload(idx, e)}
+                      />
+                    </label>
+                  </div>
                 </div>
                 <div className="aspect-[4/3] rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center relative group">
                   {currentImg ? (
@@ -515,7 +576,8 @@ export function SettingsManager() {
                   <Input
                     value={form.heroImages[idx] || ""}
                     onChange={(e) => handleHeroImageChange(idx, e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
+                    onBlur={(e) => handleHeroImageChange(idx, e.target.value)}
+                    placeholder="https://... or Google Drive share link"
                     className="text-xs h-9 font-mono"
                   />
                 </div>

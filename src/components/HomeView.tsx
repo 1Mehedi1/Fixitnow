@@ -52,9 +52,10 @@ export function HomeView({
     view, setView, openPost,
     customPosts, setCustomPosts,
     customTestimonials, setCustomTestimonials,
+    customSettings, setCustomSettings,
   } = useStore()
 
-  // Hydrate client-side posts and testimonials on mount strictly ONCE (zero infinite loops)
+  // Hydrate client-side posts, testimonials, and settings on mount strictly ONCE (zero infinite loops)
   useEffect(() => {
     try {
       const stored = localStorage.getItem("fixitnow_client_posts")
@@ -83,8 +84,35 @@ export function HomeView({
         setCustomTestimonials(testimonials)
       }
     } catch {}
+
+    try {
+      const storedSettings = localStorage.getItem("fixitnow_client_settings")
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings)
+        if (parsedSettings && typeof parsedSettings === "object") {
+          setCustomSettings(parsedSettings)
+        }
+      }
+    } catch {}
+
+    // Also background fetch latest settings from API to ensure cross-device updates sync
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.settings) {
+          const fresh = {
+            ...d.settings,
+            services: d.services || d.settings.services,
+            heroImages: d.heroImages || d.settings.heroImages,
+            typewriterSentences: d.typewriterSentences || d.settings.typewriterSentences,
+          }
+          setCustomSettings(fresh)
+        }
+      })
+      .catch(() => {})
   }, []) // Empty dependency array runs once on mount!
 
+  const activeSettings = customSettings || settings
   const activePosts = (customPosts && customPosts.length > 0) ? customPosts : posts
   const activeTestimonials = (customTestimonials && customTestimonials.length > 0) ? customTestimonials : (allTestimonials || testimonials)
 
@@ -173,14 +201,14 @@ export function HomeView({
   // ADMIN view — full-screen, no public chrome
   if (view === "admin") {
     return (
-      <SiteSettingsProvider settings={settings}>
+      <SiteSettingsProvider settings={activeSettings}>
         <AdminPanel posts={allPosts} testimonials={activeTestimonials} />
       </SiteSettingsProvider>
     )
   }
 
   return (
-    <SiteSettingsProvider settings={settings}>
+    <SiteSettingsProvider settings={activeSettings}>
       <div className="min-h-screen flex flex-col bg-background overflow-x-clip w-full max-w-full pb-16 md:pb-0">
         <Header />
         <div className="h-[96px] sm:h-[100px] w-full shrink-0" aria-hidden="true" />

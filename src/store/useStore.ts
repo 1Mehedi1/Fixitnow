@@ -1,6 +1,8 @@
 import { create } from "zustand"
 import type { Post } from "@prisma/client"
 
+import type { SiteSettingsT } from "@/lib/site"
+
 export type View = "home" | "portfolio" | "blog" | "beforeAfter" | "about" | "admin"
 export type AdminTab = "dashboard" | "posts" | "testimonials" | "analytics" | "settings"
 
@@ -13,6 +15,7 @@ interface AppState {
   editorOpen: boolean
   customPosts: any[] | null
   customTestimonials: any[] | null
+  customSettings: SiteSettingsT | null
 
   setView: (v: View) => void
   openPost: (p: Post) => void
@@ -26,6 +29,7 @@ interface AppState {
   setCustomTestimonials: (testimonials: any[]) => void
   upsertCustomTestimonial: (testimonial: any) => void
   deleteCustomTestimonial: (id: string) => void
+  setCustomSettings: (settings: SiteSettingsT) => void
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -37,6 +41,7 @@ export const useStore = create<AppState>((set) => ({
   editorOpen: false,
   customPosts: null,
   customTestimonials: null,
+  customSettings: null,
 
   setView: (v) => set({ view: v }),
   openPost: (p) => set({ selectedPost: p, detailOpen: true }),
@@ -120,4 +125,12 @@ export const useStore = create<AppState>((set) => ({
       } catch {}
       return { customTestimonials: next }
     }),
+  setCustomSettings: (settings) => {
+    try {
+      localStorage.setItem("fixitnow_client_settings", JSON.stringify(settings))
+    } catch (err) {
+      console.warn("localStorage quota exceeded or unavailable:", err)
+    }
+    set({ customSettings: settings })
+  },
 }))

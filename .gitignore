@@ -60,3 +60,4 @@ server.log
 !/data/.gitkeep
 !/data/posts.json
 !/data/testimonials.json
+!/data/site-settings.json

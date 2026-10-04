@@ -1,0 +1,234 @@
+{
+  "brand": "Fixitnow",
+  "tagline": "Singapore's Trusted Handyman",
+  "workerName": "Ahmad Rahman",
+  "phone": "+65 9123 4567",
+  "whatsapp": "6591234567",
+  "email": "hello@ahmadhomeworks.sg",
+  "location": "Singapore · Islandwide",
+  "yearsExperience": 12,
+  "jobsCompleted": 540,
+  "happyClients": 320,
+  "rating": 4.5,
+  "heroHeadline": "Your home, expertly handled.",
+  "heroSubtext": "Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works.",
+  "typewriterSentences": [
+    "Your home, expertly handled.",
+    "Plumbing & leaks, fixed fast & cleanly.",
+    "HDB & condo painting, dust-free prep guaranteed.",
+    "Full home renovation, one accountable warranty.",
+    "Licensed electrical works, EMA & LEW compliant.",
+    "Trusted craftsmanship, islandwide across Singapore."
+  ],
+  "aboutTitle": "Built on trust. Delivered with care.",
+  "aboutBody": "We are a Singapore-based home-services company with over a decade of hands-on experience across HDB flats, condominiums and landed homes. Our commitment is simple: show up when we say, do the job properly, and stand behind our work.",
+  "services": [
+    {
+      "key": "plumbing",
+      "label": "Plumbing",
+      "icon": "Wrench",
+      "desc": "Leaks, taps, pipes, water heaters, toilets — fixed fast and guaranteed.",
+      "bgImage": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=800&q=80",
+      "rates": [
+        {
+          "name": "Leaking Tap or Valve Replacement",
+          "price": "$60 – $110",
+          "unit": "per set",
+          "details": "Includes new washer/valves, thread sealing and testing"
+        },
+        {
+          "name": "Toilet Bowl Flush Mechanism Repair",
+          "price": "$80 – $140",
+          "unit": "per set",
+          "details": "Syphon replacement, inlet valve and water level tune"
+        },
+        {
+          "name": "Kitchen or Basin Bottle Trap Clear / Replace",
+          "price": "$70 – $130",
+          "unit": "per point",
+          "details": "Clearing stubborn chokes, replacing PVC/chrome traps"
+        },
+        {
+          "name": "Storage or Instant Water Heater Install",
+          "price": "$120 – $220",
+          "unit": "per unit",
+          "details": "Secure mounting, pipe connection and leak inspection"
+        }
+      ]
+    },
+    {
+      "key": "painting",
+      "label": "Painting",
+      "icon": "PaintRoller",
+      "desc": "HDB, condo, landed. Premium paints, neat edges, dust-free prep.",
+      "bgImage": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80",
+      "rates": [
+        {
+          "name": "Single Room Refresh / Water Mark Patch",
+          "price": "$180 – $320",
+          "unit": "per room",
+          "details": "Surface prep, sealer and 2 coats premium Nippon/Dulux"
+        },
+        {
+          "name": "HDB 3-Room Full Unit Painting",
+          "price": "$750 – $950",
+          "unit": "full flat",
+          "details": "Walls, ceilings, door frames with dust protection"
+        },
+        {
+          "name": "HDB 4-Room Full Unit Painting",
+          "price": "$950 – $1,250",
+          "unit": "full flat",
+          "details": "Full masking, cracks filling, premium low-VOC paint"
+        },
+        {
+          "name": "HDB 5-Room / Executive Painting",
+          "price": "$1,200 – $1,600",
+          "unit": "full flat",
+          "details": "Complete interior makeover with 1-year paint warranty"
+        }
+      ]
+    },
+    {
+      "key": "renovation",
+      "label": "Renovation",
+      "icon": "Hammer",
+      "desc": "Kitchen, toilet, full-home. Design-build with trusted sub-contractors.",
+      "bgImage": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80",
+      "rates": [
+        {
+          "name": "Full Toilet / Bathroom Overhaul",
+          "price": "$2,800 – $4,500",
+          "unit": "per bathroom",
+          "details": "Waterproofing, tiling, sanitary ware installation, debris disposal"
+        },
+        {
+          "name": "Kitchen Cabinet Carpentry & Countertop",
+          "price": "$150 – $280",
+          "unit": "per foot run",
+          "details": "High-pressure laminate, soft-close hinges, quartz top options"
+        },
+        {
+          "name": "Vinyl Flooring Supply & Lay",
+          "price": "$4.50 – $7.50",
+          "unit": "per sqft",
+          "details": "Heavy duty 5mm click vinyl with EVA underlay"
+        },
+        {
+          "name": "Feature Wall & False Ceiling Installation",
+          "price": "$120 – $240",
+          "unit": "per foot",
+          "details": "Concealed LED lighting trough, plaster finish"
+        }
+      ]
+    },
+    {
+      "key": "electrical",
+      "label": "Electrical",
+      "icon": "Zap",
+      "desc": "Licensed (LEW) wiring, sockets, lighting, DB upgrades, EMA compliance.",
+      "bgImage": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
+      "rates": [
+        {
+          "name": "Lighting Fixture / Ceiling Fan Replacement",
+          "price": "$50 – $100",
+          "unit": "per point",
+          "details": "Safe mounting, wiring termination and switch test"
+        },
+        {
+          "name": "Power Socket Replacement (Single/Double)",
+          "price": "$45 – $85",
+          "unit": "per point",
+          "details": "Safety standard compliant, earthing verification"
+        },
+        {
+          "name": "Circuit Breaker / DB Box Trip Troubleshooting",
+          "price": "$90 – $160",
+          "unit": "per job",
+          "details": "Isolating faulty appliances or shorted cables"
+        },
+        {
+          "name": "Switch & Dimmer Replacement",
+          "price": "$45 – $75",
+          "unit": "per gang",
+          "details": "Standard or designer switch installation"
+        }
+      ]
+    },
+    {
+      "key": "interior",
+      "label": "Interior Works",
+      "icon": "Sofa",
+      "desc": "Carpentry, built-ins, feature walls, false ceilings, lighting design.",
+      "bgImage": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+      "rates": [
+        {
+          "name": "Custom Built-in Wardrobe / Cabinetry",
+          "price": "$240 – $360",
+          "unit": "per foot run",
+          "details": "Internal color PVC, soft-close Blum hinges, aluminum trim"
+        },
+        {
+          "name": "False Ceiling & L-Box Plastering",
+          "price": "$4.50 – $8.00",
+          "unit": "per sqft / foot run",
+          "details": "Seamless gypsum board jointing with LED strip recesses"
+        },
+        {
+          "name": "Door Frame & Timber Architrave Repair",
+          "price": "$90 – $180",
+          "unit": "per door",
+          "details": "Planed edges, re-hinged alignment, touch-up painting"
+        },
+        {
+          "name": "Curtain Track & Blind Installation",
+          "price": "$40 – $75",
+          "unit": "per window",
+          "details": "Precision laser alignment and heavy duty wall plugs"
+        }
+      ]
+    },
+    {
+      "key": "repair",
+      "label": "General Repair",
+      "icon": "Settings",
+      "desc": "Doors, locks, cabinets, tiles, grout, caulking. No job too small.",
+      "bgImage": "https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&w=800&q=80",
+      "rates": [
+        {
+          "name": "Door Lock & Handle Replacement",
+          "price": "$75 – $140",
+          "unit": "per set",
+          "details": "Mortise locks, lever handles, cylinder replacement"
+        },
+        {
+          "name": "Cabinet Soft-Close Hinges Replacement",
+          "price": "$60 – $120",
+          "unit": "per set (4 pcs)",
+          "details": "Aligning sagging cabinet doors and smooth operation"
+        },
+        {
+          "name": "Bathroom Silicone Mould Removal & Resealing",
+          "price": "$70 – $130",
+          "unit": "per perimeter",
+          "details": "Anti-fungal sanitary grade silicone, clean straight beads"
+        },
+        {
+          "name": "Wall Drilling & Heavy Mounting",
+          "price": "$50 – $90",
+          "unit": "first 2 items",
+          "details": "Mirrors, TV brackets, shelves with wall plug anchors"
+        }
+      ]
+    }
+  ],
+  "heroImages": [
+    "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=600&auto=format&fit=crop&q=70",
+    "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=70",
+    "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600&auto=format&fit=crop&q=70",
+    "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=600&auto=format&fit=crop&q=70"
+  ],
+  "companyName": "4R ENGINEERING PTE. LTD.",
+  "companyUen": "202143324G",
+  "licenseInfo": "ACRA Registered Entity · Company: 4R ENGINEERING PTE. LTD."
+}

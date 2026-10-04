@@ -109,7 +109,9 @@ function TypewriterHeadline({
 export function Hero() {
   const { setView } = useStore()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
-  const heroPhotos = s.heroImages && s.heroImages.length >= 4 ? s.heroImages : DEFAULT_HERO_IMAGES
+  const heroPhotos = [0, 1, 2, 3].map(
+    (i) => (s.heroImages && s.heroImages[i] && s.heroImages[i].trim()) ? s.heroImages[i].trim() : DEFAULT_HERO_IMAGES[i]
+  )
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background via-amber-500/[0.04] to-background pt-5 sm:pt-10 pb-10 sm:py-16 w-full max-w-full">

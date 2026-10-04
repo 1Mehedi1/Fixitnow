@@ -156,91 +156,15 @@ export const defaultSiteConfig: SiteSettingsT = {
  */
 export const siteConfig = defaultSiteConfig
 
-/** Server-side helper: load DB settings and merge with defaults. */
-export async function loadSiteSettings(): Promise<SiteSettingsT> {
-  const hasValidPostgres =
-    Boolean(process.env.DATABASE_URL) &&
-    (process.env.DATABASE_URL!.startsWith("postgresql://") ||
-      process.env.DATABASE_URL!.startsWith("postgres://"))
-
-  if (!hasValidPostgres) {
-    return defaultSiteConfig
+/** Converts Google Drive sharing links or raw URLs into direct embeddable links. */
+export function normalizeImageUrl(url: string): string {
+  if (!url) return url
+  const trimmed = url.trim()
+  const gdMatch = trimmed.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/)
+  if (gdMatch && gdMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${gdMatch[1]}`
   }
-
-  // Lazy import — server-side only
-  const { db } = await import("@/lib/db")
-  let row: import("@prisma/client").SiteSettings | null = null
-  try {
-    row = await db.siteSettings.findUnique({ where: { id: "singleton" } })
-    if (!row) {
-      row = await db.siteSettings.create({ data: { id: "singleton" } })
-    }
-  } catch {
-    // DB not available — fall through to defaults
-    return defaultSiteConfig
-  }
-
-  if (!row) {
-    return defaultSiteConfig
-  }
-
-  let services: ServiceItem[] = DEFAULT_SERVICES
-  try {
-    const parsed = JSON.parse(row.servicesJson || "[]")
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      services = parsed.map((svc) => ({
-        ...svc,
-        bgImage: svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"],
-        rates: Array.isArray(svc.rates) && svc.rates.length > 0 ? svc.rates : (DEFAULT_SERVICE_RATES[svc.key] || []),
-      }))
-    }
-  } catch {
-    // keep defaults
-  }
-
-  let heroImages: string[] = DEFAULT_HERO_IMAGES
-  try {
-    const parsedImgs = JSON.parse(row.heroImagesJson || "[]")
-    if (Array.isArray(parsedImgs) && parsedImgs.length > 0) {
-      heroImages = parsedImgs
-    }
-  } catch {
-    // keep defaults
-  }
-
-  let typewriterSentences: string[] = DEFAULT_TYPEWRITER_SENTENCES
-  try {
-    const parsedSentences = JSON.parse((row as any).typewriterSentencesJson || "[]")
-    if (Array.isArray(parsedSentences) && parsedSentences.length > 0) {
-      typewriterSentences = parsedSentences
-    }
-  } catch {
-    // keep defaults
-  }
-
-  return {
-    brand: row.brand || defaultSiteConfig.brand,
-    tagline: row.tagline || defaultSiteConfig.tagline,
-    workerName: row.workerName || defaultSiteConfig.workerName,
-    phone: row.phone || defaultSiteConfig.phone,
-    whatsapp: row.whatsapp || defaultSiteConfig.whatsapp,
-    email: row.email || defaultSiteConfig.email,
-    location: row.location || defaultSiteConfig.location,
-    yearsExperience: row.yearsExperience ?? defaultSiteConfig.yearsExperience,
-    jobsCompleted: row.jobsCompleted ?? defaultSiteConfig.jobsCompleted,
-    happyClients: row.happyClients ?? defaultSiteConfig.happyClients,
-    rating: row.rating ?? defaultSiteConfig.rating,
-    heroHeadline: row.heroHeadline || defaultSiteConfig.heroHeadline,
-    heroSubtext: row.heroSubtext || defaultSiteConfig.heroSubtext,
-    typewriterSentences,
-    aboutTitle: row.aboutTitle || defaultSiteConfig.aboutTitle,
-    aboutBody: row.aboutBody || defaultSiteConfig.aboutBody,
-    services,
-    heroImages,
-    companyName: row.companyName || defaultSiteConfig.companyName,
-    companyUen: row.companyUen || defaultSiteConfig.companyUen,
-    licenseInfo: row.licenseInfo || defaultSiteConfig.licenseInfo,
-  }
+  return trimmed
 }
 
 /** Build a wa.me URL with a pre-filled message. */

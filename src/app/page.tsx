@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { loadSiteSettings, defaultSiteConfig } from "@/lib/site"
+import { defaultSiteConfig } from "@/lib/site"
 import { HomeView } from "@/components/HomeView"
 import { FALLBACK_POSTS, FALLBACK_TESTIMONIALS } from "@/lib/fallback-data"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic"
 
 import { getStoredPosts } from "@/lib/posts-store"
 import { getStoredTestimonials } from "@/lib/testimonials-store"
+import { getStoredSiteSettings as loadSiteSettings } from "@/lib/settings-store"
 
 async function fetchHomePageData() {
   const hasValidPostgres =
