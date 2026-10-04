@@ -1,5 +1,6 @@
 import fs from "fs"
 import path from "path"
+import os from "os"
 import { FALLBACK_TESTIMONIALS } from "./fallback-data"
 import type { Testimonial } from "@prisma/client"
 
@@ -11,7 +12,7 @@ declare global {
 }
 
 const DATA_FILE = path.join(process.cwd(), "data", "testimonials.json")
-const TMP_FILE = path.join("/tmp", "fixitnow-testimonials.json")
+const TMP_FILE = path.join(os.tmpdir(), "fixitnow-testimonials.json")
 
 function readJsonFile(filePath: string): StoredTestimonial[] | null {
   try {

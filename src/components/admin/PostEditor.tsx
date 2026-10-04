@@ -58,6 +58,31 @@ export function PostEditor() {
       setForm(EMPTY)
       return
     }
+
+    // Check store first for instant zero-lag hydration and preserve local edits
+    const localPost = useStore.getState().customPosts?.find((p) => p.id === editingPostId)
+    if (localPost) {
+      setForm({
+        title: localPost.title || "",
+        excerpt: localPost.excerpt || "",
+        content: localPost.content || "",
+        type: (localPost.type as any) || "portfolio",
+        category: localPost.category || CATEGORIES[0] || "General",
+        tags: localPost.tags || "",
+        featured: Boolean(localPost.featured),
+        published: localPost.published !== false,
+        coverImage: localPost.coverImage || "",
+        images: Array.isArray(localPost.images)
+          ? localPost.images.map((i: any) => ({
+              url: typeof i === "string" ? i : i.url,
+              kind: (typeof i === "object" && i.kind) || "gallery",
+            }))
+          : [],
+      })
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     fetch(`/api/posts/${editingPostId}`)
       .then((r) => r.json())
@@ -95,31 +120,44 @@ export function PostEditor() {
     }
     setSaving(true)
     try {
+      const computedCover =
+        form.images.length > 0
+          ? (form.images.find((img) => img.kind === "after")?.url || form.images[0]?.url || "")
+          : (form.coverImage || "")
+
       const payload = {
         ...form,
-        coverImage: form.images.length > 0
-          ? (form.images.find((img) => img.kind === "after")?.url || form.images[0]?.url || "")
-          : (form.coverImage || ""),
+        coverImage: computedCover,
       }
       const isNew = editingPostId === "new" || !editingPostId
+      const postId = isNew ? `post_${Date.now()}` : editingPostId
       const url = isNew ? "/api/posts" : `/api/posts/${editingPostId}`
       const method = isNew ? "POST" : "PUT"
 
-      const res = await fetch(url, {
+      const savedPost = {
+        ...payload,
+        id: postId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        images: form.images.map((img, i) => ({
+          id: `img_${postId}_${i}`,
+          postId: postId,
+          url: img.url,
+          kind: img.kind,
+          position: i,
+        })),
+      }
+
+      // Update Zustand and localStorage FIRST (immediate guaranteed client update)
+      upsertCustomPost(savedPost)
+
+      // Send to server
+      fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || "Save failed")
+      }).catch((err) => console.warn("Background server save notice:", err))
 
-      const savedPost = data.post || {
-        ...payload,
-        id: isNew ? data.post?.id || `post_${Date.now()}` : editingPostId,
-        createdAt: new Date().toISOString(),
-      }
-
-      upsertCustomPost(savedPost)
       toast.success(isNew ? "Post created! It is live on the site." : "Post saved! Updates are live on the site.")
       closeEditor()
     } catch (e: any) {

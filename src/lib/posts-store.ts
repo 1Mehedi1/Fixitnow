@@ -1,5 +1,6 @@
 import fs from "fs"
 import path from "path"
+import os from "os"
 import { FALLBACK_POSTS } from "./fallback-data"
 import type { Post, PostImage } from "@prisma/client"
 
@@ -13,7 +14,7 @@ declare global {
 }
 
 const DATA_FILE = path.join(process.cwd(), "data", "posts.json")
-const TMP_FILE = path.join("/tmp", "fixitnow-posts.json")
+const TMP_FILE = path.join(os.tmpdir(), "fixitnow-posts.json")
 
 function readJsonFile(filePath: string): StoredPost[] | null {
   try {

@@ -81,7 +81,26 @@ export async function POST(req: NextRequest) {
       console.warn("Local filesystem write failed, falling back to Base64 data URL:", fsErr)
     }
 
-    // Tier 3: Base64 data URL fallback for read-only serverless runtimes
+    // Tier 3: Direct CDN permanent image upload (lightweight HTTPS URL for serverless/Vercel)
+    try {
+      const uploadForm = new FormData()
+      uploadForm.append("reqtype", "fileupload")
+      uploadForm.append("fileToUpload", new Blob([buf], { type: mimeType }), filename)
+      const cRes = await fetch("https://catbox.moe/user/api.php", {
+        method: "POST",
+        body: uploadForm,
+      })
+      if (cRes.ok) {
+        const catboxUrl = (await cRes.text()).trim()
+        if (catboxUrl.startsWith("http://") || catboxUrl.startsWith("https://")) {
+          return NextResponse.json({ url: catboxUrl, storage: "cdn" })
+        }
+      }
+    } catch (cdnErr) {
+      console.warn("CDN upload failed, falling back to base64:", cdnErr)
+    }
+
+    // Tier 4: Base64 data URL fallback
     const base64Url = `data:${mimeType};base64,${buf.toString("base64")}`
     return NextResponse.json({ url: base64Url, storage: "data-uri" })
   } catch (err: any) {

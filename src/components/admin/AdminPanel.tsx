@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useEffect } from "react"
 import { useStore, type AdminTab } from "@/store/useStore"
 import { AdminLogin } from "./AdminLogin"
 import { PostList } from "./PostList"
@@ -33,7 +34,25 @@ const NAV: { key: AdminTab; label: string; icon: any }[] = [
 
 export function AdminPanel({ posts, testimonials }: Props) {
   const { data: session, status } = useSession()
-  const { adminTab, setAdminTab, setView, openEditor, customPosts } = useStore()
+  const { adminTab, setAdminTab, setView, openEditor, customPosts, setCustomPosts } = useStore()
+
+  // Ensure full post list is present in customPosts so edits never wipe siblings
+  useEffect(() => {
+    if (!customPosts && posts && posts.length > 0) {
+      try {
+        const stored = localStorage.getItem("fixitnow_client_posts")
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCustomPosts(parsed)
+            return
+          }
+        }
+      } catch {}
+      setCustomPosts(posts)
+    }
+  }, [customPosts, posts, setCustomPosts])
+
   const activePosts = customPosts || posts
 
   // Show login screen if unauthenticated

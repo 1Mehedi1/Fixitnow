@@ -10,7 +10,7 @@
     "tags": "HDB,Toilet,Leak",
     "featured": true,
     "published": true,
-    "coverImage": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=1200&auto=format&fit=crop&q=70",
+    "coverImage": "https://files.catbox.moe/dmagw6.png",
     "views": 142,
     "whatsappClicks": 28,
     "authorId": null,
@@ -20,17 +20,9 @@
       {
         "id": "img-1a",
         "postId": "fallback-post-1",
-        "url": "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&auto=format&fit=crop&q=70",
-        "kind": "before",
+        "url": "https://files.catbox.moe/dmagw6.png",
+        "kind": "gallery",
         "position": 0,
-        "createdAt": "2026-10-04T02:01:07.982Z"
-      },
-      {
-        "id": "img-1b",
-        "postId": "fallback-post-1",
-        "url": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=1200&auto=format&fit=crop&q=70",
-        "kind": "after",
-        "position": 1,
         "createdAt": "2026-10-04T02:01:07.982Z"
       }
     ]

@@ -47,7 +47,17 @@ export const useStore = create<AppState>((set) => ({
   setCustomPosts: (posts) => set({ customPosts: posts }),
   upsertCustomPost: (post) =>
     set((state) => {
-      const current = state.customPosts || []
+      let current = state.customPosts
+      if (!current) {
+        try {
+          const stored = localStorage.getItem("fixitnow_client_posts")
+          if (stored) {
+            const parsed = JSON.parse(stored)
+            if (Array.isArray(parsed) && parsed.length > 0) current = parsed
+          }
+        } catch {}
+      }
+      current = current || []
       const idx = current.findIndex((p) => p.id === post.id)
       let next: any[]
       if (idx >= 0) {
@@ -58,16 +68,30 @@ export const useStore = create<AppState>((set) => ({
       }
       try {
         localStorage.setItem("fixitnow_client_posts", JSON.stringify(next))
-      } catch {}
+      } catch (err) {
+        console.warn("localStorage quota exceeded or unavailable:", err)
+      }
       return { customPosts: next }
     }),
   deleteCustomPost: (id) =>
     set((state) => {
-      const current = state.customPosts || []
+      let current = state.customPosts
+      if (!current) {
+        try {
+          const stored = localStorage.getItem("fixitnow_client_posts")
+          if (stored) {
+            const parsed = JSON.parse(stored)
+            if (Array.isArray(parsed) && parsed.length > 0) current = parsed
+          }
+        } catch {}
+      }
+      current = current || []
       const next = current.filter((p) => p.id !== id)
       try {
         localStorage.setItem("fixitnow_client_posts", JSON.stringify(next))
-      } catch {}
+      } catch (err) {
+        console.warn("localStorage quota exceeded or unavailable:", err)
+      }
       return { customPosts: next }
     }),
   setCustomTestimonials: (testimonials) => set({ customTestimonials: testimonials }),

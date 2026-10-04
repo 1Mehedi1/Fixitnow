@@ -30,15 +30,14 @@ export const FALLBACK_POSTS: (Post & { images: PostImage[] })[] = [
     tags: "HDB,Toilet,Leak",
     featured: true,
     published: true,
-    coverImage: IMG.plumbing1,
+    coverImage: "https://files.catbox.moe/dmagw6.png",
     views: 142,
     whatsappClicks: 28,
     authorId: null,
     createdAt: now,
     updatedAt: now,
     images: [
-      { id: "img-1a", postId: "fallback-post-1", url: IMG.plumbing2, kind: "before", position: 0, createdAt: now },
-      { id: "img-1b", postId: "fallback-post-1", url: IMG.plumbing1, kind: "after", position: 1, createdAt: now },
+      { id: "img-1a", postId: "fallback-post-1", url: "https://files.catbox.moe/dmagw6.png", kind: "gallery", position: 0, createdAt: now },
     ],
   },
   {
