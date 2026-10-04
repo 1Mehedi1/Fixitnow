@@ -107,11 +107,30 @@ function TypewriterHeadline({
 }
 
 export function Hero() {
-  const { setView } = useStore()
+  const { setView, customHeroPhotos, setCustomHeroPhotos } = useStore()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
-  const heroPhotos = [0, 1, 2, 3].map(
-    (i) => (s.heroImages && s.heroImages[i] && s.heroImages[i].trim()) ? s.heroImages[i].trim() : DEFAULT_HERO_IMAGES[i]
-  )
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("fixitnow_hero_photos")
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length >= 4) {
+          setCustomHeroPhotos(parsed)
+        }
+      }
+    } catch {}
+  }, [setCustomHeroPhotos])
+
+  const heroPhotos = [0, 1, 2, 3].map((i) => {
+    if (customHeroPhotos && customHeroPhotos[i] && customHeroPhotos[i].trim()) {
+      return customHeroPhotos[i].trim()
+    }
+    if (s.heroImages && s.heroImages[i] && s.heroImages[i].trim()) {
+      return s.heroImages[i].trim()
+    }
+    return DEFAULT_HERO_IMAGES[i]
+  })
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background via-amber-500/[0.04] to-background pt-5 sm:pt-10 pb-10 sm:py-16 w-full max-w-full">

@@ -61,3 +61,4 @@ server.log
 !/data/posts.json
 !/data/testimonials.json
 !/data/site-settings.json
+!/data/hero-photos.json

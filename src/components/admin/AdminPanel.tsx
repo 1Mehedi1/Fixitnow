@@ -17,6 +17,8 @@ import { PostEditor } from "./PostEditor"
 import { TestimonialManager } from "./TestimonialManager"
 import { AnalyticsDashboard } from "./AnalyticsDashboard"
 import { SettingsManager } from "./SettingsManager"
+import { HeroManager } from "./HeroManager"
+import { Image as ImageIcon } from "lucide-react"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
 
 interface Props {
@@ -26,6 +28,7 @@ interface Props {
 
 const NAV: { key: AdminTab; label: string; icon: any }[] = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard },
+  { key: "heroPhotos", label: "Hero Photos", icon: ImageIcon },
   { key: "posts", label: "Posts", icon: FileText },
   { key: "testimonials", label: "Testimonials", icon: MessageSquare },
   { key: "analytics", label: "Analytics", icon: BarChart3 },
@@ -197,6 +200,9 @@ export function AdminPanel({ posts, testimonials }: Props) {
                     <Button onClick={() => openEditor("new")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold cursor-pointer">
                       <Plus className="h-4 w-4 mr-1.5" /> New post
                     </Button>
+                    <Button variant="outline" onClick={() => setAdminTab("heroPhotos")} className="border-amber-500/40 bg-amber-500/10 text-amber-300 hover:text-white hover:bg-amber-500/20 cursor-pointer">
+                      <ImageIcon className="h-4 w-4 mr-1.5" /> Hero Photos
+                    </Button>
                     <Button variant="outline" onClick={() => setAdminTab("posts")} className="border-slate-700 bg-slate-800 text-slate-200 hover:text-white cursor-pointer">
                       <FileText className="h-4 w-4 mr-1.5" /> Manage posts
                     </Button>
@@ -236,6 +242,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
             </div>
           )}
 
+          {adminTab === "heroPhotos" && <HeroManager />}
           {adminTab === "posts" && <PostList posts={activePosts} />}
           {adminTab === "testimonials" && <TestimonialManager testimonials={testimonials} />}
           {adminTab === "analytics" && <AnalyticsDashboard />}

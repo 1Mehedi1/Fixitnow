@@ -53,6 +53,7 @@ export function HomeView({
     customPosts, setCustomPosts,
     customTestimonials, setCustomTestimonials,
     customSettings, setCustomSettings,
+    customHeroPhotos, setCustomHeroPhotos,
   } = useStore()
 
   // Hydrate client-side posts, testimonials, and settings on mount strictly ONCE (zero infinite loops)
@@ -95,21 +96,15 @@ export function HomeView({
       }
     } catch {}
 
-    // Also background fetch latest settings from API to ensure cross-device updates sync
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.settings) {
-          const fresh = {
-            ...d.settings,
-            services: d.services || d.settings.services,
-            heroImages: d.heroImages || d.settings.heroImages,
-            typewriterSentences: d.typewriterSentences || d.settings.typewriterSentences,
-          }
-          setCustomSettings(fresh)
+    try {
+      const storedHero = localStorage.getItem("fixitnow_hero_photos")
+      if (storedHero) {
+        const parsedHero = JSON.parse(storedHero)
+        if (Array.isArray(parsedHero) && parsedHero.length >= 4) {
+          setCustomHeroPhotos(parsedHero)
         }
-      })
-      .catch(() => {})
+      }
+    } catch {}
   }, []) // Empty dependency array runs once on mount!
 
   const activeSettings = customSettings || settings

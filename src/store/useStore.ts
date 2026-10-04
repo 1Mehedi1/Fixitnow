@@ -4,7 +4,7 @@ import type { Post } from "@prisma/client"
 import type { SiteSettingsT } from "@/lib/site"
 
 export type View = "home" | "portfolio" | "blog" | "beforeAfter" | "about" | "admin"
-export type AdminTab = "dashboard" | "posts" | "testimonials" | "analytics" | "settings"
+export type AdminTab = "dashboard" | "posts" | "heroPhotos" | "testimonials" | "analytics" | "settings"
 
 interface AppState {
   view: View
@@ -16,6 +16,7 @@ interface AppState {
   customPosts: any[] | null
   customTestimonials: any[] | null
   customSettings: SiteSettingsT | null
+  customHeroPhotos: string[] | null
 
   setView: (v: View) => void
   openPost: (p: Post) => void
@@ -30,6 +31,8 @@ interface AppState {
   upsertCustomTestimonial: (testimonial: any) => void
   deleteCustomTestimonial: (id: string) => void
   setCustomSettings: (settings: SiteSettingsT) => void
+  setCustomHeroPhotos: (photos: string[]) => void
+  updateHeroPhoto: (index: number, url: string) => void
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -42,6 +45,7 @@ export const useStore = create<AppState>((set) => ({
   customPosts: null,
   customTestimonials: null,
   customSettings: null,
+  customHeroPhotos: null,
 
   setView: (v) => set({ view: v }),
   openPost: (p) => set({ selectedPost: p, detailOpen: true }),
@@ -132,5 +136,49 @@ export const useStore = create<AppState>((set) => ({
       console.warn("localStorage quota exceeded or unavailable:", err)
     }
     set({ customSettings: settings })
+  },
+  setCustomHeroPhotos: (photos) => {
+    try {
+      localStorage.setItem("fixitnow_hero_photos", JSON.stringify(photos))
+    } catch {}
+    set((state) => {
+      const nextSettings = state.customSettings
+        ? { ...state.customSettings, heroImages: photos }
+        : null
+      if (nextSettings) {
+        try {
+          localStorage.setItem("fixitnow_client_settings", JSON.stringify(nextSettings))
+        } catch {}
+      }
+      return { customHeroPhotos: photos, customSettings: nextSettings || state.customSettings }
+    })
+  },
+  updateHeroPhoto: (index, url) => {
+    set((state) => {
+      let current = state.customHeroPhotos
+      if (!current) {
+        try {
+          const stored = localStorage.getItem("fixitnow_hero_photos")
+          if (stored) {
+            const parsed = JSON.parse(stored)
+            if (Array.isArray(parsed) && parsed.length >= 4) current = parsed
+          }
+        } catch {}
+      }
+      const next = current ? [...current] : ["", "", "", ""]
+      next[index] = url
+      try {
+        localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))
+      } catch {}
+      const nextSettings = state.customSettings
+        ? { ...state.customSettings, heroImages: next }
+        : null
+      if (nextSettings) {
+        try {
+          localStorage.setItem("fixitnow_client_settings", JSON.stringify(nextSettings))
+        } catch {}
+      }
+      return { customHeroPhotos: next, customSettings: nextSettings || state.customSettings }
+    })
   },
 }))

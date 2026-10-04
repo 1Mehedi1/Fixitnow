@@ -54,7 +54,7 @@ interface FormState {
 }
 
 export function SettingsManager() {
-  const { setCustomSettings } = useStore()
+  const { setCustomSettings, updateHeroPhoto } = useStore()
   const [form, setForm] = useState<FormState>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -107,7 +107,18 @@ export function SettingsManager() {
 
           let loadedSentences = Array.isArray(d.typewriterSentences) && d.typewriterSentences.length > 0
             ? d.typewriterSentences
-            : (Array.isArray(d.settings.typewriterSentences) ? d.settings.typewriterSentences : [...(defaultSiteConfig.typewriterSentences || [])])
+            : (Array.isArray(d.settings?.typewriterSentences) ? d.settings.typewriterSentences : [...(defaultSiteConfig.typewriterSentences || [])])
+
+          let savedHeroLocal: string[] | null = null
+          try {
+            const storedHero = localStorage.getItem("fixitnow_hero_photos")
+            if (storedHero) {
+              const parsed = JSON.parse(storedHero)
+              if (Array.isArray(parsed) && parsed.length >= 4) savedHeroLocal = parsed
+            }
+          } catch {}
+
+          const finalHeroImgs = savedHeroLocal || heroImgs
 
           const loadedData: FormState = {
             brand: d.settings.brand || defaultSiteConfig.brand,
@@ -127,7 +138,7 @@ export function SettingsManager() {
             aboutTitle: d.settings.aboutTitle || defaultSiteConfig.aboutTitle,
             aboutBody: d.settings.aboutBody || defaultSiteConfig.aboutBody,
             services: loadedServices,
-            heroImages: heroImgs,
+            heroImages: finalHeroImgs,
             companyName: d.settings.companyName || defaultSiteConfig.companyName,
             companyUen: d.settings.companyUen || defaultSiteConfig.companyUen,
             licenseInfo: d.settings.licenseInfo || defaultSiteConfig.licenseInfo,
@@ -150,6 +161,13 @@ export function SettingsManager() {
       }
       setForm(payload)
       setCustomSettings(payload as any)
+
+      // Sync to /api/hero-photos
+      fetch("/api/hero-photos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ heroImages: normalizedHeroImages }),
+      }).catch(() => {})
 
       const res = await fetch("/api/settings", {
         method: "PUT",
@@ -188,6 +206,12 @@ export function SettingsManager() {
     const updated = [...form.heroImages]
     updated[index] = cleaned
     setForm({ ...form, heroImages: updated })
+    updateHeroPhoto(index, cleaned)
+    fetch("/api/hero-photos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ index, url: cleaned }),
+    }).catch(() => {})
   }
 
   const handleHeroFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,8 +224,9 @@ export function SettingsManager() {
       const res = await fetch("/api/upload", { method: "POST", body: fd })
       const data = await res.json()
       if (data.url) {
-        handleHeroImageChange(index, data.url)
-        toast.success(`Hero Photo ${index + 1} uploaded!`, { id: tId })
+        const direct = normalizeDriveUrl(data.url)
+        handleHeroImageChange(index, direct)
+        toast.success(`Hero Photo ${index + 1} uploaded & saved!`, { id: tId })
       } else {
         throw new Error(data.error || "Upload failed")
       }

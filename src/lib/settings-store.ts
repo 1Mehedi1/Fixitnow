@@ -56,6 +56,9 @@ function writeJsonFile(settings: SiteSettingsT) {
   } catch {}
 }
 
+const HERO_FILE = path.join(process.cwd(), "data", "hero-photos.json")
+const TMP_HERO_FILE = path.join(os.tmpdir(), "fixitnow-hero-photos.json")
+
 export function parseRawSettings(raw: any): SiteSettingsT {
   if (!raw) return defaultSiteConfig
 
@@ -72,12 +75,17 @@ export function parseRawSettings(raw: any): SiteSettingsT {
   } catch {}
 
   let heroImages: string[] = defaultSiteConfig.heroImages
-  try {
-    const parsedImgs = typeof raw.heroImagesJson === "string" ? JSON.parse(raw.heroImagesJson) : raw.heroImages
-    if (Array.isArray(parsedImgs) && parsedImgs.length > 0) {
-      heroImages = parsedImgs.map((img: any) => normalizeImageUrl(typeof img === "string" ? img : String(img || "")))
-    }
-  } catch {}
+  const customHeroOnDisk = readJsonFile(TMP_HERO_FILE) || readJsonFile(HERO_FILE)
+  if (Array.isArray(customHeroOnDisk) && customHeroOnDisk.length >= 4) {
+    heroImages = customHeroOnDisk.map((img: any) => normalizeImageUrl(typeof img === "string" ? img : String(img || "")))
+  } else {
+    try {
+      const parsedImgs = typeof raw.heroImagesJson === "string" ? JSON.parse(raw.heroImagesJson) : raw.heroImages
+      if (Array.isArray(parsedImgs) && parsedImgs.length > 0) {
+        heroImages = parsedImgs.map((img: any) => normalizeImageUrl(typeof img === "string" ? img : String(img || "")))
+      }
+    } catch {}
+  }
 
   let typewriterSentences: string[] = defaultSiteConfig.typewriterSentences || DEFAULT_TYPEWRITER_SENTENCES
   try {
