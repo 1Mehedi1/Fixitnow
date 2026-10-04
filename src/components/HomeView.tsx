@@ -50,7 +50,7 @@ export function HomeView({
 }: Props) {
   const { view, setView, openPost, customPosts, setCustomPosts } = useStore()
 
-  // Hydrate client-side posts on mount (with localStorage fallback for instant admin updates)
+  // Hydrate client-side posts on mount strictly ONCE (zero infinite loops)
   useEffect(() => {
     try {
       const stored = localStorage.getItem("fixitnow_client_posts")
@@ -62,14 +62,15 @@ export function HomeView({
         }
       }
     } catch {}
-    if (!customPosts && posts && posts.length > 0) {
+    if (posts && posts.length > 0) {
       setCustomPosts(posts)
     }
-  }, [posts, customPosts, setCustomPosts])
+  }, []) // Empty dependency array runs once on mount!
 
   const activePosts = (customPosts && customPosts.length > 0) ? customPosts : posts
-  const portfolioPosts = activePosts.filter((p) => p.published !== false && p.type === "portfolio")
-  const beforeAfterPosts = activePosts.filter(
+
+  const portfolioPosts = (activePosts || []).filter((p) => p.published !== false && p.type === "portfolio")
+  const beforeAfterPosts = (activePosts || []).filter(
     (p) => p.published !== false && p.images && p.images.some((img: any) => img.kind === "before") && p.images.some((img: any) => img.kind === "after")
   )
 
@@ -90,7 +91,7 @@ export function HomeView({
     }
   }, [view])
 
-  // Analytics: track page view on mount & view change
+  // Analytics: track page view on mount & view change with real session, visitorId, and load time
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -101,6 +102,29 @@ export function HomeView({
       if (!session) {
         session = `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
         sessionStorage.setItem("fixitnow_session_id", session)
+      }
+    } catch {}
+
+    // Track visitor identity (New vs Returning) in localStorage
+    let visitorId = ""
+    let isNewVisitor = false
+    try {
+      visitorId = localStorage.getItem("fixitnow_visitor_id") || ""
+      if (!visitorId) {
+        isNewVisitor = true
+        visitorId = `vis_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
+        localStorage.setItem("fixitnow_visitor_id", visitorId)
+      }
+    } catch {}
+
+    // Real client load time in ms
+    let loadTime = 0
+    try {
+      const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[]
+      if (navEntries && navEntries.length > 0 && navEntries[0].duration) {
+        loadTime = Math.round(navEntries[0].duration)
+      } else if (performance.timing) {
+        loadTime = Math.max(0, performance.timing.loadEventEnd - performance.timing.navigationStart)
       }
     } catch {}
 
@@ -115,6 +139,9 @@ export function HomeView({
         eventType: "page_view",
         path: `/?view=${view}`,
         session,
+        visitorId,
+        isNewVisitor,
+        loadTime,
         clientMeta: {
           device,
           referrer: document.referrer || "",
@@ -137,7 +164,7 @@ export function HomeView({
     <SiteSettingsProvider settings={settings}>
       <div className="min-h-screen flex flex-col bg-background overflow-x-clip w-full max-w-full pb-16 md:pb-0">
         <Header />
-        <div className="h-[96px] sm:h-[98px] w-full shrink-0" aria-hidden="true" />
+        <div className="h-[96px] sm:h-[100px] w-full shrink-0" aria-hidden="true" />
 
         <main className="flex-1 w-full max-w-full overflow-x-clip">
           {view === "home" && (

@@ -3,27 +3,30 @@ import { db } from "@/lib/db"
 import {
   parseUserAgent,
   parseReferrer,
+  parseReferrerCategory,
   parseGeoLocation,
   saveLocalAnalyticsEvent,
   type AnalyticsEventRecord,
 } from "@/lib/analytics-helper"
+import { incrementPostViews, incrementPostWhatsApp } from "@/lib/posts-store"
 
 export const dynamic = "force-dynamic"
 
 /**
  * Public tracking endpoint — anonymous, privacy-friendly analytics.
- * Body: { eventType, postId?, duration?, path?, session?, clientMeta? }
+ * Body: { eventType, postId?, duration?, path?, session?, visitorId?, isNewVisitor?, loadTime?, clientMeta? }
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
-    const { eventType, postId, duration, path: p, session, clientMeta } = body || {}
+    const { eventType, postId, duration, path: p, session, visitorId, isNewVisitor, loadTime, clientMeta } = body || {}
     if (!eventType) return NextResponse.json({ ok: false, error: "Missing eventType" })
 
     const userAgent = req.headers.get("user-agent")
     const { device, browser, os } = parseUserAgent(userAgent)
     const referrerHeader = req.headers.get("referer") || clientMeta?.referrer
     const referrer = parseReferrer(referrerHeader)
+    const referrerCategory = parseReferrerCategory(referrerHeader)
     const { country, countryCode, countryFlag, city } = parseGeoLocation(req.headers, clientMeta)
 
     const eventId = `ev_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`
@@ -32,6 +35,9 @@ export async function POST(req: NextRequest) {
       eventType: String(eventType).slice(0, 40),
       postId: postId ? String(postId) : null,
       session: session ? String(session).slice(0, 64) : null,
+      visitorId: visitorId ? String(visitorId).slice(0, 64) : null,
+      isNewVisitor: Boolean(isNewVisitor),
+      loadTime: typeof loadTime === "number" ? loadTime : null,
       duration: typeof duration === "number" ? duration : null,
       path: p ? String(p).slice(0, 200) : "/",
       device: clientMeta?.device || device,
@@ -42,11 +48,22 @@ export async function POST(req: NextRequest) {
       countryFlag,
       city,
       referrer,
+      referrerCategory,
       createdAt: new Date().toISOString(),
     }
 
     // Persist to local JSON analytics store (guarantees 100% uptime & rich metadata)
     await saveLocalAnalyticsEvent(record)
+
+    // Update stored posts counter directly in posts-store
+    if (record.postId) {
+      if (record.eventType === "post_view") {
+        incrementPostViews(record.postId).catch(() => {})
+      }
+      if (record.eventType.includes("whatsapp")) {
+        incrementPostWhatsApp(record.postId).catch(() => {})
+      }
+    }
 
     // Attempt PostgreSQL persistence if DB is connected
     try {
@@ -60,7 +77,6 @@ export async function POST(req: NextRequest) {
         },
       })
 
-      // If it's a post view, bump post counter
       if (record.eventType === "post_view" && record.postId) {
         db.post.update({ where: { id: record.postId }, data: { views: { increment: 1 } } }).catch(() => {})
       }

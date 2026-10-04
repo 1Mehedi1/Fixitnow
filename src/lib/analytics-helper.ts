@@ -1,5 +1,6 @@
 import fs from "fs/promises"
 import path from "path"
+import os from "os"
 
 export interface ParsedVisitorMeta {
   device: "Mobile" | "Desktop" | "Tablet"
@@ -17,6 +18,9 @@ export interface AnalyticsEventRecord {
   eventType: string
   postId?: string | null
   session?: string | null
+  visitorId?: string | null
+  isNewVisitor?: boolean
+  loadTime?: number | null
   duration?: number | null
   path?: string | null
   device?: string
@@ -27,6 +31,7 @@ export interface AnalyticsEventRecord {
   countryFlag?: string
   city?: string
   referrer?: string
+  referrerCategory?: "Organic Search" | "Direct" | "Referral" | "Social" | "Paid / Ads" | "Other"
   createdAt: string
 }
 
@@ -107,6 +112,37 @@ export function parseReferrer(ref: string | null): string {
   }
 }
 
+export function parseReferrerCategory(ref: string | null): "Organic Search" | "Direct" | "Referral" | "Social" | "Paid / Ads" | "Other" {
+  if (!ref || ref === "Direct / Bookmark") return "Direct"
+  try {
+    const url = new URL(ref)
+    const host = url.hostname.toLowerCase()
+    const search = url.search.toLowerCase()
+    if (search.includes("utm_medium=cpc") || search.includes("utm_medium=paid") || search.includes("gclid=") || search.includes("fbclid=")) {
+      return "Paid / Ads"
+    }
+    if (host.includes("google") || host.includes("bing") || host.includes("yahoo") || host.includes("duckduckgo")) {
+      return "Organic Search"
+    }
+    if (
+      host.includes("facebook") ||
+      host.includes("fb.me") ||
+      host.includes("instagram") ||
+      host.includes("tiktok") ||
+      host.includes("whatsapp") ||
+      host.includes("wa.me") ||
+      host.includes("twitter") ||
+      host.includes("x.com") ||
+      host.includes("linkedin")
+    ) {
+      return "Social"
+    }
+    return "Referral"
+  } catch {
+    return "Direct"
+  }
+}
+
 export function parseGeoLocation(headers: Headers, clientMeta?: any): { country: string; countryCode: string; countryFlag: string; city: string } {
   // Check standard CDN & edge headers
   let code = (
@@ -139,49 +175,110 @@ export function parseGeoLocation(headers: Headers, clientMeta?: any): { country:
   }
 }
 
-const EVENTS_FILE = path.join(process.cwd(), "data", "analytics-events.json")
+// Multi-tier storage paths:
+// Tier 1: In-memory global array
+// Tier 2: /tmp/fixitnow-analytics.json (100% writable on Vercel and Linux/macOS/Windows)
+// Tier 3: data/analytics-events.json (when cwd is writable)
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __fixitnow_analytics_events: AnalyticsEventRecord[] | undefined
+}
+
+const TMP_FILE = path.join(os.tmpdir(), "fixitnow-analytics.json")
+const DATA_FILE = path.join(process.cwd(), "data", "analytics-events.json")
 
 export async function saveLocalAnalyticsEvent(record: AnalyticsEventRecord) {
-  try {
-    const dataDir = path.join(process.cwd(), "data")
-    await fs.mkdir(dataDir, { recursive: true })
+  // 1. In-memory
+  if (!globalThis.__fixitnow_analytics_events) {
+    globalThis.__fixitnow_analytics_events = []
+  }
+  globalThis.__fixitnow_analytics_events.unshift(record)
+  if (globalThis.__fixitnow_analytics_events.length > 5000) {
+    globalThis.__fixitnow_analytics_events = globalThis.__fixitnow_analytics_events.slice(0, 5000)
+  }
 
+  // 2. Writable temp file
+  try {
     let existing: AnalyticsEventRecord[] = []
     try {
-      const raw = await fs.readFile(EVENTS_FILE, "utf-8")
+      const raw = await fs.readFile(TMP_FILE, "utf-8")
       existing = JSON.parse(raw)
       if (!Array.isArray(existing)) existing = []
     } catch {
       existing = []
     }
-
-    // Keep last 5,000 events
     existing.unshift(record)
-    if (existing.length > 5000) {
-      existing = existing.slice(0, 5000)
-    }
+    if (existing.length > 5000) existing = existing.slice(0, 5000)
+    await fs.writeFile(TMP_FILE, JSON.stringify(existing, null, 2), "utf-8")
+  } catch (tmpErr) {
+    console.warn("Failed to write to tmp analytics file:", tmpErr)
+  }
 
-    await fs.writeFile(EVENTS_FILE, JSON.stringify(existing, null, 2), "utf-8")
-  } catch (err) {
-    console.warn("Failed to persist local analytics event:", err)
+  // 3. Project data file if writable
+  try {
+    const dataDir = path.join(process.cwd(), "data")
+    await fs.mkdir(dataDir, { recursive: true })
+    let existingData: AnalyticsEventRecord[] = []
+    try {
+      const raw = await fs.readFile(DATA_FILE, "utf-8")
+      existingData = JSON.parse(raw)
+      if (!Array.isArray(existingData)) existingData = []
+    } catch {
+      existingData = []
+    }
+    existingData.unshift(record)
+    if (existingData.length > 5000) existingData = existingData.slice(0, 5000)
+    await fs.writeFile(DATA_FILE, JSON.stringify(existingData, null, 2), "utf-8")
+  } catch {
+    // Expected on read-only serverless filesystems
   }
 }
 
 export async function loadLocalAnalyticsEvents(): Promise<AnalyticsEventRecord[]> {
-  try {
-    const raw = await fs.readFile(EVENTS_FILE, "utf-8")
-    const list = JSON.parse(raw)
-    return Array.isArray(list) ? list : []
-  } catch {
-    return []
+  const map = new Map<string, AnalyticsEventRecord>()
+
+  // 1. From global in-memory
+  if (globalThis.__fixitnow_analytics_events && Array.isArray(globalThis.__fixitnow_analytics_events)) {
+    for (const e of globalThis.__fixitnow_analytics_events) {
+      if (e && e.id) map.set(e.id, e)
+    }
   }
+
+  // 2. From tmp file
+  try {
+    const raw = await fs.readFile(TMP_FILE, "utf-8")
+    const list = JSON.parse(raw)
+    if (Array.isArray(list)) {
+      for (const e of list) {
+        if (e && e.id && !map.has(e.id)) map.set(e.id, e)
+      }
+    }
+  } catch {}
+
+  // 3. From project data file
+  try {
+    const raw = await fs.readFile(DATA_FILE, "utf-8")
+    const list = JSON.parse(raw)
+    if (Array.isArray(list)) {
+      for (const e of list) {
+        if (e && e.id && !map.has(e.id)) map.set(e.id, e)
+      }
+    }
+  } catch {}
+
+  const merged = Array.from(map.values())
+  merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  return merged
 }
 
 export async function clearLocalAnalyticsEvents(): Promise<boolean> {
+  globalThis.__fixitnow_analytics_events = []
   try {
-    await fs.writeFile(EVENTS_FILE, "[]", "utf-8")
-    return true
-  } catch {
-    return false
-  }
+    await fs.writeFile(TMP_FILE, "[]", "utf-8")
+  } catch {}
+  try {
+    await fs.writeFile(DATA_FILE, "[]", "utf-8")
+  } catch {}
+  return true
 }

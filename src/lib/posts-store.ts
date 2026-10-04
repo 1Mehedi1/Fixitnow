@@ -231,3 +231,12 @@ export async function incrementPostViews(id: string): Promise<void> {
     writeJsonFile(posts)
   }
 }
+
+export async function incrementPostWhatsApp(id: string): Promise<void> {
+  const posts = await getStoredPosts()
+  const post = posts.find((p) => p.id === id)
+  if (post) {
+    post.whatsappClicks = (post.whatsappClicks || 0) + 1
+    writeJsonFile(posts)
+  }
+}

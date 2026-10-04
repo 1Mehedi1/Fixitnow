@@ -1,15 +1,15 @@
 "use client"
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Eye, Clock, MapPin, Calendar, X, Phone, MessageSquare } from "lucide-react"
+import { Eye, MapPin, Calendar, X, Phone, MessageSquare } from "lucide-react"
 import { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import { useStore } from "@/store/useStore"
-import { whatsappLink, whatsappForPost, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
+import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 import { BeforeAfterSlider } from "./BeforeAfterSlider"
 import type { Post, PostImage } from "@prisma/client"
@@ -21,7 +21,6 @@ interface DetailedPost extends Post {
 export function PostDetailModal() {
   const { detailOpen, selectedPost, closePost } = useStore()
   const [full, setFull] = useState<DetailedPost | null>(null)
-  const [loading, setLoading] = useState(false)
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   useEffect(() => {
@@ -37,8 +36,7 @@ export function PostDetailModal() {
     }
     setFull(initialDetailed)
 
-    // Background fetch to update view count and fetch full details
-    setLoading(false)
+    // Background fetch to update view count
     fetch(`/api/posts/${selectedPost.id}`)
       .then((r) => r.json())
       .then((d) => {
@@ -54,7 +52,7 @@ export function PostDetailModal() {
       .catch(() => {})
   }, [detailOpen, selectedPost])
 
-  if (!full && !loading) return null
+  if (!full) return null
 
   const before = full?.images?.find((i) => i.kind === "before")
   const after = full?.images?.find((i) => i.kind === "after")
@@ -63,168 +61,185 @@ export function PostDetailModal() {
   const cover = full?.coverImage || full?.images?.[0]?.url
 
   const waQuoteText = full
-    ? `Hi ${s.workerName}, I saw your work "${full.title}" on Fixitnow. Can I get a quote for a similar job at my place?`
-    : `Hi ${s.workerName}, I'd like to get a quote.`
+    ? `Hi, I saw your work "${full.title}" on Fixitnow. Can I get a quote for a similar job at my place?`
+    : `Hi, I would like to get an instant quote for a repair or renovation job.`
 
   return (
     <Dialog open={detailOpen} onOpenChange={(o) => !o && closePost()}>
-      <DialogContent showCloseButton={false} className="w-[95vw] max-w-[95vw] sm:max-w-3xl md:max-w-4xl max-h-[92vh] p-0 overflow-hidden gap-0 rounded-2xl border-border/80 shadow-2xl">
-        <DialogTitle className="sr-only">{full?.title || "Project Details"}</DialogTitle>
-        <ScrollArea className="h-[92vh] overflow-x-hidden scroll-area-thin">
-          {full && (
-            <article className="pb-8 max-w-full overflow-x-hidden">
-              {/* Hero image header */}
-              {cover && (
-                <div className="relative aspect-[16/9] max-h-[420px] bg-muted overflow-hidden">
-                  <img src={cover} alt={full.title} className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
-                  <button
-                    onClick={closePost}
-                    className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 transition-colors z-20 cursor-pointer"
-                    aria-label="Close"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 text-white z-10">
-                    <div className="flex gap-2 mb-2 flex-wrap">
-                      {full.featured && (
-                        <Badge className="bg-amber-500 text-stone-950 font-bold border-0 text-xs">
-                          ⭐ Featured Work
-                        </Badge>
-                      )}
-                      {full.category && (
-                        <Badge variant="secondary" className="bg-white/95 text-stone-900 font-semibold border-0 text-xs">
-                          {full.category}
-                        </Badge>
-                      )}
-                    </div>
-                    <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white text-balance drop-shadow-md">
-                      {full.title}
-                    </h1>
-                  </div>
+      <DialogContent
+        showCloseButton={false}
+        className="w-[94vw] max-w-[94vw] sm:max-w-xl md:max-w-2xl max-h-[90vh] p-3 sm:p-5 overflow-hidden gap-0 rounded-3xl border border-border/80 bg-background/95 backdrop-blur-xl shadow-2xl"
+      >
+        <DialogTitle className="sr-only">{full.title || "Project Details"}</DialogTitle>
+        <DialogDescription className="sr-only">Detailed case study view</DialogDescription>
+
+        {/* Scrollable Container with Inner Boundary Card */}
+        <ScrollArea className="max-h-[85vh] overflow-x-hidden scroll-area-thin">
+          <div className="rounded-2xl border-2 border-border/70 bg-card/90 p-4 sm:p-6 space-y-5 shadow-sm">
+            {/* Top Bar with Title & Close Button */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1.5 flex-1 min-w-0">
+                <div className="flex gap-2 items-center flex-wrap">
+                  {full.featured && (
+                    <Badge className="bg-amber-500/20 text-amber-500 dark:text-amber-400 font-bold border border-amber-500/30 text-[11px]">
+                      ⭐ Featured Work
+                    </Badge>
+                  )}
+                  {full.category && (
+                    <Badge variant="secondary" className="text-[11px] font-semibold">
+                      {full.category}
+                    </Badge>
+                  )}
                 </div>
-              )}
+                <h2 className="font-display text-lg sm:text-xl md:text-2xl font-black text-foreground leading-snug break-words">
+                  {full.title}
+                </h2>
+              </div>
 
-              <div className="p-5 sm:p-7 space-y-6 max-w-full overflow-x-hidden">
-                {/* Meta strip */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-muted-foreground pb-2 border-b border-border/50">
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    {new Date(full.createdAt).toLocaleDateString("en-SG", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <MapPin className="h-4 w-4 text-emerald-500" />
-                    {s.location}
-                  </span>
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <Eye className="h-4 w-4 text-blue-500" />
-                    {(full.views || 0) + 1} views
-                  </span>
+              {/* Close Button */}
+              <button
+                onClick={closePost}
+                className="h-9 w-9 rounded-full bg-muted hover:bg-muted/80 text-foreground flex items-center justify-center transition-colors shrink-0 cursor-pointer border border-border/60"
+                aria-label="Close modal"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            {/* Cover Photo — Spanning 100% of card width with zero empty space */}
+            {cover && (
+              <div className="w-full aspect-[16/10] sm:aspect-[16/9] rounded-xl overflow-hidden relative shadow-md border border-border/60 bg-muted">
+                <img
+                  src={cover}
+                  alt={full.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            {/* Meta Details Strip */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground py-2 border-y border-border/50">
+              <span className="flex items-center gap-1.5 font-medium">
+                <Calendar className="h-3.5 w-3.5 text-primary" />
+                {new Date(full.createdAt).toLocaleDateString("en-SG", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <MapPin className="h-3.5 w-3.5 text-emerald-500" />
+                {s.location || "Singapore · Islandwide"}
+              </span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <Eye className="h-3.5 w-3.5 text-blue-500" />
+                {(full.views || 0) + 1} views
+              </span>
+            </div>
+
+            {/* Excerpt / Summary */}
+            {full.excerpt && (
+              <p className="text-xs sm:text-sm text-foreground/90 font-medium leading-relaxed bg-muted/40 p-3.5 rounded-xl border border-border/40">
+                {full.excerpt}
+              </p>
+            )}
+
+            {/* Before/After slider if available */}
+            {hasSlider && before && after && (
+              <div className="space-y-2.5 pt-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-display font-bold text-sm sm:text-base text-foreground">
+                    Before & After Transformation
+                  </h3>
+                  <span className="text-[11px] text-muted-foreground font-medium">Drag slider to compare</span>
                 </div>
-
-                {/* Excerpt */}
-                {full.excerpt && (
-                  <p className="text-sm sm:text-base text-foreground/90 font-medium leading-relaxed bg-muted/30 p-4 rounded-xl border border-border/40">
-                    {full.excerpt}
-                  </p>
-                )}
-
-                {/* Before/After slider if available */}
-                {hasSlider && before && after && (
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-display font-bold text-base sm:text-lg text-foreground">Before & After Transformation</h3>
-                      <span className="text-xs text-muted-foreground">Drag slider to compare</span>
-                    </div>
-                    <div className="rounded-2xl overflow-hidden border border-border/70 shadow-md">
-                      <BeforeAfterSlider before={before.url} after={after.url} alt={full.title} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Body content */}
-                {full.content && (
-                  <div className="prose prose-stone dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed py-2 break-words">
-                    <ReactMarkdown>{full.content}</ReactMarkdown>
-                  </div>
-                )}
-
-                {/* Gallery images */}
-                {gallery.length > 0 && !hasSlider && (
-                  <div className="space-y-3">
-                    <h3 className="font-display font-bold text-base sm:text-lg text-foreground">Project Photos</h3>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {gallery.map((img) => (
-                        <div key={img.id} className="aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border/40 shadow-sm">
-                          <img src={img.url} alt={full.title} className="h-full w-full object-cover hover:scale-105 transition-transform duration-300" loading="lazy" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <Separator className="my-5" />
-
-                {/* Compact, Short Card Sized Direct WhatsApp & Call Action Card */}
-                <div className="rounded-2xl bg-gradient-to-br from-emerald-950/20 via-background to-emerald-900/10 border-2 border-emerald-500/30 p-4 sm:p-5 space-y-3.5 shadow-md">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                        Direct Handyman Quote · Transparent Pricing
-                      </span>
-                    </div>
-                    <h4 className="font-display font-bold text-base sm:text-lg text-foreground">
-                      Need a similar repair or renovation?
-                    </h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                      Send a photo of your job directly on WhatsApp. Get an honest, transparent itemized estimate.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
-                    <Button
-                      asChild
-                      size="default"
-                      className="bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold h-11 px-5 shadow-sm transition-all cursor-pointer flex-1 justify-center"
-                    >
-                      <a
-                        href={whatsappLink(s, waQuoteText)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => {
-                          fetch("/api/analytics", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ eventType: "whatsapp_click", postId: full.id }),
-                          }).catch(() => {})
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2 shrink-0" />
-                        WhatsApp for Quote
-                      </a>
-                    </Button>
-
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="default"
-                      className="h-11 px-4 border-emerald-500/40 hover:bg-emerald-500/10 text-foreground font-semibold sm:w-auto justify-center"
-                    >
-                      <a href={`tel:${s.phone.replace(/[^0-9+]/g, "")}`}>
-                        <Phone className="h-4 w-4 mr-2 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        Direct Call
-                      </a>
-                    </Button>
-                  </div>
+                <div className="rounded-xl overflow-hidden border border-border/70 shadow-sm w-full">
+                  <BeforeAfterSlider before={before.url} after={after.url} alt={full.title} />
                 </div>
               </div>
-            </article>
-          )}
+            )}
+
+            {/* Detailed Story Markdown */}
+            {full.content && (
+              <div className="prose prose-stone dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed py-1 break-words">
+                <ReactMarkdown>{full.content}</ReactMarkdown>
+              </div>
+            )}
+
+            {/* Gallery images */}
+            {gallery.length > 0 && !hasSlider && (
+              <div className="space-y-2.5 pt-1">
+                <h3 className="font-display font-bold text-sm sm:text-base text-foreground">Project Photos</h3>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {gallery.map((img) => (
+                    <div key={img.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted border border-border/40 shadow-xs">
+                      <img src={img.url} alt={full.title} className="h-full w-full object-cover" loading="lazy" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Short Compact Card-Sized WhatsApp & Direct Call Quote CTA */}
+            <div className="rounded-xl bg-gradient-to-br from-emerald-500/10 via-card to-teal-500/10 border-2 border-emerald-500/30 p-3.5 sm:p-4 space-y-3 shadow-xs">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                  Instant Quote · 0% Middleman Markup
+                </span>
+              </div>
+              <p className="text-xs text-foreground/80 leading-snug">
+                Send photo on WhatsApp to get an immediate, transparent estimate.
+              </p>
+
+              <div className="flex flex-wrap gap-2 pt-0.5">
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-xs h-9 px-4 shadow-sm transition-all hover:scale-[1.02] cursor-pointer flex-1 sm:flex-initial"
+                >
+                  <a
+                    href={whatsappLink(s, waQuoteText)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      fetch("/api/analytics", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ eventType: "whatsapp_click", postId: full.id }),
+                      }).catch(() => {})
+                    }}
+                  >
+                    <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
+                    WhatsApp for Quote
+                  </a>
+                </Button>
+
+                {s.phone && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="h-9 px-3.5 text-xs font-semibold hover:border-emerald-500/50 cursor-pointer"
+                  >
+                    <a
+                      href={`tel:${s.phone.replace(/[^0-9+]/g, "")}`}
+                      onClick={() => {
+                        fetch("/api/analytics", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ eventType: "phone_call", postId: full.id }),
+                        }).catch(() => {})
+                      }}
+                    >
+                      <Phone className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
+                      Direct Call
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>

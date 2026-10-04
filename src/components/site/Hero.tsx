@@ -112,7 +112,7 @@ export function Hero() {
   const heroPhotos = s.heroImages && s.heroImages.length >= 4 ? s.heroImages : DEFAULT_HERO_IMAGES
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background via-amber-500/[0.04] to-background pt-3 pb-10 sm:py-16 w-full max-w-full">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background via-amber-500/[0.04] to-background pt-5 sm:pt-10 pb-10 sm:py-16 w-full max-w-full">
       {/* Scattered Architectural Technical Grid & Luminous Amber Aura */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Crisp Technical Micro-Grid Pattern */}

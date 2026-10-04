@@ -74,19 +74,19 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
-      {/* Top High-Trust WhatsApp Emerald Direct Line Bar — 100% Clickable */}
+      {/* Top High-Trust WhatsApp Emerald Direct Line Bar — 100% Clickable & Mobile Responsive */}
       <a
         href={whatsappLink(s, "Hi, I would like to get an instant quote for a repair / renovation job.")}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full bg-gradient-to-r from-[#075E54] via-[#128C7E] to-[#0d5c3a] hover:brightness-110 text-white py-2 px-3 sm:px-4 text-xs sm:text-sm font-semibold tracking-wide transition-all shadow-xs block group cursor-pointer"
+        className="w-full bg-gradient-to-r from-[#075E54] via-[#128C7E] to-[#0d5c3a] hover:brightness-110 text-white py-1.5 sm:py-2 px-2.5 sm:px-4 text-[11px] sm:text-xs md:text-sm font-semibold tracking-wide transition-all shadow-xs block group cursor-pointer"
         title="Chat on WhatsApp for an instant consultation & quote"
       >
-        <div className="container mx-auto max-w-7xl flex items-center justify-center gap-2 text-center">
-          <WhatsAppIcon className="h-4 w-4 fill-white shrink-0 animate-pulse group-hover:scale-110 transition-transform" />
-          <span className="flex items-center gap-1.5 flex-wrap justify-center">
+        <div className="container mx-auto max-w-7xl flex items-center justify-center gap-1.5 sm:gap-2 text-center">
+          <WhatsAppIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-white shrink-0 animate-pulse group-hover:scale-110 transition-transform" />
+          <span className="truncate flex items-center gap-1.5 justify-center">
             <span>Chat on WhatsApp for an Instant Quote</span>
-            <span className="opacity-90 font-normal">· Tap anywhere to connect with us</span>
+            <span className="hidden md:inline opacity-90 font-normal">· Tap anywhere to connect with us</span>
           </span>
         </div>
       </a>
