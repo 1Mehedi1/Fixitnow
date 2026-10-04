@@ -25,10 +25,10 @@ const SLOT_META = [
 export function HeroManager() {
   const { customHeroPhotos, setCustomHeroPhotos, updateHeroPhoto } = useStore()
   const [photos, setPhotos] = useState<string[]>([
-    "https://files.catbox.moe/dmagw6.png",
-    DEFAULT_HERO_IMAGES[1],
-    DEFAULT_HERO_IMAGES[2],
-    DEFAULT_HERO_IMAGES[3],
+    "https://files.catbox.moe/xx0tqh.jpg",
+    "https://files.catbox.moe/fcb1g7.jpg",
+    "https://files.catbox.moe/6pj5rs.jpg",
+    "https://files.catbox.moe/g2969p.jpg",
   ])
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
@@ -86,9 +86,11 @@ export function HeroManager() {
       const data = await res.json()
       if (data.url) {
         const directUrl = normalizeImageUrl(data.url)
-        const next = [...photos]
-        next[idx] = directUrl
-        setPhotos(next)
+        setPhotos((prev) => {
+          const next = [...prev]
+          next[idx] = directUrl
+          return next
+        })
         updateHeroPhoto(idx, directUrl)
 
         // Instant background sync to /api/hero-photos

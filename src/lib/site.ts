@@ -108,10 +108,10 @@ export interface SiteSettingsT {
 }
 
 export const DEFAULT_HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=600&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=600&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=600&auto=format&fit=crop&q=70",
+  "https://files.catbox.moe/xx0tqh.jpg",
+  "https://files.catbox.moe/fcb1g7.jpg",
+  "https://files.catbox.moe/6pj5rs.jpg",
+  "https://files.catbox.moe/g2969p.jpg",
 ]
 
 const DEFAULT_SERVICES: ServiceItem[] = [

@@ -2,6 +2,7 @@ import { create } from "zustand"
 import type { Post } from "@prisma/client"
 
 import type { SiteSettingsT } from "@/lib/site"
+import { DEFAULT_HERO_IMAGES } from "@/lib/site"
 
 export type View = "home" | "portfolio" | "blog" | "beforeAfter" | "about" | "admin"
 export type AdminTab = "dashboard" | "posts" | "heroPhotos" | "testimonials" | "analytics" | "settings"
@@ -165,7 +166,7 @@ export const useStore = create<AppState>((set) => ({
           }
         } catch {}
       }
-      const next = current ? [...current] : ["", "", "", ""]
+      const next = current ? [...current] : [...DEFAULT_HERO_IMAGES]
       next[index] = url
       try {
         localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))

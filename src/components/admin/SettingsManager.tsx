@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign, Type, MessageSquare } from "lucide-react"
+import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign, Type, MessageSquare, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -54,7 +54,7 @@ interface FormState {
 }
 
 export function SettingsManager() {
-  const { setCustomSettings, updateHeroPhoto } = useStore()
+  const { setCustomSettings, updateHeroPhoto, setAdminTab } = useStore()
   const [form, setForm] = useState<FormState>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -154,20 +154,11 @@ export function SettingsManager() {
   const save = async () => {
     setSaving(true)
     try {
-      const normalizedHeroImages = form.heroImages.map(normalizeDriveUrl)
       const payload: FormState = {
         ...form,
-        heroImages: normalizedHeroImages,
       }
       setForm(payload)
       setCustomSettings(payload as any)
-
-      // Sync to /api/hero-photos
-      fetch("/api/hero-photos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroImages: normalizedHeroImages }),
-      }).catch(() => {})
 
       const res = await fetch("/api/settings", {
         method: "PUT",
@@ -175,7 +166,6 @@ export function SettingsManager() {
         body: JSON.stringify({
           ...payload,
           servicesJson: payload.services,
-          heroImagesJson: payload.heroImages,
           typewriterSentencesJson: payload.typewriterSentences,
         }),
       })
@@ -201,39 +191,6 @@ export function SettingsManager() {
     toast.info("Form reset to defaults. Click Save to apply.")
   }
 
-  const handleHeroImageChange = (index: number, url: string) => {
-    const cleaned = normalizeDriveUrl(url)
-    const updated = [...form.heroImages]
-    updated[index] = cleaned
-    setForm({ ...form, heroImages: updated })
-    updateHeroPhoto(index, cleaned)
-    fetch("/api/hero-photos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ index, url: cleaned }),
-    }).catch(() => {})
-  }
-
-  const handleHeroFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const fd = new FormData()
-    fd.append("file", file)
-    const tId = toast.loading(`Uploading Hero Photo ${index + 1}...`)
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: fd })
-      const data = await res.json()
-      if (data.url) {
-        const direct = normalizeDriveUrl(data.url)
-        handleHeroImageChange(index, direct)
-        toast.success(`Hero Photo ${index + 1} uploaded & saved!`, { id: tId })
-      } else {
-        throw new Error(data.error || "Upload failed")
-      }
-    } catch (err: any) {
-      toast.error("Upload failed", { description: err.message, id: tId })
-    }
-  }
 
   const handleServiceFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -539,77 +496,29 @@ export function SettingsManager() {
         </CardContent>
       </Card>
 
-      {/* Hero 4 Photos */}
-      <Card>
+      {/* Hero 4 Photos Pointer Card */}
+      <Card className="border-amber-500/30 bg-amber-500/[0.04]">
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <ImageIcon className="h-4 w-4 text-primary" /> Hero Showcase Photos (4 Images)
-          </CardTitle>
-          <CardDescription>
-            The 4 photos featured prominently in the hero collage. Paste image URLs or upload photos directly.
-          </CardDescription>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <ImageIcon className="h-4 w-4 text-primary" /> Hero Showcase Photos (4 Images)
+              </CardTitle>
+              <CardDescription className="mt-1">
+                The 4 featured photos in the hero section are managed in the dedicated <strong>Hero Photos</strong> tab with instant upload, live mobile/desktop preview, and cross-device sync.
+              </CardDescription>
+            </div>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={() => setAdminTab("heroPhotos")}
+              className="gap-1.5 font-bold shrink-0 self-start sm:self-auto cursor-pointer"
+            >
+              Open Hero Photos <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent className="grid sm:grid-cols-2 gap-5">
-          {[0, 1, 2, 3].map((idx) => {
-            const labels = [
-              "Photo 1 · Top-Left (Portrait)",
-              "Photo 2 · Bottom-Left (Square)",
-              "Photo 3 · Top-Right (Square)",
-              "Photo 4 · Bottom-Right (Portrait)"
-            ]
-            const currentImg = form.heroImages[idx] || defaultSiteConfig.heroImages[idx] || ""
-            return (
-              <div key={idx} className="border border-border/80 rounded-xl p-4 bg-muted/20 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{labels[idx]}</span>
-                  <div className="flex items-center gap-2.5">
-                    {form.heroImages[idx] ? (
-                      <button
-                        type="button"
-                        onClick={() => handleHeroImageChange(idx, "")}
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
-                        title="Clear photo"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        <span>Clear</span>
-                      </button>
-                    ) : null}
-                    <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
-                      <Upload className="h-3.5 w-3.5" />
-                      <span>Upload new</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleHeroFileUpload(idx, e)}
-                      />
-                    </label>
-                  </div>
-                </div>
-                <div className="aspect-[4/3] rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center relative group">
-                  {currentImg ? (
-                    <img src={currentImg} alt={`Hero Photo ${idx + 1}`} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-xs text-muted-foreground flex flex-col items-center gap-1">
-                      <ImageIcon className="h-6 w-6 opacity-40" />
-                      <span>No photo set</span>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">Image URL</Label>
-                  <Input
-                    value={form.heroImages[idx] || ""}
-                    onChange={(e) => handleHeroImageChange(idx, e.target.value)}
-                    onBlur={(e) => handleHeroImageChange(idx, e.target.value)}
-                    placeholder="https://... or Google Drive share link"
-                    className="text-xs h-9 font-mono"
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </CardContent>
       </Card>
 
       {/* About section */}

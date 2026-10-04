@@ -8,7 +8,7 @@ import { useSiteSettings } from "@/components/site-settings-context"
 export function MobileBottomDock() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
-  const prefilledMsg = `Hi ${s.workerName || "Tanbir"}, I saw your website and would like a quick photo quote for a repair. Here are the details/photos:`
+  const prefilledMsg = `Hi, I saw your website and would like a quick photo quote for a repair. Here are the details/photos:`
   const waUrl = whatsappLink(s, prefilledMsg)
   const phoneClean = (s.phone || "+65 8928 2459").replace(/[^0-9+]/g, "")
 
@@ -30,7 +30,7 @@ export function MobileBottomDock() {
           <Phone className="h-4 w-4 text-[#f95700] shrink-0" />
           <div className="text-left leading-tight">
             <span className="block text-[10px] text-muted-foreground uppercase font-extrabold tracking-wider">Direct Line</span>
-            <span className="text-xs font-black">Call Tanbir</span>
+            <span className="text-xs font-black">Call Direct</span>
           </div>
         </a>
 
@@ -56,7 +56,7 @@ export function MobileBottomDock() {
             </span>
           </div>
           <div className="text-left leading-tight">
-            <span className="block text-[10px] text-white/90 uppercase font-extrabold tracking-wider">15-Min Reply</span>
+            <span className="block text-[10px] text-white/90 uppercase font-extrabold tracking-wider">Fast Quote</span>
             <span className="text-xs font-black">WhatsApp Photo</span>
           </div>
         </a>

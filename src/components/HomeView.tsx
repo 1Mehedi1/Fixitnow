@@ -105,6 +105,19 @@ export function HomeView({
         }
       }
     } catch {}
+
+    // Cross-device sync: fetch latest hero photos from API for any new/mobile visitor
+    fetch("/api/hero-photos")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {
+          setCustomHeroPhotos(d.heroImages)
+          try {
+            localStorage.setItem("fixitnow_hero_photos", JSON.stringify(d.heroImages))
+          } catch {}
+        }
+      })
+      .catch(() => {})
   }, []) // Empty dependency array runs once on mount!
 
   const activeSettings = customSettings || settings

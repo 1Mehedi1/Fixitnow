@@ -58,10 +58,10 @@ export async function getStoredHeroPhotos(): Promise<string[]> {
   }
 
   const fallback = [
-    "https://files.catbox.moe/dmagw6.png",
-    DEFAULT_HERO_IMAGES[1],
-    DEFAULT_HERO_IMAGES[2],
-    DEFAULT_HERO_IMAGES[3],
+    "https://files.catbox.moe/xx0tqh.jpg",
+    "https://files.catbox.moe/fcb1g7.jpg",
+    "https://files.catbox.moe/6pj5rs.jpg",
+    "https://files.catbox.moe/g2969p.jpg",
   ]
   globalThis.__heroPhotos = fallback
   writeJson(fallback)

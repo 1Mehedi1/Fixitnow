@@ -120,6 +120,22 @@ export function Hero() {
         }
       }
     } catch {}
+
+    // Always fetch live photos from server API to guarantee 100% cross-device sync (mobile, tablet, desktop)
+    fetch("/api/hero-photos")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {
+          const cleaned = d.heroImages.map((u: any, i: number) =>
+            typeof u === "string" && u.trim() ? u.trim() : DEFAULT_HERO_IMAGES[i]
+          )
+          setCustomHeroPhotos(cleaned)
+          try {
+            localStorage.setItem("fixitnow_hero_photos", JSON.stringify(cleaned))
+          } catch {}
+        }
+      })
+      .catch(() => {})
   }, [setCustomHeroPhotos])
 
   const heroPhotos = [0, 1, 2, 3].map((i) => {
