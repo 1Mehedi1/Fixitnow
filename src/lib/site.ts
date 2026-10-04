@@ -24,11 +24,13 @@ export interface ServiceItem {
   desc: string
   bgImage?: string
   rates?: RateItem[]
+  subcategories?: string[]
 }
 
 export const DEFAULT_SERVICE_IMAGES: Record<string, string> = {
-  plumbing: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=800&q=80",
-  painting: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80",
+  roofing: "https://files.catbox.moe/g2969p.jpg",
+  painting: "https://files.catbox.moe/6pj5rs.jpg",
+  plumbing: "https://files.catbox.moe/dmagw6.png",
   renovation: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80",
   electrical: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
   interior: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
@@ -36,50 +38,29 @@ export const DEFAULT_SERVICE_IMAGES: Record<string, string> = {
 }
 
 export const DEFAULT_SERVICE_RATES: Record<string, RateItem[]> = {
-  plumbing: [
-    { name: "Leaking Tap or Valve Replacement", price: "$60 – $110", unit: "per set", details: "Includes new washer/valves, thread sealing and testing" },
-    { name: "Toilet Bowl Flush Mechanism Repair", price: "$80 – $140", unit: "per set", details: "Syphon replacement, inlet valve and water level tune" },
-    { name: "Kitchen or Basin Bottle Trap Clear / Replace", price: "$70 – $130", unit: "per point", details: "Clearing stubborn chokes, replacing PVC/chrome traps" },
-    { name: "Storage or Instant Water Heater Install", price: "$120 – $220", unit: "per unit", details: "Secure mounting, pipe connection and leak inspection" },
-  ],
-  electrical: [
-    { name: "Lighting Fixture / Ceiling Fan Replacement", price: "$50 – $100", unit: "per point", details: "Safe mounting, wiring termination and switch test" },
-    { name: "Power Socket Replacement (Single/Double)", price: "$45 – $85", unit: "per point", details: "Safety standard compliant, earthing verification" },
-    { name: "Circuit Breaker / DB Box Trip Troubleshooting", price: "$90 – $160", unit: "per job", details: "Isolating faulty appliances or shorted cables" },
-    { name: "Switch & Dimmer Replacement", price: "$45 – $75", unit: "per gang", details: "Standard or designer switch installation" },
+  roofing: [
+    { name: "Water proofing", price: "$450 – $1,200", unit: "per area", details: "Multi-layer polyurethane / cementitious membrane coating with water flood test" },
+    { name: "Roof leaking repair", price: "$180 – $480", unit: "per leak point", details: "Targeted leak detection, flashing sealing, tile crack patching & seal check" },
+    { name: "Canopy repairing", price: "$220 – $550", unit: "per canopy", details: "Polycarbonate/glass panel resealing, frame joint restoration & anti-rust" },
+    { name: "Roof tiles installation", price: "$280 – $650", unit: "per section", details: "Ridge capping, replacement of cracked clay/concrete tiles & mortar realignment" },
   ],
   painting: [
-    { name: "Single Room Refresh / Water Mark Patch", price: "$180 – $320", unit: "per room", details: "Surface prep, sealer and 2 coats premium Nippon/Dulux" },
-    { name: "HDB 3-Room Full Unit Painting", price: "$750 – $950", unit: "full flat", details: "Walls, ceilings, door frames with dust protection" },
-    { name: "HDB 4-Room Full Unit Painting", price: "$950 – $1,250", unit: "full flat", details: "Full masking, cracks filling, premium low-VOC paint" },
-    { name: "HDB 5-Room / Executive Painting", price: "$1,200 – $1,600", unit: "full flat", details: "Complete interior makeover with 1-year paint warranty" },
+    { name: "Painting", price: "$180 – $350", unit: "per room", details: "Surface prep, sealer and 2 coats premium Nippon/Dulux low-VOC paint" },
+    { name: "Epoxy painting", price: "$350 – $750", unit: "per area", details: "Heavy-duty epoxy floor & wall coating for kitchens, toilets & carparks" },
+    { name: "House painting", price: "$850 – $1,450", unit: "full flat", details: "Complete interior overhaul for 3/4/5-room HDB and condominiums" },
+    { name: "Office painting", price: "$650 – $1,800", unit: "per unit", details: "Commercial grade fast-drying coatings, after-office hours execution" },
+    { name: "Indoors and outdoors painting", price: "$300 – $850", unit: "per zone", details: "Weather-resistant exterior acrylic paint & interior mold-resistant finishes" },
   ],
-  repair: [
-    { name: "Door Lock & Handle Replacement", price: "$75 – $140", unit: "per set", details: "Mortise locks, lever handles, cylinder replacement" },
-    { name: "Cabinet Soft-Close Hinges Replacement", price: "$60 – $120", unit: "per set (4 pcs)", details: "Aligning sagging cabinet doors and smooth operation" },
-    { name: "Bathroom Silicone Mould Removal & Resealing", price: "$70 – $130", unit: "per perimeter", details: "Anti-fungal sanitary grade silicone, clean straight beads" },
-    { name: "Wall Drilling & Heavy Mounting", price: "$50 – $90", unit: "first 2 items", details: "Mirrors, TV brackets, shelves with wall plug anchors" },
-  ],
-  renovation: [
-    { name: "Full Toilet / Bathroom Overhaul", price: "$2,800 – $4,500", unit: "per bathroom", details: "Waterproofing, tiling, sanitary ware installation, debris disposal" },
-    { name: "Kitchen Cabinet Carpentry & Countertop", price: "$150 – $280", unit: "per foot run", details: "High-pressure laminate, soft-close hinges, quartz top options" },
-    { name: "Vinyl Flooring Supply & Lay", price: "$4.50 – $7.50", unit: "per sqft", details: "Heavy duty 5mm click vinyl with EVA underlay" },
-    { name: "Feature Wall & False Ceiling Installation", price: "$120 – $240", unit: "per foot", details: "Concealed LED lighting trough, plaster finish" },
-  ],
-  interior: [
-    { name: "Custom Built-in Wardrobe / Cabinetry", price: "$240 – $360", unit: "per foot run", details: "Internal color PVC, soft-close Blum hinges, aluminum trim" },
-    { name: "False Ceiling & L-Box Plastering", price: "$4.50 – $8.00", unit: "per sqft / foot run", details: "Seamless gypsum board jointing with LED strip recesses" },
-    { name: "Door Frame & Timber Architrave Repair", price: "$90 – $180", unit: "per door", details: "Planed edges, re-hinged alignment, touch-up painting" },
-    { name: "Curtain Track & Blind Installation", price: "$40 – $75", unit: "per window", details: "Precision laser alignment and heavy duty wall plugs" },
+  plumbing: [
+    { name: "Toilet leaking repair", price: "$80 – $150", unit: "per point", details: "Concealed or exposed toilet pipe, valve, inlet siphon & pan collar leak sealing" },
   ],
 }
 
 export const DEFAULT_TYPEWRITER_SENTENCES: string[] = [
   "Your home, expertly handled.",
-  "Plumbing & leaks, fixed fast & cleanly.",
-  "HDB & condo painting, dust-free prep guaranteed.",
-  "Full home renovation, one accountable warranty.",
-  "Licensed electrical works, EMA & LEW compliant.",
+  "Roofing & waterproofing, guaranteed leak-free.",
+  "Interior & exterior painting, dust-free prep guaranteed.",
+  "Fast plumbing & toilet leak repairs across Singapore.",
   "Trusted craftsmanship, islandwide across Singapore.",
 ]
 
@@ -115,12 +96,33 @@ export const DEFAULT_HERO_IMAGES = [
 ]
 
 const DEFAULT_SERVICES: ServiceItem[] = [
-  { key: "plumbing", label: "Plumbing", icon: "Wrench", desc: "Leaks, taps, pipes, water heaters, toilets — fixed fast and guaranteed.", bgImage: DEFAULT_SERVICE_IMAGES.plumbing, rates: DEFAULT_SERVICE_RATES.plumbing },
-  { key: "painting", label: "Painting", icon: "PaintRoller", desc: "HDB, condo, landed. Premium paints, neat edges, dust-free prep.", bgImage: DEFAULT_SERVICE_IMAGES.painting, rates: DEFAULT_SERVICE_RATES.painting },
-  { key: "renovation", label: "Renovation", icon: "Hammer", desc: "Kitchen, toilet, full-home. Design-build with trusted sub-contractors.", bgImage: DEFAULT_SERVICE_IMAGES.renovation, rates: DEFAULT_SERVICE_RATES.renovation },
-  { key: "electrical", label: "Electrical", icon: "Zap", desc: "Licensed (LEW) wiring, sockets, lighting, DB upgrades, EMA compliance.", bgImage: DEFAULT_SERVICE_IMAGES.electrical, rates: DEFAULT_SERVICE_RATES.electrical },
-  { key: "interior", label: "Interior Works", icon: "Sofa", desc: "Carpentry, built-ins, feature walls, false ceilings, lighting design.", bgImage: DEFAULT_SERVICE_IMAGES.interior, rates: DEFAULT_SERVICE_RATES.interior },
-  { key: "repair", label: "General Repair", icon: "Settings", desc: "Doors, locks, cabinets, tiles, grout, caulking. No job too small.", bgImage: DEFAULT_SERVICE_IMAGES.repair, rates: DEFAULT_SERVICE_RATES.repair },
+  {
+    key: "roofing",
+    label: "Roofing & Waterproofing",
+    icon: "Home",
+    desc: "Waterproofing, roof leak repairs, canopy restoration and roof tiles installation.",
+    bgImage: DEFAULT_SERVICE_IMAGES.roofing,
+    rates: DEFAULT_SERVICE_RATES.roofing,
+    subcategories: ["Water proofing", "Roof leaking repair", "Canopy repairing", "Roof tiles installation"],
+  },
+  {
+    key: "painting",
+    label: "Painting Services",
+    icon: "PaintRoller",
+    desc: "Epoxy painting, house painting, office painting, and indoors & outdoors painting.",
+    bgImage: DEFAULT_SERVICE_IMAGES.painting,
+    rates: DEFAULT_SERVICE_RATES.painting,
+    subcategories: ["Painting", "Epoxy painting", "House painting", "Office painting", "Indoors and outdoors painting"],
+  },
+  {
+    key: "plumbing",
+    label: "Plumbing Services",
+    icon: "Wrench",
+    desc: "Toilet leaking repairs, concealed pipe leak fixes, valves and tap replacements.",
+    bgImage: DEFAULT_SERVICE_IMAGES.plumbing,
+    rates: DEFAULT_SERVICE_RATES.plumbing,
+    subcategories: ["Toilet leaking repair"],
+  },
 ]
 
 export const defaultSiteConfig: SiteSettingsT = {
@@ -137,7 +139,7 @@ export const defaultSiteConfig: SiteSettingsT = {
   rating: 4.5,
   heroHeadline: "Your home, expertly handled.",
   heroSubtext:
-    "Singapore's trusted handyman for plumbing, painting, renovation, electrical and interior works.",
+    "Singapore's trusted specialist for roofing & waterproofing, painting services, and plumbing repair.",
   typewriterSentences: DEFAULT_TYPEWRITER_SENTENCES,
   aboutTitle: "Built on trust. Delivered with care.",
   aboutBody:

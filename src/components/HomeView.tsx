@@ -62,10 +62,18 @@ export function HomeView({
       const stored = localStorage.getItem("fixitnow_client_posts")
       if (stored) {
         const parsed = JSON.parse(stored)
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        const hasOutdatedCategories = Array.isArray(parsed) && (
+          parsed.some((p: any) => p.category === "Renovation" || p.category === "Electrical" || p.category === "Plumbing") ||
+          !parsed.some((p: any) => p.category === "Roofing & Waterproofing")
+        )
+
+        if (Array.isArray(parsed) && parsed.length > 0 && !hasOutdatedCategories) {
           setCustomPosts(parsed)
         } else if (posts && posts.length > 0) {
           setCustomPosts(posts)
+          try {
+            localStorage.setItem("fixitnow_client_posts", JSON.stringify(posts))
+          } catch {}
         }
       } else if (posts && posts.length > 0) {
         setCustomPosts(posts)
@@ -90,9 +98,17 @@ export function HomeView({
       const storedSettings = localStorage.getItem("fixitnow_client_settings")
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings)
-        if (parsedSettings && typeof parsedSettings === "object") {
+        const hasRoofing = Array.isArray(parsedSettings?.services) && parsedSettings.services.some((s: any) => s.key === "roofing")
+        if (parsedSettings && typeof parsedSettings === "object" && hasRoofing) {
           setCustomSettings(parsedSettings)
+        } else if (settings) {
+          setCustomSettings(settings)
+          try {
+            localStorage.setItem("fixitnow_client_settings", JSON.stringify(settings))
+          } catch {}
         }
+      } else if (settings) {
+        setCustomSettings(settings)
       }
     } catch {}
 
@@ -230,7 +246,7 @@ export function HomeView({
               <FeaturedJobs
                 posts={portfolioPosts}
                 title="Selected work"
-                subtitle="A sample of recent plumbing, painting, renovation, electrical and interior jobs across Singapore. Tap any card for the full story."
+                subtitle="Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story."
               />
               {beforeAfterPosts.length > 0 && (
                 <BeforeAfterPreview posts={beforeAfterPosts.slice(0, 4)} onSeeAll={() => setView("beforeAfter")} />

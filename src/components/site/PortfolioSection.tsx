@@ -21,7 +21,16 @@ export function PortfolioSection({ posts }: Props) {
   const [cat, setCat] = useState<string>("All")
   const { openPost } = useStore()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
-  const CATEGORIES = s.services.map((svc) => svc.label)
+  const CATEGORIES = useMemo(() => {
+    const list: string[] = []
+    s.services.forEach((svc) => {
+      if (svc.label && !list.includes(svc.label)) list.push(svc.label)
+    })
+    posts.forEach((p) => {
+      if (p.category && !list.includes(p.category)) list.push(p.category)
+    })
+    return list
+  }, [s.services, posts])
 
   const filtered = useMemo(() => {
     if (cat === "All") return posts
@@ -55,22 +64,21 @@ export function PortfolioSection({ posts }: Props) {
           size="sm"
           variant={cat === "All" ? "default" : "outline"}
           onClick={() => setCat("All")}
-          className="rounded-full h-8"
+          className="rounded-full h-8 cursor-pointer"
         >
           All ({posts.length})
         </Button>
         {CATEGORIES.map((c) => {
           const count = posts.filter((p) => p.category === c).length
-          if (count === 0) return null
           return (
             <Button
               key={c}
               size="sm"
               variant={cat === c ? "default" : "outline"}
               onClick={() => setCat(c)}
-              className="rounded-full h-8"
+              className="rounded-full h-8 cursor-pointer"
             >
-              {c} ({count})
+              {c} {count > 0 ? `(${count})` : ""}
             </Button>
           )
         })}
@@ -156,13 +164,18 @@ export function PortfolioSection({ posts }: Props) {
                         No image
                       </div>
                     )}
-                    <div className="absolute top-3 left-3 flex gap-2 z-10">
+                    <div className="absolute top-3 left-3 flex gap-1.5 z-10 flex-wrap">
                       {post.featured && (
-                        <Badge className="bg-primary text-primary-foreground border-0">Featured</Badge>
+                        <Badge className="bg-primary text-primary-foreground border-0 text-[10px]">Featured</Badge>
                       )}
                       {post.category && (
-                        <Badge variant="secondary" className="bg-white/90 text-stone-900 border-0 backdrop-blur">
+                        <Badge variant="secondary" className="bg-white/95 text-stone-900 border-0 backdrop-blur font-bold text-[10px]">
                           {post.category}
+                        </Badge>
+                      )}
+                      {post.tags && post.tags.split(",")[0] && (
+                        <Badge variant="outline" className="bg-black/60 text-white border-white/20 backdrop-blur text-[10px]">
+                          {post.tags.split(",")[0].trim()}
                         </Badge>
                       )}
                     </div>

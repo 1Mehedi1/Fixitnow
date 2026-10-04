@@ -1,7 +1,25 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Wrench, PaintRoller, Hammer, Zap, Sofa, Settings, ArrowRight, type LucideIcon } from "lucide-react"
+import {
+  Wrench,
+  PaintRoller,
+  Hammer,
+  Zap,
+  Sofa,
+  Settings,
+  ArrowRight,
+  Home,
+  ShieldCheck,
+  Droplets,
+  Brush,
+  Layers,
+  Building,
+  Lightbulb,
+  DoorOpen,
+  ShowerHead,
+  type LucideIcon,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig, DEFAULT_SERVICE_IMAGES } from "@/lib/site"
@@ -14,6 +32,15 @@ const ICONS: Record<string, LucideIcon> = {
   Zap,
   Sofa,
   Settings,
+  Home,
+  ShieldCheck,
+  Droplets,
+  Brush,
+  Layers,
+  Building,
+  Lightbulb,
+  DoorOpen,
+  ShowerHead,
 }
 
 const CARD_GRADIENTS = [
@@ -44,16 +71,19 @@ export function Services() {
             Every job, handled with care.
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 sm:mt-3 text-pretty">
-            From a leaky tap to a full-home renovation — one worker, one phone number, one
+            From a leaky tap to roofing and waterproofing — one worker, one phone number, one
             warranty. Here's the work I do across Singapore.
           </p>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {s.services.map((svc, i) => {
-            const Icon = ICONS[svc.icon] || Wrench
+            const Icon = ICONS[svc.icon] || Home || Wrench
             const bgUrl = svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"]
             const cardGrad = CARD_GRADIENTS[i % CARD_GRADIENTS.length]
+            const subcats = svc.subcategories && svc.subcategories.length > 0
+              ? svc.subcategories
+              : (svc.rates || []).map((r) => r.name)
 
             return (
               <motion.div
@@ -100,6 +130,25 @@ export function Services() {
                       <p className="text-xs sm:text-sm text-muted-foreground group-hover:text-neutral-200 leading-relaxed font-normal mt-1 line-clamp-3 transition-colors duration-300">
                         {svc.desc}
                       </p>
+
+                      {/* Subcategories preview tags */}
+                      {subcats.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2.5">
+                          {subcats.slice(0, 4).map((sc) => (
+                            <span
+                              key={sc}
+                              className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-black/10 dark:bg-white/10 group-hover:bg-black/60 group-hover:text-amber-200 transition-colors text-foreground/85 group-hover:border group-hover:border-amber-400/30"
+                            >
+                              • {sc}
+                            </span>
+                          ))}
+                          {subcats.length > 4 && (
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/10 group-hover:bg-black/60 group-hover:text-amber-200 transition-colors text-foreground/85">
+                              +{subcats.length - 4} more
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Bottom CTA Row */}

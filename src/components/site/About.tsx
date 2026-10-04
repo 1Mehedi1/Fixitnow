@@ -121,7 +121,11 @@ export function About() {
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Trade Capabilities</div>
-                <div className="font-display font-bold text-foreground text-sm sm:text-base">Electrical · Plumbing · Renovation</div>
+                <div className="font-display font-bold text-foreground text-sm sm:text-base">
+                  {(s.services && s.services.length > 0)
+                    ? s.services.map((svc) => svc.label).join(" · ")
+                    : "Roofing & Waterproofing · Painting Services · Plumbing Services"}
+                </div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> BCA & Safety Code Compliant
                 </div>
@@ -130,7 +134,7 @@ export function About() {
 
             <div className="relative z-10 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground">
               <p className="max-w-2xl leading-relaxed text-foreground/85">
-                All structural works, electrical installations, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by itemized quotes and genuine workmanship warranty.
+                All roofing, waterproofing, painting, and plumbing jobs across Singapore are executed directly under strict Singapore safety regulations. Backed by itemized quotes and genuine workmanship warranty.
               </p>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 dark:bg-emerald-400/20 border border-emerald-600/30 dark:border-emerald-400/40 px-2.5 py-1 font-bold text-emerald-950 dark:text-emerald-200 text-[11px]">

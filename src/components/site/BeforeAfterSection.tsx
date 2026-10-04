@@ -29,12 +29,17 @@ export function BeforeAfterSection({ posts }: Props) {
   const { openPost } = useStore()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
-  // Build categories from the post list (no fixed list — uses whatever the worker has tagged)
+  // Build categories from site settings services and post list
   const categories = useMemo(() => {
-    const set = new Set<string>()
-    posts.forEach((p) => p.category && set.add(p.category))
-    return ["All", ...Array.from(set)]
-  }, [posts])
+    const list: string[] = ["All"]
+    s.services.forEach((svc) => {
+      if (svc.label && !list.includes(svc.label)) list.push(svc.label)
+    })
+    posts.forEach((p) => {
+      if (p.category && !list.includes(p.category)) list.push(p.category)
+    })
+    return list
+  }, [s.services, posts])
 
   const filtered = useMemo(() => {
     if (cat === "All") return posts
@@ -149,7 +154,10 @@ export function BeforeAfterSection({ posts }: Props) {
                     <div>
                       <div className="flex items-center gap-1.5 mb-2 flex-wrap">
                         {post.category && (
-                          <Badge variant="secondary" className="text-[10px] px-2 py-0.5">{post.category}</Badge>
+                          <Badge variant="secondary" className="text-[10px] px-2 py-0.5 font-bold">{post.category}</Badge>
+                        )}
+                        {post.tags && post.tags.split(",")[0] && (
+                          <Badge variant="outline" className="text-[10px] px-2 py-0.5">{post.tags.split(",")[0].trim()}</Badge>
                         )}
                         {post.featured && (
                           <Badge className="bg-primary/10 text-primary border-0 text-[10px] px-2 py-0.5">Featured</Badge>

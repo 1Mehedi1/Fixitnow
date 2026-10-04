@@ -14,21 +14,20 @@ const PROPERTY_TYPES = [
   { id: "commercial", label: "Commercial", sub: "Office/Shop", icon: Store },
 ]
 
-const SERVICES = [
-  { id: "plumbing", label: "Plumbing & Leaks" },
-  { id: "electrical", label: "Electrical & Lights" },
-  { id: "painting", label: "Wall Painting" },
-  { id: "renovation", label: "Renovation / Strip-out" },
-  { id: "repair", label: "General Home Repairs" },
-]
-
 export function QuickQuoteCalculator() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
+  const servicesList = (s.services && s.services.length > 0)
+    ? s.services.map((svc) => ({ id: svc.key, label: svc.label }))
+    : [
+        { id: "roofing", label: "Roofing & Waterproofing" },
+        { id: "painting", label: "Painting Services" },
+        { id: "plumbing", label: "Plumbing Services" },
+      ]
   const [selectedProperty, setSelectedProperty] = useState("hdb")
-  const [selectedService, setSelectedService] = useState("plumbing")
+  const [selectedService, setSelectedService] = useState(servicesList[0]?.id || "roofing")
 
   const propLabel = PROPERTY_TYPES.find((p) => p.id === selectedProperty)?.label || "HDB Flat"
-  const svcLabel = SERVICES.find((sv) => sv.id === selectedService)?.label || "Plumbing & Leaks"
+  const svcLabel = servicesList.find((sv) => sv.id === selectedService)?.label || servicesList[0]?.label || "Roofing & Waterproofing"
 
   const generatedMsg = `Hi ${s.workerName}, I need ${svcLabel} for my ${propLabel} in Singapore. Can you give me an estimated quote?`
 
@@ -90,7 +89,7 @@ export function QuickQuoteCalculator() {
                 2. Select Service Needed
               </span>
               <div className="flex flex-wrap gap-2">
-                {SERVICES.map((svc) => {
+                {servicesList.map((svc) => {
                   const isSelected = selectedService === svc.id
                   return (
                     <button

@@ -51,6 +51,14 @@ export function PostEditor() {
   const [form, setForm] = useState<FormState>(EMPTY)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [isCustomCat, setIsCustomCat] = useState(false)
+
+  const currentService = settings.services.find(
+    (s) => s.label.toLowerCase() === form.category.toLowerCase()
+  )
+  const currentSubcats = currentService?.subcategories && currentService.subcategories.length > 0
+    ? currentService.subcategories
+    : (currentService?.rates || []).map((r) => r.name)
 
   useEffect(() => {
     if (!editorOpen) return
@@ -257,12 +265,24 @@ export function PostEditor() {
 
               {/* Category */}
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wider font-bold text-slate-200">
-                  Trade Category
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs uppercase tracking-wider font-bold text-slate-200">
+                    Trade Category *
+                  </Label>
+                  <span className="text-[11px] text-slate-400">
+                    Determines showcase & portfolio tab filtering
+                  </span>
+                </div>
                 <Select
-                  value={form.category}
-                  onValueChange={(v) => setForm({ ...form, category: v })}
+                  value={isCustomCat ? "__custom__" : form.category}
+                  onValueChange={(v) => {
+                    if (v === "__custom__") {
+                      setIsCustomCat(true)
+                    } else {
+                      setIsCustomCat(false)
+                      setForm({ ...form, category: v })
+                    }
+                  }}
                 >
                   <SelectTrigger className="bg-slate-950/60 border-slate-700 text-white">
                     <SelectValue />
@@ -273,20 +293,77 @@ export function PostEditor() {
                         {c}
                       </SelectItem>
                     ))}
+                    <SelectItem value="__custom__" className="text-amber-400 font-semibold">
+                      + Enter Custom Category…
+                    </SelectItem>
                   </SelectContent>
                 </Select>
+
+                {isCustomCat && (
+                  <Input
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    placeholder="Type new trade category name..."
+                    className="mt-2 text-sm bg-slate-950/80 border-amber-500/50 text-white"
+                    autoFocus
+                  />
+                )}
               </div>
 
-              {/* Tags */}
+              {/* Subcategories & Tags */}
               <div className="space-y-1.5">
-                <Label htmlFor="post-tags" className="text-xs uppercase tracking-wider font-bold text-slate-300">
-                  Tags (comma-separated)
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="post-tags" className="text-xs uppercase tracking-wider font-bold text-slate-200">
+                    Subcategories & Tags
+                  </Label>
+                  <span className="text-[11px] text-slate-400">
+                    Tap a subcategory chip to tag this job
+                  </span>
+                </div>
+
+                {currentSubcats.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-1.5 p-2 rounded-lg bg-slate-950/40 border border-slate-800">
+                    {currentSubcats.map((sc) => {
+                      const tagsArray = form.tags.split(",").map((t) => t.trim().toLowerCase())
+                      const isSelected = tagsArray.includes(sc.toLowerCase())
+                      return (
+                        <button
+                          type="button"
+                          key={sc}
+                          onClick={() => {
+                            if (isSelected) {
+                              const remaining = form.tags
+                                .split(",")
+                                .map((t) => t.trim())
+                                .filter((t) => t.toLowerCase() !== sc.toLowerCase())
+                              setForm({ ...form, tags: remaining.join(", ") })
+                            } else {
+                              const existing = form.tags
+                                .split(",")
+                                .map((t) => t.trim())
+                                .filter(Boolean)
+                              setForm({ ...form, tags: [sc, ...existing].join(", ") })
+                            }
+                          }}
+                          className={`text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer font-medium ${
+                            isSelected
+                              ? "bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-xs"
+                              : "bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500 hover:text-white"
+                          }`}
+                        >
+                          {isSelected ? "✓ " : "+ "}
+                          {sc}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+
                 <Input
                   id="post-tags"
                   value={form.tags}
                   onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                  placeholder="HDB, Toilet, Leak, Pasir Ris"
+                  placeholder="e.g. Water proofing, Roof leaking repair, Pasir Ris"
                   className="bg-slate-950/60 border-slate-700 text-white"
                 />
               </div>

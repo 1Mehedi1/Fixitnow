@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign, Type, MessageSquare, ArrowRight } from "lucide-react"
+import { Save, Loader2, Plus, Trash2, RotateCcw, Building2, Phone, Star, Sparkles, Image as ImageIcon, ShieldCheck, Upload, DollarSign, Type, MessageSquare, ArrowRight, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,8 +15,9 @@ import { defaultSiteConfig, type ServiceItem, type RateItem, DEFAULT_SERVICE_IMA
 import { useStore } from "@/store/useStore"
 
 const ICON_OPTIONS = [
-  "Wrench", "PaintRoller", "Hammer", "Zap", "Sofa", "Settings",
-  "Droplet", "Brush", "Home", "Lightbulb", "DoorOpen", "ShowerHead",
+  "Home", "PaintRoller", "Wrench", "ShieldCheck", "Hammer", "Zap",
+  "Sofa", "Settings", "Droplet", "Brush", "Layers", "Building",
+  "Lightbulb", "DoorOpen", "ShowerHead",
 ]
 
 function normalizeDriveUrl(url: string): string {
@@ -212,6 +213,52 @@ export function SettingsManager() {
     }
   }
 
+  const [newSubcatInputs, setNewSubcatInputs] = useState<Record<number, string>>({})
+
+  const addSubcategory = (sIdx: number) => {
+    const rawVal = (newSubcatInputs[sIdx] || "").trim()
+    if (!rawVal) return
+    const next = [...form.services]
+    const svc = { ...next[sIdx] }
+    const currentSubcats = svc.subcategories && svc.subcategories.length > 0
+      ? [...svc.subcategories]
+      : (svc.rates || []).map((r) => r.name)
+    if (!currentSubcats.includes(rawVal)) {
+      currentSubcats.push(rawVal)
+    }
+    svc.subcategories = currentSubcats
+
+    // Also add to rates
+    const currentRates = [...(svc.rates || [])]
+    if (!currentRates.some((r) => r.name.toLowerCase() === rawVal.toLowerCase())) {
+      currentRates.push({
+        name: rawVal,
+        price: "$80 – $250",
+        unit: "per job",
+        details: "Professional on-site trade work, testing and clean-up included.",
+      })
+    }
+    svc.rates = currentRates
+    next[sIdx] = svc
+    setForm({ ...form, services: next })
+    setNewSubcatInputs({ ...newSubcatInputs, [sIdx]: "" })
+    toast.success(`Subcategory "${rawVal}" added to ${svc.label}`)
+  }
+
+  const removeSubcategory = (sIdx: number, subcatName: string) => {
+    const next = [...form.services]
+    const svc = { ...next[sIdx] }
+    const currentSubcats = (svc.subcategories && svc.subcategories.length > 0
+      ? svc.subcategories
+      : (svc.rates || []).map((r) => r.name)
+    ).filter((s) => s !== subcatName)
+    svc.subcategories = currentSubcats
+    svc.rates = (svc.rates || []).filter((r) => r.name !== subcatName)
+    next[sIdx] = svc
+    setForm({ ...form, services: next })
+    toast.info(`Removed subcategory "${subcatName}"`)
+  }
+
   const updateService = (i: number, key: keyof ServiceItem, value: string) => {
     const next = [...form.services]
     next[i] = { ...next[i], [key]: value }
@@ -219,27 +266,30 @@ export function SettingsManager() {
   }
 
   const addService = () => {
+    const timestamp = Date.now()
     setForm({
       ...form,
       services: [
         ...form.services,
         {
-          key: `svc-${Date.now()}`,
-          label: "New Service",
+          key: `trade-${timestamp}`,
+          label: "New Trade Category",
           icon: "Wrench",
-          desc: "Describe this service.",
-          bgImage: DEFAULT_SERVICE_IMAGES["repair"],
+          desc: "Expert repairs, installation and maintenance across Singapore.",
+          bgImage: "https://files.catbox.moe/g2969p.jpg",
+          subcategories: ["General Service"],
           rates: [
             {
-              name: "Standard Service / Repair Task",
-              price: "$60 – $120",
-              unit: "per set",
-              details: "Standard parts, labor and safety test included.",
+              name: "General Service",
+              price: "$80 – $180",
+              unit: "per job",
+              details: "Standard parts, on-site labor and testing included.",
             },
           ],
         },
       ],
     })
+    toast.success("New Trade Category added! You can now customize its name and subcategories.")
   }
 
   const removeService = (i: number) => {
@@ -549,112 +599,211 @@ export function SettingsManager() {
         </CardContent>
       </Card>
 
-      {/* Services */}
+      {/* Trade Categories & Subcategories */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" /> Services List
+                <Layers className="h-4 w-4 text-primary" /> Trade Categories & Subcategories
               </CardTitle>
-              <CardDescription>The services shown in the grid. Add, edit, remove.</CardDescription>
+              <CardDescription className="mt-1">
+                Manage your showcase trade categories and subcategories. Changes update Selected Work, Portfolio, Before & After, Rate Card, and Services across the entire website.
+              </CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={addService}>
-              <Plus className="h-4 w-4 mr-1.5" /> Add service
+            <Button variant="default" size="sm" onClick={addService} className="gap-1.5 font-bold cursor-pointer shrink-0">
+              <Plus className="h-4 w-4" /> Add New Category
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {form.services.map((svc, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
-              className="rounded-lg border border-border p-4 space-y-3 bg-muted/30"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service #{i + 1}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeService(i)}
-                  className="text-destructive hover:text-destructive h-7"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-              <div className="grid sm:grid-cols-3 gap-3">
-                <Field label="Label" value={svc.label} onChange={(v) => updateService(i, "label", v)} placeholder="Plumbing" />
-                <div className="space-y-1.5">
-                  <Label className="text-xs uppercase tracking-wider">Icon</Label>
-                  <select
-                    value={svc.icon}
-                    onChange={(e) => updateService(i, "icon", e.target.value)}
-                    className="flex h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 py-1 text-sm text-white shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer"
-                  >
-                    {ICON_OPTIONS.map((ic) => (
-                      <option key={ic} value={ic} className="bg-slate-900 text-white">
-                        {ic}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <Field label="Key (slug)" value={svc.key} onChange={(v) => updateService(i, "key", v)} placeholder="plumbing" hint="Used internally, lowercase no spaces" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wider">Description</Label>
-                <Textarea
-                  value={svc.desc}
-                  onChange={(e) => updateService(i, "desc", e.target.value)}
-                  rows={2}
-                  placeholder="Short description of this service."
-                />
-              </div>
+        <CardContent className="space-y-5">
+          {form.services.map((svc, i) => {
+            const subcats = svc.subcategories && svc.subcategories.length > 0
+              ? svc.subcategories
+              : (svc.rates || []).map((r) => r.name)
 
-              {/* Service Card Background Image */}
-              <div className="border border-border/70 rounded-lg p-3 bg-muted/40 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                    <ImageIcon className="h-3.5 w-3.5 text-primary" /> Card Background Image
-                  </span>
-                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
-                    <Upload className="h-3.5 w-3.5" />
-                    <span>Upload image</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleServiceFileUpload(i, e)}
-                    />
-                  </label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-14 w-20 rounded-md overflow-hidden border border-border bg-black/60 flex-shrink-0 relative">
-                    <img
-                      src={svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"]}
-                      alt={svc.label}
-                      className="w-full h-full object-cover"
-                    />
+            return (
+              <motion.div
+                key={svc.key || i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+                className="rounded-xl border border-border p-4 sm:p-5 space-y-4 bg-muted/20"
+              >
+                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                      Category #{i + 1}
+                    </span>
+                    <span className="text-sm font-bold text-foreground">
+                      {svc.label || "Untitled"}
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      ({svc.key})
+                    </span>
                   </div>
-                  <div className="flex-1 space-y-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeService(i)}
+                    className="text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 h-7 px-2 cursor-pointer gap-1"
+                    title="Delete category"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="text-xs">Delete Category</span>
+                  </Button>
+                </div>
+
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <Field
+                    label="Category Name (Display Label)"
+                    value={svc.label}
+                    onChange={(v) => updateService(i, "label", v)}
+                    placeholder="e.g. Roofing & Waterproofing"
+                  />
+                  <div className="space-y-1.5">
+                    <Label className="text-xs uppercase tracking-wider font-semibold">Icon</Label>
+                    <select
+                      value={svc.icon}
+                      onChange={(e) => updateService(i, "icon", e.target.value)}
+                      className="flex h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 py-1 text-sm text-white shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer"
+                    >
+                      {ICON_OPTIONS.map((ic) => (
+                        <option key={ic} value={ic} className="bg-slate-900 text-white">
+                          {ic}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Field
+                    label="Key (slug identifier)"
+                    value={svc.key}
+                    onChange={(v) => updateService(i, "key", v)}
+                    placeholder="roofing"
+                    hint="Used internally, lowercase letters and hyphens"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs uppercase tracking-wider font-semibold">Short Trade Description</Label>
+                  <Textarea
+                    value={svc.desc}
+                    onChange={(e) => updateService(i, "desc", e.target.value)}
+                    rows={2}
+                    placeholder="Describe this trade category for customers..."
+                  />
+                </div>
+
+                {/* Subcategories Editor */}
+                <div className="border border-border/80 rounded-xl p-3.5 bg-background/70 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-xs uppercase tracking-wider font-bold text-foreground flex items-center gap-1.5">
+                        <Sparkles className="h-3.5 w-3.5 text-amber-500" /> Subcategories under "{svc.label}"
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Used for post tagging, portfolio filtering, and Singapore rate cards.
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                      {subcats.length} {subcats.length === 1 ? "subcategory" : "subcategories"}
+                    </span>
+                  </div>
+
+                  {/* Subcategories Chips */}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {subcats.length === 0 ? (
+                      <p className="text-xs text-muted-foreground italic">No subcategories added yet.</p>
+                    ) : (
+                      subcats.map((sc, scIdx) => (
+                        <div
+                          key={scIdx}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted border border-border/80 text-xs font-semibold text-foreground group"
+                        >
+                          <span>• {sc}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeSubcategory(i, sc)}
+                            className="text-muted-foreground hover:text-rose-400 p-0.5 transition-colors cursor-pointer text-sm font-bold ml-0.5"
+                            title={`Remove ${sc}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Add Subcategory Input */}
+                  <div className="flex items-center gap-2 pt-1">
                     <Input
-                      value={svc.bgImage || ""}
-                      onChange={(e) => updateService(i, "bgImage", e.target.value)}
-                      placeholder={DEFAULT_SERVICE_IMAGES[svc.key] || "https://images.unsplash.com/..."}
-                      className="text-xs h-9 font-mono"
+                      value={newSubcatInputs[i] || ""}
+                      onChange={(e) => setNewSubcatInputs({ ...newSubcatInputs, [i]: e.target.value })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          addSubcategory(i)
+                        }
+                      }}
+                      placeholder={`Add new subcategory under ${svc.label} (e.g. Canopy repairing)`}
+                      className="text-xs h-8.5 bg-slate-950/40"
                     />
-                    <p className="text-[10px] text-muted-foreground">
-                      Paste an image URL or upload directly. Leave empty to use the curated default.
-                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => addSubcategory(i)}
+                      className="h-8.5 text-xs font-bold shrink-0 cursor-pointer"
+                    >
+                      <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+
+                {/* Service Card Background Image */}
+                <div className="border border-border/70 rounded-xl p-3 bg-muted/40 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <ImageIcon className="h-3.5 w-3.5 text-primary" /> Card Background Image
+                    </span>
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                      <Upload className="h-3.5 w-3.5" />
+                      <span>Upload image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleServiceFileUpload(i, e)}
+                      />
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-14 w-20 rounded-md overflow-hidden border border-border bg-black/60 flex-shrink-0 relative">
+                      <img
+                        src={svc.bgImage || DEFAULT_SERVICE_IMAGES[svc.key] || DEFAULT_SERVICE_IMAGES["repair"]}
+                        alt={svc.label}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        value={svc.bgImage || ""}
+                        onChange={(e) => updateService(i, "bgImage", e.target.value)}
+                        placeholder={DEFAULT_SERVICE_IMAGES[svc.key] || "https://files.catbox.moe/..."}
+                        className="text-xs h-9 font-mono"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Paste an image URL or upload directly.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
           {form.services.length === 0 && (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              No services yet. Click "Add service" to create one.
+              No trade categories yet. Click "Add New Category" to create one.
             </div>
           )}
         </CardContent>

@@ -80,6 +80,13 @@ export function PostDetailModal() {
                       {full.category}
                     </Badge>
                   )}
+                  {full.tags && (
+                    full.tags.split(",").slice(0, 3).map((t, idx) => (
+                      <Badge key={idx} variant="outline" className="text-[11px]">
+                        {t.trim()}
+                      </Badge>
+                    ))
+                  )}
                 </div>
                 <h2 className="font-display text-lg sm:text-xl md:text-2xl font-black text-foreground leading-snug break-words">
                   {full.title}

@@ -41,10 +41,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
 }
 
 const DEFAULT_CATEGORIES: { id: string; label: string; icon: LucideIcon; rates: RateItem[] }[] = [
-  { id: "plumbing", label: "Plumbing", icon: Wrench, rates: DEFAULT_SERVICE_RATES.plumbing },
-  { id: "electrical", label: "Electrical", icon: Zap, rates: DEFAULT_SERVICE_RATES.electrical },
-  { id: "painting", label: "Painting", icon: PaintRoller, rates: DEFAULT_SERVICE_RATES.painting },
-  { id: "repair", label: "Carpentry & Repairs", icon: Hammer, rates: DEFAULT_SERVICE_RATES.repair },
+  { id: "roofing", label: "Roofing & Waterproofing", icon: Home, rates: DEFAULT_SERVICE_RATES.roofing },
+  { id: "painting", label: "Painting Services", icon: PaintRoller, rates: DEFAULT_SERVICE_RATES.painting },
+  { id: "plumbing", label: "Plumbing Services", icon: Wrench, rates: DEFAULT_SERVICE_RATES.plumbing },
 ]
 
 export function PricingGuide() {
@@ -56,14 +55,14 @@ export function PricingGuide() {
       .map((svc) => ({
         id: svc.key,
         label: svc.label,
-        icon: ICON_MAP[svc.icon] || Wrench,
+        icon: ICON_MAP[svc.icon] || Home || Wrench,
         rates: svc.rates || [],
       }))
     return list.length > 0 ? list : DEFAULT_CATEGORIES
   }, [s.services])
 
   const [activeTab, setActiveTab] = useState("")
-  const currentCatId = activeTab || categories[0]?.id || "plumbing"
+  const currentCatId = activeTab || categories[0]?.id || "roofing"
   const currentCat = categories.find((c) => c.id === currentCatId) || categories[0]
 
   return (

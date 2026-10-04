@@ -79,13 +79,18 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-          <div className="absolute top-3 left-3 flex gap-2 z-10">
+          <div className="absolute top-3 left-3 flex gap-1.5 z-10 flex-wrap">
             {post.featured && (
-              <Badge className="bg-primary text-primary-foreground border-0">Featured</Badge>
+              <Badge className="bg-primary text-primary-foreground border-0 text-[10px]">Featured</Badge>
             )}
             {category && (
-              <Badge variant="secondary" className="bg-white/90 text-stone-900 border-0 backdrop-blur">
+              <Badge variant="secondary" className="bg-white/95 text-stone-900 border-0 backdrop-blur font-bold text-[10px]">
                 {category}
+              </Badge>
+            )}
+            {post.tags && post.tags.split(",")[0] && (
+              <Badge variant="outline" className="bg-black/60 text-white border-white/20 backdrop-blur text-[10px]">
+                {post.tags.split(",")[0].trim()}
               </Badge>
             )}
           </div>
