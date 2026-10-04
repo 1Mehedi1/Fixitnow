@@ -52,3 +52,9 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Runtime data & uploads
+/public/uploads/*
+!/public/uploads/.gitkeep
+/data/*.json
+!/data/.gitkeep

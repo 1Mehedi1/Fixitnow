@@ -50,13 +50,16 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     }
   }
 
-  const post = await db.post.update({ where: { id }, data, include: { images: true } })
-
   try {
-    revalidatePath("/")
-  } catch {}
-
-  return NextResponse.json({ post })
+    const post = await db.post.update({ where: { id }, data, include: { images: true } })
+    try {
+      revalidatePath("/")
+    } catch {}
+    return NextResponse.json({ post, ok: true })
+  } catch (err: any) {
+    console.error("Post update error:", err)
+    return NextResponse.json({ error: err?.message || "Failed to update post" }, { status: 500 })
+  }
 }
 
 /** Admin: delete post. */
@@ -64,12 +67,17 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
-  const { id } = await ctx.params
-  await db.post.delete({ where: { id } })
-
   try {
-    revalidatePath("/")
-  } catch {}
+    const { id } = await ctx.params
+    await db.post.delete({ where: { id } })
 
-  return NextResponse.json({ ok: true })
+    try {
+      revalidatePath("/")
+    } catch {}
+
+    return NextResponse.json({ ok: true })
+  } catch (err: any) {
+    console.error("Post delete error:", err)
+    return NextResponse.json({ error: err?.message || "Failed to delete post" }, { status: 500 })
+  }
 }

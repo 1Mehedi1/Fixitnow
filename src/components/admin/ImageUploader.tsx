@@ -30,29 +30,37 @@ export function ImageUploader({ images, onChange }: Props) {
 
     setUploading(true)
     try {
+      const uploaded: UploadedImage[] = []
       for (const file of list) {
         // Compress client-side
-        const compressed = await imageCompression(file, {
-          maxSizeMB: MAX_SIZE_MB,
-          maxWidthOrHeight: MAX_DIMENSION,
-          useWebWorker: true,
-          fileType: file.type === "image/png" ? "image/webp" : undefined,
-        })
+        let uploadFile: File | Blob = file
+        try {
+          uploadFile = await imageCompression(file, {
+            maxSizeMB: MAX_SIZE_MB,
+            maxWidthOrHeight: MAX_DIMENSION,
+            useWebWorker: true,
+            fileType: file.type === "image/png" ? "image/webp" : undefined,
+          })
+        } catch (compErr) {
+          console.warn("Client compression skipped, using original file:", compErr)
+        }
 
         // Upload to server
         const form = new FormData()
-        const filename = file.name.replace(/\.[^.]+$/, "") + (compressed.type === "image/webp" ? ".webp" : "")
-        form.append("file", compressed, filename)
+        const filename = file.name.replace(/\.[^.]+$/, "") + (uploadFile.type === "image/webp" ? ".webp" : "")
+        form.append("file", uploadFile, filename)
 
         const res = await fetch("/api/upload", { method: "POST", body: form })
-        if (!res.ok) throw new Error("Upload failed")
-        const { url } = await res.json()
-        images = [...images, { url, kind: "gallery" as const }]
-        onChange(images)
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok || !data.url) {
+          throw new Error(data.error || `Server returned ${res.status}: Upload failed`)
+        }
+        uploaded.push({ url: data.url, kind: "gallery" as const })
       }
-      toast.success(`Uploaded ${list.length} image${list.length > 1 ? "s" : ""}`)
+      onChange([...images, ...uploaded])
+      toast.success(`Uploaded ${uploaded.length} image${uploaded.length > 1 ? "s" : ""}`)
     } catch (e: any) {
-      toast.error("Upload failed", { description: e.message })
+      toast.error("Upload failed", { description: e.message || "Please try again" })
     } finally {
       setUploading(false)
     }

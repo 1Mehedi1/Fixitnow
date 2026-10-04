@@ -105,8 +105,8 @@ export function PostEditor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      if (!res.ok) throw new Error("Save failed")
-      const { post } = await res.json()
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || "Save failed")
       toast.success(editingPostId === "new" || !editingPostId ? "Post created" : "Post updated")
       // Reload page so the new post appears in lists
       window.location.reload()

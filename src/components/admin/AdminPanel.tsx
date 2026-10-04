@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react"
 import { motion } from "framer-motion"
 import {
   LayoutDashboard, FileText, MessageSquare, BarChart3, Settings,
-  LogOut, ExternalLink, Loader2, Plus,
+  LogOut, ExternalLink, Loader2, Plus, Sun, Moon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -35,6 +35,25 @@ const NAV: { key: AdminTab; label: string; icon: any }[] = [
 export function AdminPanel({ posts, testimonials }: Props) {
   const { data: session, status } = useSession()
   const { adminTab, setAdminTab, setView, openEditor } = useStore()
+  const [adminTheme, setAdminTheme] = useState<"dark" | "light">("dark")
+
+  // Load dedicated admin theme (completely independent of public website)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fixitnow_admin_theme") as "dark" | "light" | null
+      if (saved === "dark" || saved === "light") {
+        setAdminTheme(saved)
+      }
+    } catch {}
+  }, [])
+
+  const toggleAdminTheme = () => {
+    const next = adminTheme === "dark" ? "light" : "dark"
+    setAdminTheme(next)
+    try {
+      localStorage.setItem("fixitnow_admin_theme", next)
+    } catch {}
+  }
 
   // Show login screen if unauthenticated
   if (status === "loading") {
@@ -56,12 +75,22 @@ export function AdminPanel({ posts, testimonials }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex">
+    <div
+      className={
+        adminTheme === "dark"
+          ? "dark bg-[#0b0912] text-slate-100 min-h-screen flex flex-col md:flex-row transition-colors"
+          : "light bg-[#f8fafc] text-slate-900 min-h-screen flex flex-col md:flex-row transition-colors"
+      }
+      style={{ colorScheme: adminTheme }}
+    >
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-border bg-card p-4 sticky top-0 h-screen">
-        <div className="mb-6 px-2">
-          <div className="font-display font-bold text-lg">Admin Panel</div>
-          <p className="text-xs text-muted-foreground">Signed in as {session.user?.email}</p>
+      <aside className="hidden md:flex flex-col w-64 border-r border-border/80 dark:border-white/10 bg-card p-4 sticky top-0 h-screen shadow-sm">
+        <div className="mb-6 px-2 flex items-center justify-between">
+          <div>
+            <div className="font-display font-black text-lg tracking-tight">Admin Console</div>
+            <p className="text-[11px] text-muted-foreground truncate max-w-[150px]">{session.user?.email}</p>
+          </div>
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Online" />
         </div>
 
         <nav className="flex-1 space-y-1">
@@ -69,52 +98,85 @@ export function AdminPanel({ posts, testimonials }: Props) {
             <button
               key={n.key}
               onClick={() => setAdminTab(n.key)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                 adminTab === n.key
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted text-foreground/80"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "hover:bg-muted text-foreground/80 hover:text-foreground"
               }`}
             >
-              <n.icon className="h-4 w-4" />
-              {n.label}
-              {n.key === "posts" && <Badge variant="secondary" className="ml-auto">{counts.posts}</Badge>}
-              {n.key === "testimonials" && <Badge variant="secondary" className="ml-auto">{counts.testimonials}</Badge>}
+              <n.icon className="h-4 w-4 shrink-0" />
+              <span>{n.label}</span>
+              {n.key === "posts" && <Badge variant="secondary" className="ml-auto text-[10px]">{counts.posts}</Badge>}
+              {n.key === "testimonials" && <Badge variant="secondary" className="ml-auto text-[10px]">{counts.testimonials}</Badge>}
             </button>
           ))}
         </nav>
 
-        <div className="pt-4 mt-auto border-t border-border space-y-1">
-          <Button variant="ghost" className="w-full justify-start text-sm" onClick={() => setView("home")}>
-            <ExternalLink className="h-4 w-4 mr-2" /> View public site
+        {/* Dedicated Admin Day/Night Toggle & Bottom Actions */}
+        <div className="pt-4 mt-auto border-t border-border/70 dark:border-white/10 space-y-2">
+          {/* Admin Independent Day/Night Mode Switch */}
+          <button
+            onClick={toggleAdminTheme}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold bg-muted/60 dark:bg-muted/40 hover:bg-muted border border-border/60 dark:border-white/10 text-foreground transition-all cursor-pointer"
+            title="Toggle Admin Day/Night Mode (Does not affect main website)"
+          >
+            <span className="flex items-center gap-2">
+              {adminTheme === "dark" ? (
+                <Moon className="h-3.5 w-3.5 text-cyan-400" />
+              ) : (
+                <Sun className="h-3.5 w-3.5 text-amber-500" />
+              )}
+              <span>Admin Theme</span>
+            </span>
+            <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider py-0 px-1.5">
+              {adminTheme === "dark" ? "Night" : "Day"}
+            </Badge>
+          </button>
+
+          <Button variant="ghost" className="w-full justify-start text-xs font-medium cursor-pointer" onClick={() => setView("home")}>
+            <ExternalLink className="h-3.5 w-3.5 mr-2" /> View public site
           </Button>
-          <Button variant="ghost" className="w-full justify-start text-sm text-destructive hover:text-destructive" onClick={() => signOut({ callbackUrl: "/" })}>
-            <LogOut className="h-4 w-4 mr-2" /> Sign out
+          <Button variant="ghost" className="w-full justify-start text-xs font-medium text-destructive hover:text-destructive cursor-pointer" onClick={() => signOut({ callbackUrl: "/" })}>
+            <LogOut className="h-3.5 w-3.5 mr-2" /> Sign out
           </Button>
         </div>
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-card border-b border-border">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-card border-b border-border/80 dark:border-white/10 shadow-sm">
         <div className="flex items-center justify-between p-3">
           <div>
-            <div className="font-display font-bold text-sm">Admin Panel</div>
-            <div className="text-[10px] text-muted-foreground">{session.user?.email}</div>
+            <div className="font-display font-black text-sm">Admin Console</div>
+            <div className="text-[10px] text-muted-foreground truncate max-w-[130px]">{session.user?.email}</div>
           </div>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
+            {/* Mobile Theme Toggle */}
+            <button
+              onClick={toggleAdminTheme}
+              className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted border border-border/60 dark:border-white/10 text-foreground transition-colors cursor-pointer"
+              title="Toggle Day/Night Mode"
+            >
+              {adminTheme === "dark" ? (
+                <Moon className="h-3.5 w-3.5 text-cyan-400" />
+              ) : (
+                <Sun className="h-3.5 w-3.5 text-amber-500" />
+              )}
+            </button>
+
             {NAV.map((n) => (
               <button
                 key={n.key}
                 onClick={() => setAdminTab(n.key)}
-                className={`h-9 w-9 rounded-lg flex items-center justify-center ${
-                  adminTab === n.key ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                  adminTab === n.key ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground/80"
                 }`}
                 title={n.label}
               >
-                <n.icon className="h-4 w-4" />
+                <n.icon className="h-3.5 w-3.5" />
               </button>
             ))}
-            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => signOut({ callbackUrl: "/" })}>
-              <LogOut className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => signOut({ callbackUrl: "/" })}>
+              <LogOut className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
