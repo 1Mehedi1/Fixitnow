@@ -30,7 +30,7 @@ const STEPS = [
     title: "Direct Trade Execution",
     icon: Wrench,
     color: "from-blue-500/20 text-blue-500 border-blue-500/30",
-    desc: "Direct execution by your MOM-licensed specialist. EMA electrical compliance, BCA plumbing safety, neat craftsmanship.",
+    desc: "Direct execution by your trade-certified specialist. EMA electrical compliance, BCA plumbing safety, neat craftsmanship.",
     highlight: "No Subcontractors",
   },
   {

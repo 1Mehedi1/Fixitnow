@@ -1,21 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
-import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
+import { getStoredPostById, saveStoredPost, deleteStoredPost, incrementPostViews } from "@/lib/posts-store"
 
 /** Public: fetch single post by id, also increments views. */
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params
-  const post = await db.post.findUnique({
-    where: { id },
-    include: { images: { orderBy: { position: "asc" } } },
-  })
-  if (!post || !post.published) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 })
+  try {
+    const post = await getStoredPostById(id)
+    if (!post) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    }
+    // Background view increment
+    incrementPostViews(id).catch(() => {})
+    return NextResponse.json({ post })
+  } catch (err: any) {
+    console.error("Error fetching post by id:", err)
+    return NextResponse.json({ error: err?.message || "Failed to load post" }, { status: 500 })
   }
-  // fire-and-forget view increment
-  db.post.update({ where: { id }, data: { views: { increment: 1 } } }).catch(() => {})
-  return NextResponse.json({ post })
 }
 
 /** Admin: update post. */
@@ -24,37 +26,18 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
   const { id } = await ctx.params
-  const body = await req.json()
-  const { title, excerpt, content, type, category, tags, featured, published, coverImage, images } = body
-
-  // Replace images atomically if provided.
-  const data: any = {
-    title,
-    excerpt,
-    content,
-    type,
-    category,
-    tags,
-    featured,
-    published,
-    coverImage,
-  }
-  if (Array.isArray(images)) {
-    await db.postImage.deleteMany({ where: { postId: id } })
-    data.images = {
-      create: images.map((img: any, i: number) => ({
-        url: img.url,
-        kind: img.kind || "gallery",
-        position: i,
-      })),
-    }
-  }
+  const body = await req.json().catch(() => ({}))
 
   try {
-    const post = await db.post.update({ where: { id }, data, include: { images: true } })
+    const post = await saveStoredPost({
+      ...body,
+      id,
+    })
+
     try {
       revalidatePath("/")
     } catch {}
+
     return NextResponse.json({ post, ok: true })
   } catch (err: any) {
     console.error("Post update error:", err)
@@ -69,7 +52,7 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
   }
   try {
     const { id } = await ctx.params
-    await db.post.delete({ where: { id } })
+    await deleteStoredPost(id)
 
     try {
       revalidatePath("/")

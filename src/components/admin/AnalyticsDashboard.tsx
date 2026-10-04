@@ -7,7 +7,9 @@ import {
   Eye, Users, MousePointerClick, PhoneCall, TrendingUp, BarChart3,
   Smartphone, Laptop, Tablet, Globe, MapPin, ArrowUpRight, Clock,
   Activity, Share2, Layers, Filter, CheckCircle2, ChevronRight, ShieldCheck,
+  Trash2,
 } from "lucide-react"
+import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -83,6 +85,19 @@ export function AnalyticsDashboard() {
       .finally(() => setLoading(false))
   }
 
+  const handleReset = async () => {
+    if (!confirm("Are you sure you want to reset all visitor telemetry to zero?")) return
+    try {
+      const res = await fetch("/api/analytics/stats", { method: "DELETE" })
+      if (res.ok) {
+        toast.success("All test telemetry cleared")
+        fetchStats(range)
+      }
+    } catch {
+      toast.error("Failed to reset")
+    }
+  }
+
   useEffect(() => {
     fetchStats(range)
   }, [range])
@@ -109,38 +124,50 @@ export function AnalyticsDashboard() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Header with Title and Range Picker */}
+      {/* Header with Title, Telemetry Badge, Range Picker & Reset Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h2 className="font-display text-2xl sm:text-3xl font-black tracking-tight text-foreground">
               Visitor Telemetry & Analytics
             </h2>
-            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Pulse
+              100% Real Live Telemetry (Zero Synthetic Data)
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Real-time Singapore geolocation, device attribution, and WhatsApp lead conversion funnel.
+            Strictly records real visitor devices, Singapore locations, and WhatsApp photo inquiries.
           </p>
         </div>
 
-        {/* Timeframe Filter Buttons */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/60 dark:bg-muted/30 border border-border/70 dark:border-white/10 self-start sm:self-auto overflow-x-auto">
-          {RANGES.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => setRange(r.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                range === r.id
-                  ? "bg-card text-foreground shadow-xs border border-border/80"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+          {/* Timeframe Filter Buttons */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/60 dark:bg-muted/30 border border-border/70 dark:border-white/10 overflow-x-auto">
+            {RANGES.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => setRange(r.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  range === r.id
+                    ? "bg-card text-foreground shadow-xs border border-border/80"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            className="h-8 text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 border-rose-500/30 cursor-pointer"
+            title="Clear all test clicks and start fresh"
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1" /> Reset Test Data
+          </Button>
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import { create } from "zustand"
 import type { Post } from "@prisma/client"
 
 export type View = "home" | "portfolio" | "blog" | "beforeAfter" | "about" | "admin"
-export type AdminTab = "dashboard" | "posts" | "testimonials" | "analytics" | "settings"
+export type AdminTab = "dashboard" | "posts" | "sections" | "testimonials" | "analytics" | "settings"
 
 interface AppState {
   view: View

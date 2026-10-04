@@ -8,17 +8,21 @@ import type { Post, PostImage, Testimonial } from "@prisma/client"
 // Automatically revalidates in the background every 60 seconds (or immediately on admin saves).
 export const revalidate = 60
 
+import { getStoredPosts } from "@/lib/posts-store"
+
 async function fetchHomePageData() {
   const hasValidPostgres =
     Boolean(process.env.DATABASE_URL) &&
     (process.env.DATABASE_URL!.startsWith("postgresql://") ||
       process.env.DATABASE_URL!.startsWith("postgres://"))
 
-  // If no PostgreSQL database is configured (or placeholder file: URL), return rich Singapore fallback data in 0ms!
+  const settings = await loadSiteSettings().catch(() => defaultSiteConfig)
+  const storedPosts = await getStoredPosts().catch(() => FALLBACK_POSTS)
+
   if (!hasValidPostgres) {
     return {
-      settings: defaultSiteConfig,
-      posts: FALLBACK_POSTS,
+      settings: settings || defaultSiteConfig,
+      posts: storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS,
       testimonials: FALLBACK_TESTIMONIALS,
     }
   }
@@ -29,7 +33,6 @@ async function fetchHomePageData() {
   )
 
   const queryPromise = Promise.all([
-    loadSiteSettings().catch(() => defaultSiteConfig),
     db.post.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
@@ -42,16 +45,16 @@ async function fetchHomePageData() {
   ])
 
   try {
-    const [settings, posts, testimonials] = await Promise.race([queryPromise, timeoutPromise])
+    const [dbPosts, testimonials] = await Promise.race([queryPromise, timeoutPromise])
     return {
       settings: settings || defaultSiteConfig,
-      posts: posts && posts.length > 0 ? posts : FALLBACK_POSTS,
+      posts: dbPosts && dbPosts.length > 0 ? dbPosts : (storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS),
       testimonials: testimonials && testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS,
     }
   } catch (err) {
     return {
-      settings: defaultSiteConfig,
-      posts: FALLBACK_POSTS,
+      settings: settings || defaultSiteConfig,
+      posts: storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS,
       testimonials: FALLBACK_TESTIMONIALS,
     }
   }

@@ -87,7 +87,7 @@ export function Footer() {
               {[
                 { label: "Home", view: "home" as View },
                 { label: "Portfolio", view: "portfolio" as View },
-                { label: "Blog", view: "blog" as View },
+                { label: "Before & After", view: "beforeAfter" as View },
                 { label: "About", view: "about" as View },
               ].map((l) => (
                 <li key={l.view}>

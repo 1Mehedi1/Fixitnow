@@ -146,7 +146,7 @@ export const defaultSiteConfig: SiteSettingsT = {
   heroImages: DEFAULT_HERO_IMAGES,
   companyName: "4R ENGINEERING PTE. LTD.",
   companyUen: "202143324G",
-  licenseInfo: "MOM Registered Construction Work Permit · Employment of Foreign Manpower Act",
+  licenseInfo: "ACRA Registered Entity · Regulated Trade Specialist",
 }
 
 /**

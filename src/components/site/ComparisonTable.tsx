@@ -13,7 +13,7 @@ const COMPARISON = [
   },
   {
     feature: "Who Actually Does the Work?",
-    fixitnow: "Executed directly by MOM-licensed entity (4R ENGINEERING PTE. LTD.)",
+    fixitnow: "Executed directly by registered trade entity (4R ENGINEERING PTE. LTD.)",
     others: "Subcontracted out to unknown random third-party freelancers",
   },
   {
@@ -33,7 +33,7 @@ const COMPARISON = [
   },
   {
     feature: "Legal Singapore Entity",
-    fixitnow: "ACRA Registered UEN: 202143324G · MOM Construction Sector Authorized",
+    fixitnow: "ACRA Registered UEN: 202143324G · Regulated Trade Specialist",
     others: "Often disclaim on-site liability in platform fine print terms",
   },
 ]
@@ -55,7 +55,7 @@ export function ComparisonTable() {
             Direct Trade Specialist vs Platform Middlemen
           </div>
           <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-balance">
-            Direct MOM Contractor vs. Aggregator Brokers
+            Direct Trade Contractor vs. Aggregator Brokers
           </h2>
           <p className="text-xs sm:text-base text-muted-foreground mt-2.5 sm:mt-3 leading-relaxed">
             Why pay 25%–35% extra for aggregator platform fees and outsourced middlemen? Deal directly with the registered Singapore trade specialist who actually executes your work.
@@ -98,7 +98,7 @@ export function ComparisonTable() {
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 w-1/3">
                     <span className="flex items-center gap-1.5">
-                      <UserCheck className="h-4 w-4" /> {s.brand} (Direct MOM Contractor)
+                      <UserCheck className="h-4 w-4" /> {s.brand} (Direct Trade Contractor)
                     </span>
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">

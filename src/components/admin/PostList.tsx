@@ -17,7 +17,7 @@ interface Props {
 
 export function PostList({ posts }: Props) {
   const { openEditor } = useStore()
-  const [tab, setTab] = useState<"all" | "portfolio" | "blog">("all")
+  const [tab, setTab] = useState<"all" | "portfolio">("all")
   const [q, setQ] = useState("")
 
   const filtered = useMemo(() => {
@@ -45,7 +45,6 @@ export function PostList({ posts }: Props) {
           <TabsList>
             <TabsTrigger value="all">All ({posts.length})</TabsTrigger>
             <TabsTrigger value="portfolio">Portfolio ({posts.filter((p) => p.type === "portfolio").length})</TabsTrigger>
-            <TabsTrigger value="blog">Blog ({posts.filter((p) => p.type === "blog").length})</TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="relative flex-1">

@@ -326,7 +326,7 @@ export function SettingsManager() {
           <Field label="Company Name (Work Permit Employer)" value={form.companyName} onChange={(v) => setForm({ ...form, companyName: v })} placeholder="4R ENGINEERING PTE. LTD." hint="Shown in trust badges & licensing details" />
           <Field label="Company UEN (ACRA)" value={form.companyUen} onChange={(v) => setForm({ ...form, companyUen: v })} placeholder="202143324G" hint="Singapore Unique Entity Number" />
           <div className="sm:col-span-2">
-            <Field label="Licensing & Trust Description" value={form.licenseInfo} onChange={(v) => setForm({ ...form, licenseInfo: v })} placeholder="MOM Registered Work Permit · Construction Sector" hint="Displayed under Hero and in About section" />
+            <Field label="Licensing & Trust Description" value={form.licenseInfo} onChange={(v) => setForm({ ...form, licenseInfo: v })} placeholder="ACRA Registered Entity · Regulated Trade Specialist" hint="Displayed under Hero and in About section" />
           </div>
         </CardContent>
       </Card>

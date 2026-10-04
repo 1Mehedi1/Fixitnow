@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useStore } from "@/store/useStore"
 import { Header } from "@/components/site/Header"
 import { Hero } from "@/components/site/Hero"
@@ -21,10 +21,13 @@ import { ComparisonTable } from "@/components/site/ComparisonTable"
 import { PricingGuide } from "@/components/site/PricingGuide"
 import { FaqSection } from "@/components/site/FaqSection"
 import { TradePartnership } from "@/components/site/TradePartnership"
+import { ScrollToTop } from "@/components/site/ScrollToTop"
 import { AdminPanel } from "@/components/admin/AdminPanel"
-import { SiteSettingsProvider } from "@/components/site-settings-context"
+import { SiteSettingsProvider, useSiteSettings } from "@/components/site-settings-context"
+import { defaultSiteConfig } from "@/lib/site"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
 import type { SiteSettingsT } from "@/lib/site"
+import type { CustomSection } from "@/lib/sections-store"
 
 interface Props {
   settings: SiteSettingsT
@@ -45,7 +48,20 @@ export function HomeView({
   allPosts,
   allTestimonials,
 }: Props) {
-  const { view, setView } = useStore()
+  const { view, setView, openPost } = useStore()
+  const [customSections, setCustomSections] = useState<CustomSection[]>([])
+
+  // Load enabled custom sections
+  useEffect(() => {
+    fetch("/api/sections")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.sections)) {
+          setCustomSections(d.sections.filter((s: any) => s.enabled))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // Sync view state from URL ?view= on mount
   useEffect(() => {
@@ -127,6 +143,21 @@ export function HomeView({
               {beforeAfterPosts.length > 0 && (
                 <BeforeAfterPreview posts={beforeAfterPosts.slice(0, 4)} onSeeAll={() => setView("beforeAfter")} />
               )}
+              {/* Dynamic Custom Sections created by Admin (e.g. "Our Blog", "Handyman Guides", etc.) */}
+              {customSections.map((sec) => {
+                const secPosts = posts.filter(
+                  (p) => (p as any).customSectionId === sec.id && p.published
+                )
+                if (secPosts.length === 0) return null
+                return (
+                  <DynamicCustomSection
+                    key={sec.id}
+                    section={sec}
+                    posts={secPosts}
+                    onOpenPost={openPost}
+                  />
+                )
+              })}
               <Services />
               <ProcessSection />
               <ComparisonTable />
@@ -150,6 +181,7 @@ export function HomeView({
 
         <Footer />
         <WhatsAppFloat />
+        <ScrollToTop />
         <MobileBottomDock />
         <PostDetailModal />
       </div>
@@ -167,7 +199,7 @@ function BeforeAfterPreview({
 }) {
   const { openPost } = useStore()
   return (
-    <section className="py-12 sm:py-20 lg:py-24 bg-muted/30">
+    <section id="before-after-section" className="py-12 sm:py-20 lg:py-24 bg-muted/30">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-10">
           <div className="max-w-2xl">
@@ -227,3 +259,86 @@ function BeforeAfterPreview({
 // Inline import to avoid circular dep
 import { BeforeAfterSlider as BeforeAfterSliderInline } from "@/components/site/BeforeAfterSlider"
 import { ArrowRight } from "lucide-react"
+
+/** Renders an admin-created custom section dynamically on the homepage */
+function DynamicCustomSection({
+  section,
+  posts,
+  onOpenPost,
+}: {
+  section: CustomSection
+  posts: (Post & { images: PostImage[] })[]
+  onOpenPost: (p: Post) => void
+}) {
+  return (
+    <section className="py-12 sm:py-20 lg:py-24 bg-card/60 border-t border-border/50">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+            {section.badge || "Articles & Updates"}
+          </div>
+          <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight text-balance text-foreground">
+            {section.title}
+          </h2>
+          {section.subtitle && (
+            <p className="text-sm sm:text-base text-muted-foreground mt-2.5 leading-relaxed">
+              {section.subtitle}
+            </p>
+          )}
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => {
+            const cover = post.coverImage || post.images[0]?.url
+            return (
+              <div
+                key={post.id}
+                onClick={() => onOpenPost(post)}
+                className="group rounded-2xl overflow-hidden border border-border/80 bg-card hover:border-primary/50 hover:shadow-xl transition-all cursor-pointer flex flex-col"
+              >
+                {cover && (
+                  <div className="aspect-[16/10] overflow-hidden bg-muted relative">
+                    <img
+                      src={cover}
+                      alt={post.title}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    {post.category && (
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold">
+                        {post.category}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <h3 className="font-display font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+                    {post.excerpt && (
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 line-clamp-3 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                    )}
+                  </div>
+                  <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>
+                      {new Date(post.createdAt).toLocaleDateString("en-SG", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <span className="font-semibold text-primary group-hover:underline">Read details →</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+

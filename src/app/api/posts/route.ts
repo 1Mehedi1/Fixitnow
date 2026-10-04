@@ -1,17 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
-import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
-
-function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 80)
-}
+import { getStoredPosts, saveStoredPost } from "@/lib/posts-store"
 
 /** Public list — supports ?type=&category=&featured=&limit= */
 export async function GET(req: NextRequest) {
@@ -22,27 +12,18 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(url.searchParams.get("limit") || "100")
   const q = url.searchParams.get("q") || undefined
 
-  const where: any = { published: true }
-  if (type) where.type = type
-  if (category) where.category = category
-  if (featured === "true") where.featured = true
-  if (q) where.title = { contains: q }
-
   try {
-    const posts = await db.post.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: Math.max(1, Math.min(limit, 200)),
-      include: { images: { orderBy: { position: "asc" } } },
-    })
-    return NextResponse.json({ posts })
-  } catch {
-    const { FALLBACK_POSTS } = await import("@/lib/fallback-data")
-    let filtered = FALLBACK_POSTS
-    if (type) filtered = filtered.filter((p) => p.type === type)
-    if (category) filtered = filtered.filter((p) => p.category === category)
-    if (featured === "true") filtered = filtered.filter((p) => p.featured)
-    return NextResponse.json({ posts: filtered })
+    let posts = await getStoredPosts()
+    posts = posts.filter((p) => p.published)
+    if (type) posts = posts.filter((p) => p.type === type)
+    if (category) posts = posts.filter((p) => p.category === category)
+    if (featured === "true") posts = posts.filter((p) => p.featured)
+    if (q) posts = posts.filter((p) => p.title.toLowerCase().includes(q.toLowerCase()))
+
+    return NextResponse.json({ posts: posts.slice(0, Math.max(1, Math.min(limit, 200))) })
+  } catch (err: any) {
+    console.error("Error fetching posts:", err)
+    return NextResponse.json({ error: err?.message || "Failed to load posts" }, { status: 500 })
   }
 }
 
@@ -63,38 +44,26 @@ export async function POST(req: NextRequest) {
     published = true,
     coverImage,
     images = [],
+    customSectionId = null,
   } = body
 
-  if (!title) return NextResponse.json({ error: "Title required" }, { status: 400 })
+  if (!title || !title.trim()) {
+    return NextResponse.json({ error: "Title required" }, { status: 400 })
+  }
 
   try {
-    const admin = await (await import("@/lib/auth")).getAdmin()
-    const slug = slugify(title) + "-" + Math.random().toString(36).slice(2, 6)
-
-    const post = await db.post.create({
-      data: {
-        title,
-        slug,
-        excerpt,
-        content,
-        type,
-        category,
-        tags,
-        featured: !!featured,
-        published: !!published,
-        coverImage,
-        authorId: admin?.id,
-        images: images.length
-          ? {
-              create: images.map((img: any, i: number) => ({
-                url: img.url,
-                kind: img.kind || "gallery",
-                position: i,
-              })),
-            }
-          : undefined,
-      },
-      include: { images: true },
+    const post = await saveStoredPost({
+      title: title.trim(),
+      excerpt,
+      content,
+      type,
+      category,
+      tags,
+      featured,
+      published,
+      coverImage,
+      images,
+      customSectionId,
     })
 
     try {

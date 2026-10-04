@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Sun, Moon, Phone, ShieldCheck } from "lucide-react"
+import { Menu, X, Sun, Moon, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useStore, type View } from "@/store/useStore"
 import { whatsappLink, type SiteSettingsT } from "@/lib/site"
@@ -67,23 +67,32 @@ export function Header() {
     }
   }
 
+  const handleLogoClick = () => {
+    setView("home")
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300">
-      {/* Top High-Vis Orange Announcement Bar - Direct Line for Fast Quote */}
-      <div className="w-full bg-[#f95700] hover:bg-[#ea4f00] text-white py-1.5 px-3 sm:px-4 text-xs sm:text-sm font-medium tracking-wide transition-colors shadow-xs">
+      {/* Top High-Trust WhatsApp Emerald Direct Line Bar — 100% Clickable */}
+      <a
+        href={whatsappLink(s, `Hi ${s.workerName}, I'd like to get an instant quote for a repair / renovation job.`)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full bg-gradient-to-r from-[#075E54] via-[#128C7E] to-[#0d5c3a] hover:brightness-110 text-white py-1.5 px-3 sm:px-4 text-xs sm:text-sm font-medium tracking-wide transition-all shadow-xs block group cursor-pointer"
+        title="Tap to WhatsApp Tanbir for an instant 15-minute quote"
+      >
         <div className="container mx-auto max-w-7xl flex items-center justify-center gap-2 text-center">
-          <Phone className="h-3.5 w-3.5 fill-current shrink-0 animate-pulse" />
+          <WhatsAppIcon className="h-3.5 w-3.5 fill-white shrink-0 animate-pulse group-hover:scale-110 transition-transform" />
           <span>
-            Call our direct line for a fast quote:{" "}
-            <a
-              href={`tel:${s.phone.replace(/[^0-9+]/g, "")}`}
-              className="underline font-bold underline-offset-2 hover:text-amber-100 transition-colors ml-1"
-            >
-              {s.phone}
-            </a>
+            WhatsApp direct line for instant 15-min quote:{" "}
+            <span className="underline font-bold underline-offset-2 ml-1 text-white">
+              {s.phone} ({s.workerName.split(" ")[0]})
+            </span>
+            <span className="hidden sm:inline opacity-90 text-[11px] ml-2">· Tap anywhere to chat</span>
           </span>
         </div>
-      </div>
+      </a>
 
       {/* Apple-style Frosted Glass Navigation Bar */}
       <div
@@ -96,7 +105,7 @@ export function Header() {
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             {/* Logo */}
-            <button onClick={() => setView("home")} className="flex items-center gap-2.5 group text-left cursor-pointer transition-transform hover:scale-[1.02]">
+            <button onClick={handleLogoClick} className="flex items-center gap-2.5 group text-left cursor-pointer transition-transform hover:scale-[1.02]">
               <div id="navbar-brand-logo" className="shrink-0 flex items-center justify-center">
                 <BrandLogo size="md" />
               </div>
@@ -234,15 +243,6 @@ export function Header() {
                     className="text-left px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
                   >
                     Common Questions (FAQ)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setView("admin")
-                      setMobileOpen(false)
-                    }}
-                    className="text-left px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted flex items-center gap-2"
-                  >
-                    <ShieldCheck className="h-4 w-4" /> Admin Login
                   </button>
                   <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium border border-border/70 my-1 bg-muted/40">
                     <span className="flex items-center gap-2 text-foreground text-xs font-semibold">

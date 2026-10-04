@@ -83,7 +83,7 @@ export function About() {
                       Verified Singapore Entity
                     </span>
                     <span className="text-xs font-bold text-emerald-800 dark:text-emerald-200 bg-emerald-500/20 dark:bg-emerald-500/25 border border-emerald-600/30 dark:border-emerald-400/40 px-2.5 py-0.5 rounded-full">
-                      MOM & ACRA Recognized
+                      ACRA Recognized & Regulated Entity
                     </span>
                   </div>
                   <h3 className="font-display text-lg sm:text-2xl font-black tracking-tight mt-1 text-emerald-950 dark:text-white">
@@ -109,14 +109,14 @@ export function About() {
                 <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Lead Trade Specialist</div>
                 <div className="font-display font-bold text-foreground text-sm sm:text-base">{s.workerName || "Ahmed Mohammod Tanbir"}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> MOM Construction Authorized
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> Trade & Construction Certified
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Regulatory Authority</div>
-                <div className="font-display font-bold text-foreground text-sm sm:text-base">Ministry of Manpower (MOM)</div>
+                <div className="text-xs text-emerald-800 dark:text-emerald-300 uppercase tracking-wider font-extrabold">Regulatory Standards</div>
+                <div className="font-display font-bold text-foreground text-sm sm:text-base">Building & Trade Standards</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> EFMA Compliant & Regulated
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span> Singapore Industry Safety Compliant
                 </div>
               </div>
               <div className="space-y-1">

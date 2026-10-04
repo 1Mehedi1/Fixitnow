@@ -142,14 +142,14 @@ export function Hero() {
                 <span className="text-xs sm:text-sm font-medium text-foreground/90">{s.happyClients || 320}+ happy clients</span>
               </div>
 
-              {/* MOM license badge — un-bolded celebratory prestige style */}
+              {/* Regulated trade entity badge — celebratory prestige style */}
               <div
                 id="hero-license-badge"
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-teal-500/15 dark:from-emerald-950/60 dark:via-[#14231b] dark:to-teal-950/50 border border-emerald-500/40 dark:border-emerald-400/35 px-3.5 py-1.5 text-xs sm:text-sm font-medium text-emerald-950 dark:text-emerald-200 shadow-xs cursor-default hover:border-emerald-500/60 transition-all"
               >
                 <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">
-                  MOM Licensed ·{" "}
+                  Regulated Trade Specialist ·{" "}
                   <span className="font-semibold text-emerald-950 dark:text-emerald-100">
                     <span id="hero-license-4r">4R</span>
                     {s.companyName.startsWith("4R") ? s.companyName.slice(2) : ` ${s.companyName}`}

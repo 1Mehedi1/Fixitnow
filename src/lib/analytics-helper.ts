@@ -176,3 +176,12 @@ export async function loadLocalAnalyticsEvents(): Promise<AnalyticsEventRecord[]
     return []
   }
 }
+
+export async function clearLocalAnalyticsEvents(): Promise<boolean> {
+  try {
+    await fs.writeFile(EVENTS_FILE, "[]", "utf-8")
+    return true
+  } catch {
+    return false
+  }
+}

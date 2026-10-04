@@ -144,7 +144,7 @@ export function WhatsAppPhotoQuote() {
             </span>
             <span className="flex items-center gap-1.5 font-medium">
               <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              MOM Licensed · 4R ENGINEERING PTE. LTD.
+              ACRA Registered Entity · 4R ENGINEERING PTE. LTD.
             </span>
             <span className="flex items-center gap-1.5 font-medium">
               <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
