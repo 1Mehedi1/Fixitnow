@@ -1,0 +1,182 @@
+[
+  {
+    "id": "fallback-post-1",
+    "title": "HDB Toilet Re-piping",
+    "slug": "hdb-toilet-repiping-bedok",
+    "excerpt": "Replaced corroded galvanised pipes with PPR, fixed a stubborn leak under the sink.",
+    "content": "## The Job\n\nReplaced corroded piping with high-grade PPR heat-fused joints. Zero drop on 30-minute pressure test.",
+    "type": "portfolio",
+    "category": "Plumbing",
+    "tags": "HDB,Toilet,Leak",
+    "featured": true,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=1200&auto=format&fit=crop&q=70",
+    "views": 142,
+    "whatsappClicks": 28,
+    "authorId": null,
+    "createdAt": "2026-10-04T02:01:07.982Z",
+    "updatedAt": "2026-10-04T02:01:07.982Z",
+    "images": [
+      {
+        "id": "img-1a",
+        "postId": "fallback-post-1",
+        "url": "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&auto=format&fit=crop&q=70",
+        "kind": "before",
+        "position": 0,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      },
+      {
+        "id": "img-1b",
+        "postId": "fallback-post-1",
+        "url": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=1200&auto=format&fit=crop&q=70",
+        "kind": "after",
+        "position": 1,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      }
+    ]
+  },
+  {
+    "id": "fallback-post-2",
+    "title": "Full 5-Room HDB Painting in Punggol",
+    "slug": "painting-punggol-5room",
+    "excerpt": "Nippon Paint 3-in-1 medallion, ceilings included. Dust-free prep, completed in 2.5 days.",
+    "content": "## Process\n\nFull furniture masking, hairline crack patching, 2 coats premium Nippon Paint.",
+    "type": "portfolio",
+    "category": "Painting",
+    "tags": "HDB,Punggol,Nippon",
+    "featured": true,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=1200&auto=format&fit=crop&q=70",
+    "views": 189,
+    "whatsappClicks": 35,
+    "authorId": null,
+    "createdAt": "2026-10-04T02:01:07.982Z",
+    "updatedAt": "2026-10-04T02:01:07.982Z",
+    "images": [
+      {
+        "id": "img-2a",
+        "postId": "fallback-post-2",
+        "url": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1200&auto=format&fit=crop&q=70",
+        "kind": "before",
+        "position": 0,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      },
+      {
+        "id": "img-2b",
+        "postId": "fallback-post-2",
+        "url": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=1200&auto=format&fit=crop&q=70",
+        "kind": "after",
+        "position": 1,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      }
+    ]
+  },
+  {
+    "id": "fallback-post-3",
+    "title": "Condo Kitchen Renovation in Serangoon",
+    "slug": "condo-kitchen-serangoon",
+    "excerpt": "Custom solid-surface countertop, new backsplash, full re-tiling. Two-week turnaround.",
+    "content": "## Execution\n\nSeamless solid surface, marine-ply carcasses with soft-close Blum hinges, herringbone marble-look tile backsplash.",
+    "type": "portfolio",
+    "category": "Renovation",
+    "tags": "Condo,Kitchen,Carpentry",
+    "featured": true,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=1200&auto=format&fit=crop&q=70",
+    "views": 210,
+    "whatsappClicks": 42,
+    "authorId": null,
+    "createdAt": "2026-10-04T02:01:07.982Z",
+    "updatedAt": "2026-10-04T02:01:07.982Z",
+    "images": [
+      {
+        "id": "img-3a",
+        "postId": "fallback-post-3",
+        "url": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&auto=format&fit=crop&q=70",
+        "kind": "before",
+        "position": 0,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      },
+      {
+        "id": "img-3b",
+        "postId": "fallback-post-3",
+        "url": "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=1200&auto=format&fit=crop&q=70",
+        "kind": "after",
+        "position": 1,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      }
+    ]
+  },
+  {
+    "id": "fallback-post-4",
+    "title": "Full Electrical Rewiring, Landed in Bukit Timah",
+    "slug": "rewiring-landed-bukit-timah",
+    "excerpt": "4-storey landed house, complete rewire with new distribution board. EMA-compliant, LEW-signed off.",
+    "content": "## Scope\n\nNew PVC conduits throughout 4 storeys, new Hager 100A DB, RCBO protection on every circuit.",
+    "type": "portfolio",
+    "category": "Electrical",
+    "tags": "Landed,Rewiring,LEW",
+    "featured": false,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=70",
+    "views": 115,
+    "whatsappClicks": 19,
+    "authorId": null,
+    "createdAt": "2026-10-04T02:01:07.982Z",
+    "updatedAt": "2026-10-04T02:01:07.982Z",
+    "images": [
+      {
+        "id": "img-4a",
+        "postId": "fallback-post-4",
+        "url": "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=1200&auto=format&fit=crop&q=70",
+        "kind": "after",
+        "position": 0,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      },
+      {
+        "id": "img-4b",
+        "postId": "fallback-post-4",
+        "url": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=70",
+        "kind": "gallery",
+        "position": 1,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      }
+    ]
+  },
+  {
+    "id": "fallback-post-5",
+    "title": "Master Bathroom Hack, EC in Sembawang",
+    "slug": "bathroom-hack-sembawang",
+    "excerpt": "Hacked and re-tiled a tired master bathroom. Walk-in rain shower, frameless glass.",
+    "content": "## Scope\n\nHacked tiles, 2 coats Sika waterproofing, large-format 600x600 marble-look tiles, walk-in rain shower.",
+    "type": "portfolio",
+    "category": "Renovation",
+    "tags": "Bathroom,Hack,Waterproofing",
+    "featured": false,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&auto=format&fit=crop&q=70",
+    "views": 167,
+    "whatsappClicks": 31,
+    "authorId": null,
+    "createdAt": "2026-10-04T02:01:07.982Z",
+    "updatedAt": "2026-10-04T02:01:07.982Z",
+    "images": [
+      {
+        "id": "img-5a",
+        "postId": "fallback-post-5",
+        "url": "https://images.unsplash.com/photo-1505873242700-f289a29e1e0f?w=1200&auto=format&fit=crop&q=70",
+        "kind": "before",
+        "position": 0,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      },
+      {
+        "id": "img-5b",
+        "postId": "fallback-post-5",
+        "url": "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&auto=format&fit=crop&q=70",
+        "kind": "after",
+        "position": 1,
+        "createdAt": "2026-10-04T02:01:07.982Z"
+      }
+    ]
+  }
+]

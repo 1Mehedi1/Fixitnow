@@ -87,16 +87,18 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
       let uploadFile: File | Blob = file
       try {
         uploadFile = await imageCompression(file, {
-          maxSizeMB: 1.5,
-          maxWidthOrHeight: 1600,
+          maxSizeMB: 0.6,
+          maxWidthOrHeight: 1200,
           useWebWorker: true,
+          fileType: "image/webp",
         })
       } catch {
         // Fallback to original file
       }
 
       const formData = new FormData()
-      formData.append("file", uploadFile, file.name)
+      const cleanName = file.name.replace(/\.[^.]+$/, "") + ".webp"
+      formData.append("file", uploadFile, cleanName)
 
       const res = await fetch("/api/upload", { method: "POST", body: formData })
       const data = await res.json().catch(() => ({}))
@@ -333,8 +335,8 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
 
       {/* Edit / New Testimonial Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="dark bg-slate-900 border-slate-800 text-slate-100 max-w-lg w-[95vw] rounded-2xl shadow-2xl">
-          <DialogHeader>
+        <DialogContent className="dark bg-slate-900 border-slate-800 text-slate-100 max-w-lg w-[95vw] max-h-[90vh] p-0 gap-0 flex flex-col rounded-2xl shadow-2xl overflow-hidden [&_.text-muted-foreground]:text-slate-300 [&_label]:text-slate-200">
+          <DialogHeader className="px-6 py-4 border-b border-slate-800 bg-slate-950/80 shrink-0">
             <DialogTitle className="text-lg font-bold text-white flex items-center gap-2">
               {editingId ? "Edit Testimonial" : "New Testimonial / WhatsApp Review"}
             </DialogTitle>
@@ -343,9 +345,10 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-2 text-slate-200">
+          {/* Scrollable Form Body */}
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 max-h-[calc(90vh-130px)]">
             {/* Quick Proof Media Upload */}
-            <div className="space-y-2 p-3.5 rounded-xl border border-slate-800 bg-slate-950/60">
+            <div className="space-y-2 p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 overflow-hidden">
               <Label className="text-xs uppercase tracking-wider font-bold text-emerald-400 flex items-center gap-1.5">
                 <ImageIcon className="h-4 w-4" /> Proof Document / WhatsApp Screenshot
               </Label>
@@ -354,19 +357,19 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
               </p>
 
               {form.avatar ? (
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-3 pt-2 w-full overflow-hidden">
                   <div className="relative h-16 w-16 rounded-lg overflow-hidden border border-emerald-500/50 bg-slate-900 shrink-0">
                     <img src={form.avatar} alt="Proof" className="h-full w-full object-cover" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                      <Check className="h-3.5 w-3.5" /> Screenshot Attached
+                      <Check className="h-3.5 w-3.5 shrink-0" /> Screenshot Attached
                     </div>
-                    <p className="text-[11px] text-slate-400 truncate">{form.avatar}</p>
+                    <p className="text-[11px] text-slate-400 font-medium">Image attached & ready to save</p>
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, avatar: "" })}
-                      className="text-[11px] text-rose-400 hover:text-rose-300 font-semibold mt-1 cursor-pointer"
+                      className="text-[11px] text-rose-400 hover:text-rose-300 font-semibold mt-1 cursor-pointer block"
                     >
                       Remove screenshot
                     </button>
@@ -452,19 +455,20 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
             </div>
           </div>
 
-          <DialogFooter className="border-t border-slate-800 pt-3">
-            <Button variant="ghost" onClick={() => setOpen(false)} className="text-slate-400 hover:text-white">
+          {/* Sticky Dialog Footer — Always visible and clickable */}
+          <div className="border-t border-slate-800 px-6 py-3.5 bg-slate-950/90 shrink-0 flex items-center justify-end gap-2.5">
+            <Button variant="ghost" onClick={() => setOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">
               Cancel
             </Button>
             <Button
               onClick={submit}
               disabled={saving || uploadingMedia}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-10 px-5 shadow-md cursor-pointer"
             >
               {saving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : null}
               {editingId ? "Save Changes" : "Save Testimonial"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

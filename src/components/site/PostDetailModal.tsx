@@ -27,27 +27,19 @@ export function PostDetailModal() {
       return
     }
 
-    // Instantly hydrate modal with available post data (0ms delay)
+    // Instantly hydrate modal with the active clicked post data (100% synchronized with card)
     const initialDetailed: DetailedPost = {
       ...(selectedPost as Post),
       images: ((selectedPost as any).images as PostImage[]) || [],
     }
     setFull(initialDetailed)
 
-    // Background fetch to update view count
-    fetch(`/api/posts/${selectedPost.id}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.post) {
-          setFull(d.post)
-          fetch("/api/analytics", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ eventType: "post_view", postId: selectedPost.id }),
-          }).catch(() => {})
-        }
-      })
-      .catch(() => {})
+    // Track view count in analytics without overwriting active edited post data
+    fetch("/api/analytics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventType: "post_view", postId: selectedPost.id }),
+    }).catch(() => {})
   }, [detailOpen, selectedPost])
 
   if (!full) return null

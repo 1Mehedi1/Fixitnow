@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
-import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
+import { getStoredTestimonials, saveStoredTestimonial } from "@/lib/testimonials-store"
 
 export const dynamic = "force-dynamic"
 
 /** Public list of published testimonials. */
 export async function GET() {
   try {
-    const items = await db.testimonial.findMany({
-      where: { published: true },
-      orderBy: { createdAt: "desc" },
-    })
-    return NextResponse.json({ testimonials: items })
-  } catch {
+    const items = await getStoredTestimonials()
+    const published = items.filter((t) => t.published !== false)
+    return NextResponse.json({ testimonials: published })
+  } catch (err: any) {
     const { FALLBACK_TESTIMONIALS } = await import("@/lib/fallback-data")
     return NextResponse.json({ testimonials: FALLBACK_TESTIMONIALS })
   }
@@ -30,15 +28,14 @@ export async function POST(req: NextRequest) {
     if (!name || !content) {
       return NextResponse.json({ error: "Name and content required" }, { status: 400 })
     }
-    const t = await db.testimonial.create({
-      data: {
-        name,
-        role,
-        rating: typeof rating === "number" ? Math.max(1, Math.min(5, rating)) : 5,
-        content,
-        avatar,
-        published: published !== false,
-      },
+
+    const t = await saveStoredTestimonial({
+      name,
+      role,
+      rating: typeof rating === "number" ? Math.max(1, Math.min(5, rating)) : 5,
+      content,
+      avatar,
+      published: published !== false,
     })
 
     try {

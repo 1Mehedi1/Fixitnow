@@ -592,14 +592,17 @@ export function SettingsManager() {
                 <Field label="Label" value={svc.label} onChange={(v) => updateService(i, "label", v)} placeholder="Plumbing" />
                 <div className="space-y-1.5">
                   <Label className="text-xs uppercase tracking-wider">Icon</Label>
-                  <Select value={svc.icon} onValueChange={(v) => updateService(i, "icon", v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {ICON_OPTIONS.map((ic) => (
-                        <SelectItem key={ic} value={ic}>{ic}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <select
+                    value={svc.icon}
+                    onChange={(e) => updateService(i, "icon", e.target.value)}
+                    className="flex h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 py-1 text-sm text-white shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer"
+                  >
+                    {ICON_OPTIONS.map((ic) => (
+                      <option key={ic} value={ic} className="bg-slate-900 text-white">
+                        {ic}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <Field label="Key (slug)" value={svc.key} onChange={(v) => updateService(i, "key", v)} placeholder="plumbing" hint="Used internally, lowercase no spaces" />
               </div>

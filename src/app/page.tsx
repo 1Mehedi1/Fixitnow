@@ -7,6 +7,7 @@ import type { Post, PostImage, Testimonial } from "@prisma/client"
 export const dynamic = "force-dynamic"
 
 import { getStoredPosts } from "@/lib/posts-store"
+import { getStoredTestimonials } from "@/lib/testimonials-store"
 
 async function fetchHomePageData() {
   const hasValidPostgres =
@@ -16,12 +17,13 @@ async function fetchHomePageData() {
 
   const settings = await loadSiteSettings().catch(() => defaultSiteConfig)
   const storedPosts = await getStoredPosts().catch(() => FALLBACK_POSTS)
+  const storedTestimonials = await getStoredTestimonials().catch(() => FALLBACK_TESTIMONIALS)
 
   if (!hasValidPostgres) {
     return {
       settings: settings || defaultSiteConfig,
       posts: storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS,
-      testimonials: FALLBACK_TESTIMONIALS,
+      testimonials: storedTestimonials.length > 0 ? storedTestimonials : FALLBACK_TESTIMONIALS,
     }
   }
 
@@ -47,13 +49,13 @@ async function fetchHomePageData() {
     return {
       settings: settings || defaultSiteConfig,
       posts: dbPosts && dbPosts.length > 0 ? dbPosts : (storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS),
-      testimonials: testimonials && testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS,
+      testimonials: testimonials && testimonials.length > 0 ? testimonials : (storedTestimonials.length > 0 ? storedTestimonials : FALLBACK_TESTIMONIALS),
     }
   } catch (err) {
     return {
       settings: settings || defaultSiteConfig,
       posts: storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS,
-      testimonials: FALLBACK_TESTIMONIALS,
+      testimonials: storedTestimonials.length > 0 ? storedTestimonials : FALLBACK_TESTIMONIALS,
     }
   }
 }

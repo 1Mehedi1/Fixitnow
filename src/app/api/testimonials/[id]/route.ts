@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
-import { db } from "@/lib/db"
 import { isAdmin } from "@/lib/auth"
+import { saveStoredTestimonial, deleteStoredTestimonial } from "@/lib/testimonials-store"
 
 export const dynamic = "force-dynamic"
 
@@ -12,7 +12,10 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   try {
     const { id } = await ctx.params
     const body = await req.json().catch(() => ({}))
-    const t = await db.testimonial.update({ where: { id }, data: body })
+    const t = await saveStoredTestimonial({
+      ...body,
+      id,
+    })
 
     try {
       revalidatePath("/")
@@ -31,7 +34,7 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
   }
   try {
     const { id } = await ctx.params
-    await db.testimonial.delete({ where: { id } })
+    await deleteStoredTestimonial(id)
 
     try {
       revalidatePath("/")

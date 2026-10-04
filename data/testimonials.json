@@ -1,0 +1,52 @@
+[
+  {
+    "id": "fallback-test-1",
+    "name": "Mrs Tan",
+    "role": "HDB 4-Room · Bedok",
+    "rating": 5,
+    "content": "Painted our entire flat in 2.5 days. Edges were crisp, zero paint on our furniture, and he cleaned up thoroughly before leaving. Felt like a brand new flat.",
+    "avatar": null,
+    "published": true,
+    "createdAt": "2026-10-04T02:01:07.982Z"
+  },
+  {
+    "id": "fallback-test-2",
+    "name": "Daniel Lim",
+    "role": "Condo Owner · Serangoon",
+    "rating": 5,
+    "content": "Re-did my kitchen. Quote was 100% transparent, no surprises, finished on the exact date promised. The solid-surface countertop seaming was invisible.",
+    "avatar": null,
+    "published": true,
+    "createdAt": "2026-10-04T02:01:07.982Z"
+  },
+  {
+    "id": "fallback-test-3",
+    "name": "Priya K",
+    "role": "BTO Owner · Sengkang",
+    "rating": 5,
+    "content": "Built my feature wall and TV console. Came back twice to fine-tune the LED lighting until I was happy. That level of after-service is rare in Singapore.",
+    "avatar": null,
+    "published": true,
+    "createdAt": "2026-10-04T02:01:07.982Z"
+  },
+  {
+    "id": "fallback-test-4",
+    "name": "Mr Goh",
+    "role": "Landed Owner · Bukit Timah",
+    "rating": 5,
+    "content": "Full rewire of a 4-storey house. LEW-signed, EMA-compliant, zero snags at handover. Highly recommended trade specialist.",
+    "avatar": null,
+    "published": true,
+    "createdAt": "2026-10-04T02:01:07.982Z"
+  },
+  {
+    "id": "fallback-test-5",
+    "name": "Aisha Bte Rahmat",
+    "role": "EC Owner · Sembawang",
+    "rating": 5,
+    "content": "Re-did my master bathroom. He explained the waterproofing process so I understood why it mattered. The walk-in rain shower is incredible.",
+    "avatar": null,
+    "published": true,
+    "createdAt": "2026-10-04T02:01:07.982Z"
+  }
+]

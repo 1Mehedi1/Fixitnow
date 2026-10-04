@@ -21,7 +21,7 @@ const now = new Date()
 export const FALLBACK_POSTS: (Post & { images: PostImage[] })[] = [
   {
     id: "fallback-post-1",
-    title: "HDB Toilet Re-piping in Bedok",
+    title: "HDB Toilet Re-piping",
     slug: "hdb-toilet-repiping-bedok",
     excerpt: "Replaced corroded galvanised pipes with PPR, fixed a stubborn leak under the sink.",
     content: "## The Job\n\nReplaced corroded piping with high-grade PPR heat-fused joints. Zero drop on 30-minute pressure test.",

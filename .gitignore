@@ -58,3 +58,5 @@ server.log
 !/public/uploads/.gitkeep
 /data/*.json
 !/data/.gitkeep
+!/data/posts.json
+!/data/testimonials.json

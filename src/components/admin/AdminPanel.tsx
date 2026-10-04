@@ -57,7 +57,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
   return (
     <div className="dark bg-slate-950 text-slate-100 min-h-screen flex flex-col md:flex-row [&_.text-muted-foreground]:text-slate-300 [&_label]:text-slate-200">
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-slate-800 bg-slate-900/60 p-4 sticky top-0 h-screen shadow-lg">
+      <aside className="hidden md:flex flex-col w-64 min-w-[16rem] shrink-0 border-r border-slate-800 bg-slate-900/60 p-4 sticky top-0 h-screen shadow-lg">
         <div className="mb-6 px-2 flex items-center justify-between">
           <div>
             <div className="font-display font-black text-lg tracking-tight text-white">Admin Panel</div>
@@ -135,7 +135,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
       </div>
 
       {/* Main content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full pt-16 md:pt-8 overflow-y-auto">
+      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-6xl w-full pt-16 md:pt-8 overflow-y-auto">
         <motion.div
           key={adminTab}
           initial={{ opacity: 0, y: 8 }}

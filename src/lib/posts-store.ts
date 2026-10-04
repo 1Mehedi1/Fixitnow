@@ -117,9 +117,10 @@ export async function saveStoredPost(data: any): Promise<StoredPost> {
   }))
 
   const coverImage =
+    (formattedImages.length > 0
+      ? (formattedImages.find((img) => img.kind === "after")?.url || formattedImages[0]?.url)
+      : null) ||
     data.coverImage ||
-    formattedImages.find((img) => img.kind === "after")?.url ||
-    formattedImages[0]?.url ||
     null
 
   const postRecord: StoredPost = {

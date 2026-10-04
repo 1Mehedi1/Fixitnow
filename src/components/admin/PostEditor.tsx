@@ -97,7 +97,9 @@ export function PostEditor() {
     try {
       const payload = {
         ...form,
-        coverImage: form.coverImage || form.images.find(img => img.kind === "after")?.url || form.images[0]?.url || null,
+        coverImage: form.images.length > 0
+          ? (form.images.find((img) => img.kind === "after")?.url || form.images[0]?.url || "")
+          : (form.coverImage || ""),
       }
       const isNew = editingPostId === "new" || !editingPostId
       const url = isNew ? "/api/posts" : `/api/posts/${editingPostId}`
@@ -300,19 +302,6 @@ export function PostEditor() {
                 />
               </div>
 
-              {/* Optional Cover image override */}
-              <div className="space-y-1.5">
-                <Label htmlFor="post-cover" className="text-xs uppercase tracking-wider font-bold text-slate-400">
-                  Cover Image URL (Optional override)
-                </Label>
-                <Input
-                  id="post-cover"
-                  value={form.coverImage}
-                  onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-                  placeholder="Defaults to first uploaded photo automatically"
-                  className="bg-slate-950/60 border-slate-700 text-white text-xs"
-                />
-              </div>
 
               {/* Toggles */}
               <div className="flex flex-wrap gap-8 pt-4 border-t border-slate-800">
