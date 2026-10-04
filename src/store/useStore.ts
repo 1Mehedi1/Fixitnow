@@ -12,6 +12,7 @@ interface AppState {
   editingPostId: string | null // null = list view, "new" = create, id = edit
   editorOpen: boolean
   customPosts: any[] | null
+  customTestimonials: any[] | null
 
   setView: (v: View) => void
   openPost: (p: Post) => void
@@ -22,6 +23,9 @@ interface AppState {
   setCustomPosts: (posts: any[]) => void
   upsertCustomPost: (post: any) => void
   deleteCustomPost: (id: string) => void
+  setCustomTestimonials: (testimonials: any[]) => void
+  upsertCustomTestimonial: (testimonial: any) => void
+  deleteCustomTestimonial: (id: string) => void
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -32,6 +36,7 @@ export const useStore = create<AppState>((set) => ({
   editingPostId: null,
   editorOpen: false,
   customPosts: null,
+  customTestimonials: null,
 
   setView: (v) => set({ view: v }),
   openPost: (p) => set({ selectedPost: p, detailOpen: true }),
@@ -64,5 +69,31 @@ export const useStore = create<AppState>((set) => ({
         localStorage.setItem("fixitnow_client_posts", JSON.stringify(next))
       } catch {}
       return { customPosts: next }
+    }),
+  setCustomTestimonials: (testimonials) => set({ customTestimonials: testimonials }),
+  upsertCustomTestimonial: (item) =>
+    set((state) => {
+      const current = state.customTestimonials || []
+      const idx = current.findIndex((t) => t.id === item.id)
+      let next: any[]
+      if (idx >= 0) {
+        next = [...current]
+        next[idx] = { ...next[idx], ...item }
+      } else {
+        next = [item, ...current]
+      }
+      try {
+        localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(next))
+      } catch {}
+      return { customTestimonials: next }
+    }),
+  deleteCustomTestimonial: (id) =>
+    set((state) => {
+      const current = state.customTestimonials || []
+      const next = current.filter((t) => t.id !== id)
+      try {
+        localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(next))
+      } catch {}
+      return { customTestimonials: next }
     }),
 }))

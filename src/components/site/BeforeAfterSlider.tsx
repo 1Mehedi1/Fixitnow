@@ -60,7 +60,7 @@ export function BeforeAfterSlider({ before, after, beforeLabel = "Before", after
       onTouchStart={(e) => startDrag(e.touches[0].clientX)}
     >
       {/* After image (full) */}
-      <img src={after} alt={alt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+      <img src={after} alt={alt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
       <span className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
         {afterLabel}
       </span>
@@ -75,6 +75,7 @@ export function BeforeAfterSlider({ before, after, beforeLabel = "Before", after
           alt={alt}
           className="absolute inset-0 h-full w-full object-cover"
           loading="lazy"
+          decoding="async"
         />
         <span className="absolute left-3 top-3 z-10 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
           {beforeLabel}

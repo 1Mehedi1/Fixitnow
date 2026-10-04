@@ -48,9 +48,13 @@ export function HomeView({
   allPosts,
   allTestimonials,
 }: Props) {
-  const { view, setView, openPost, customPosts, setCustomPosts } = useStore()
+  const {
+    view, setView, openPost,
+    customPosts, setCustomPosts,
+    customTestimonials, setCustomTestimonials,
+  } = useStore()
 
-  // Hydrate client-side posts on mount strictly ONCE (zero infinite loops)
+  // Hydrate client-side posts and testimonials on mount strictly ONCE (zero infinite loops)
   useEffect(() => {
     try {
       const stored = localStorage.getItem("fixitnow_client_posts")
@@ -58,16 +62,31 @@ export function HomeView({
         const parsed = JSON.parse(stored)
         if (Array.isArray(parsed) && parsed.length > 0) {
           setCustomPosts(parsed)
-          return
+        } else if (posts && posts.length > 0) {
+          setCustomPosts(posts)
         }
+      } else if (posts && posts.length > 0) {
+        setCustomPosts(posts)
       }
     } catch {}
-    if (posts && posts.length > 0) {
-      setCustomPosts(posts)
-    }
+
+    try {
+      const storedTests = localStorage.getItem("fixitnow_client_testimonials")
+      if (storedTests) {
+        const parsedTests = JSON.parse(storedTests)
+        if (Array.isArray(parsedTests) && parsedTests.length > 0) {
+          setCustomTestimonials(parsedTests)
+        } else if (testimonials && testimonials.length > 0) {
+          setCustomTestimonials(testimonials)
+        }
+      } else if (testimonials && testimonials.length > 0) {
+        setCustomTestimonials(testimonials)
+      }
+    } catch {}
   }, []) // Empty dependency array runs once on mount!
 
   const activePosts = (customPosts && customPosts.length > 0) ? customPosts : posts
+  const activeTestimonials = (customTestimonials && customTestimonials.length > 0) ? customTestimonials : (allTestimonials || testimonials)
 
   const portfolioPosts = (activePosts || []).filter((p) => p.published !== false && p.type === "portfolio")
   const beforeAfterPosts = (activePosts || []).filter(
@@ -155,7 +174,7 @@ export function HomeView({
   if (view === "admin") {
     return (
       <SiteSettingsProvider settings={settings}>
-        <AdminPanel posts={allPosts} testimonials={allTestimonials} />
+        <AdminPanel posts={allPosts} testimonials={activeTestimonials} />
       </SiteSettingsProvider>
     )
   }
@@ -186,7 +205,7 @@ export function HomeView({
               <PricingGuide />
               <FaqSection />
               <TradePartnership />
-              <Testimonials testimonials={testimonials} />
+              <Testimonials testimonials={activeTestimonials} />
               <About />
             </>
           )}

@@ -3,8 +3,6 @@
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Eye, MapPin, Calendar, X, Phone, MessageSquare } from "lucide-react"
 import { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
@@ -68,14 +66,14 @@ export function PostDetailModal() {
     <Dialog open={detailOpen} onOpenChange={(o) => !o && closePost()}>
       <DialogContent
         showCloseButton={false}
-        className="w-[94vw] max-w-[94vw] sm:max-w-xl md:max-w-2xl max-h-[90vh] p-3 sm:p-5 overflow-hidden gap-0 rounded-3xl border border-border/80 bg-background/95 backdrop-blur-xl shadow-2xl"
+        className="w-[94vw] max-w-[94vw] sm:max-w-xl md:max-w-2xl max-h-[90vh] p-2.5 sm:p-5 overflow-hidden gap-0 rounded-3xl border border-border/80 bg-background/98 shadow-2xl"
       >
         <DialogTitle className="sr-only">{full.title || "Project Details"}</DialogTitle>
         <DialogDescription className="sr-only">Detailed case study view</DialogDescription>
 
-        {/* Scrollable Container with Inner Boundary Card */}
-        <ScrollArea className="max-h-[85vh] overflow-x-hidden scroll-area-thin">
-          <div className="rounded-2xl border-2 border-border/70 bg-card/90 p-4 sm:p-6 space-y-5 shadow-sm">
+        {/* Native hardware-accelerated touch scroll for 60fps mobile smoothness */}
+        <div className="overflow-y-auto overscroll-contain max-h-[85vh] [-webkit-overflow-scrolling:touch] pr-1">
+          <div className="rounded-2xl border-2 border-border/70 bg-card/95 p-4 sm:p-6 space-y-5 shadow-sm">
             {/* Top Bar with Title & Close Button */}
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1.5 flex-1 min-w-0">
@@ -106,16 +104,27 @@ export function PostDetailModal() {
               </button>
             </div>
 
-            {/* Cover Photo — Spanning 100% of card width with zero empty space */}
-            {cover && (
+            {/* Cover Area — Automatically Before/After slider if both exist, otherwise single photo alone */}
+            {hasSlider && before && after ? (
+              <div className="space-y-1.5">
+                <div className="w-full rounded-xl overflow-hidden shadow-md border border-border/70 relative">
+                  <BeforeAfterSlider before={before.url} after={after.url} alt={full.title} />
+                </div>
+                <div className="flex justify-between items-center text-[11px] text-muted-foreground px-1">
+                  <span className="font-semibold text-primary">◀ Before / After Transformation ▶</span>
+                  <span>Drag slider to compare</span>
+                </div>
+              </div>
+            ) : cover ? (
               <div className="w-full aspect-[16/10] sm:aspect-[16/9] rounded-xl overflow-hidden relative shadow-md border border-border/60 bg-muted">
                 <img
                   src={cover}
                   alt={full.title}
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
-            )}
+            ) : null}
 
             {/* Meta Details Strip */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground py-2 border-y border-border/50">
@@ -144,21 +153,6 @@ export function PostDetailModal() {
               </p>
             )}
 
-            {/* Before/After slider if available */}
-            {hasSlider && before && after && (
-              <div className="space-y-2.5 pt-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-display font-bold text-sm sm:text-base text-foreground">
-                    Before & After Transformation
-                  </h3>
-                  <span className="text-[11px] text-muted-foreground font-medium">Drag slider to compare</span>
-                </div>
-                <div className="rounded-xl overflow-hidden border border-border/70 shadow-sm w-full">
-                  <BeforeAfterSlider before={before.url} after={after.url} alt={full.title} />
-                </div>
-              </div>
-            )}
-
             {/* Detailed Story Markdown */}
             {full.content && (
               <div className="prose prose-stone dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed py-1 break-words">
@@ -166,14 +160,14 @@ export function PostDetailModal() {
               </div>
             )}
 
-            {/* Gallery images */}
-            {gallery.length > 0 && !hasSlider && (
+            {/* Additional Gallery images */}
+            {gallery.length > 0 && (
               <div className="space-y-2.5 pt-1">
                 <h3 className="font-display font-bold text-sm sm:text-base text-foreground">Project Photos</h3>
                 <div className="grid grid-cols-2 gap-2.5">
                   {gallery.map((img) => (
                     <div key={img.id} className="aspect-[4/3] rounded-lg overflow-hidden bg-muted border border-border/40 shadow-xs">
-                      <img src={img.url} alt={full.title} className="h-full w-full object-cover" loading="lazy" />
+                      <img src={img.url} alt={full.title} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                     </div>
                   ))}
                 </div>
@@ -240,7 +234,7 @@ export function PostDetailModal() {
               </div>
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   )

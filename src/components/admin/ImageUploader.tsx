@@ -57,6 +57,10 @@ export function ImageUploader({ images, onChange }: Props) {
         }
         uploaded.push({ url: data.url, kind: "gallery" as const })
       }
+      if (images.length === 0 && uploaded.length === 2) {
+        uploaded[0].kind = "before"
+        uploaded[1].kind = "after"
+      }
       onChange([...images, ...uploaded])
       toast.success(`Uploaded ${uploaded.length} image${uploaded.length > 1 ? "s" : ""}`)
     } catch (e: any) {

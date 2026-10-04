@@ -1,95 +1,35 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import {
-  parseUserAgent,
-  parseReferrer,
-  parseReferrerCategory,
-  parseGeoLocation,
-  saveLocalAnalyticsEvent,
-  type AnalyticsEventRecord,
-} from "@/lib/analytics-helper"
-import { incrementPostViews, incrementPostWhatsApp } from "@/lib/posts-store"
-
-export const dynamic = "force-dynamic"
 
 /**
- * Public tracking endpoint — anonymous, privacy-friendly analytics.
- * Body: { eventType, postId?, duration?, path?, session?, visitorId?, isNewVisitor?, loadTime?, clientMeta? }
+ * Public tracking endpoint — anonymous analytics.
+ * Body: { eventType, postId?, duration?, path?, session? }
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({}))
-    const { eventType, postId, duration, path: p, session, visitorId, isNewVisitor, loadTime, clientMeta } = body || {}
-    if (!eventType) return NextResponse.json({ ok: false, error: "Missing eventType" })
+    const body = await req.json()
+    const { eventType, postId, duration, path: p, session } = body || {}
+    if (!eventType) return NextResponse.json({ ok: false })
 
-    const userAgent = req.headers.get("user-agent")
-    const { device, browser, os } = parseUserAgent(userAgent)
-    const referrerHeader = req.headers.get("referer") || clientMeta?.referrer
-    const referrer = parseReferrer(referrerHeader)
-    const referrerCategory = parseReferrerCategory(referrerHeader)
-    const { country, countryCode, countryFlag, city } = parseGeoLocation(req.headers, clientMeta)
+    const ev = await db.analyticsEvent.create({
+      data: {
+        eventType: String(eventType).slice(0, 40),
+        postId: postId || null,
+        duration: typeof duration === "number" ? duration : null,
+        path: p ? String(p).slice(0, 200) : null,
+        session: session ? String(session).slice(0, 64) : null,
+      },
+    })
 
-    const eventId = `ev_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`
-    const record: AnalyticsEventRecord = {
-      id: eventId,
-      eventType: String(eventType).slice(0, 40),
-      postId: postId ? String(postId) : null,
-      session: session ? String(session).slice(0, 64) : null,
-      visitorId: visitorId ? String(visitorId).slice(0, 64) : null,
-      isNewVisitor: Boolean(isNewVisitor),
-      loadTime: typeof loadTime === "number" ? loadTime : null,
-      duration: typeof duration === "number" ? duration : null,
-      path: p ? String(p).slice(0, 200) : "/",
-      device: clientMeta?.device || device,
-      browser,
-      os,
-      country,
-      countryCode,
-      countryFlag,
-      city,
-      referrer,
-      referrerCategory,
-      createdAt: new Date().toISOString(),
+    // If it's a post view, also bump the post.views counter for convenience.
+    if (eventType === "post_view" && postId) {
+      db.post.update({ where: { id: postId }, data: { views: { increment: 1 } } }).catch(() => {})
     }
-
-    // Persist to local JSON analytics store (guarantees 100% uptime & rich metadata)
-    await saveLocalAnalyticsEvent(record)
-
-    // Update stored posts counter directly in posts-store
-    if (record.postId) {
-      if (record.eventType === "post_view") {
-        incrementPostViews(record.postId).catch(() => {})
-      }
-      if (record.eventType.includes("whatsapp")) {
-        incrementPostWhatsApp(record.postId).catch(() => {})
-      }
+    if (eventType === "whatsapp_click" && postId) {
+      db.post.update({ where: { id: postId }, data: { whatsappClicks: { increment: 1 } } }).catch(() => {})
     }
-
-    // Attempt PostgreSQL persistence if DB is connected
-    try {
-      await db.analyticsEvent.create({
-        data: {
-          eventType: record.eventType,
-          postId: record.postId,
-          duration: record.duration,
-          path: record.path,
-          session: record.session,
-        },
-      })
-
-      if (record.eventType === "post_view" && record.postId) {
-        db.post.update({ where: { id: record.postId }, data: { views: { increment: 1 } } }).catch(() => {})
-      }
-      if (record.eventType.includes("whatsapp") && record.postId) {
-        db.post.update({ where: { id: record.postId }, data: { whatsappClicks: { increment: 1 } } }).catch(() => {})
-      }
-    } catch {
-      // Database offline/unreachable — local store has captured the event safely
-    }
-
-    return NextResponse.json({ ok: true, id: record.id })
-  } catch (e: any) {
-    console.error("Analytics tracking error:", e)
-    return NextResponse.json({ ok: false, error: e?.message }, { status: 500 })
+    return NextResponse.json({ ok: true, id: ev.id })
+  } catch (e) {
+    return NextResponse.json({ ok: false }, { status: 500 })
   }
 }

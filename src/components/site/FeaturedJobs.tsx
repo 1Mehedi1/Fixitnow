@@ -21,7 +21,10 @@ interface Props {
 function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); index: number }) {
   const { openPost } = useStore()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
-  const cover = post.coverImage || post.images[0]?.url
+  const before = post.images.find((x) => x.kind === "before")
+  const after = post.images.find((x) => x.kind === "after")
+  const hasBeforeAfter = Boolean(before && after)
+  const cover = post.coverImage || after?.url || before?.url || post.images[0]?.url
   const category = post.category || post.type
   return (
     <motion.div
@@ -35,10 +38,38 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
     >
       <Card className="overflow-hidden border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          {cover ? (
+          {hasBeforeAfter && before && after ? (
+            <div className="absolute inset-0 flex">
+              <div className="relative w-1/2 h-full overflow-hidden border-r border-white/40">
+                <img
+                  src={before.url}
+                  alt={`${post.title} Before`}
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <span className="absolute bottom-2 left-2 z-10 rounded-md bg-black/80 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
+                  Before
+                </span>
+              </div>
+              <div className="relative w-1/2 h-full overflow-hidden">
+                <img
+                  src={after.url}
+                  alt={`${post.title} After`}
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <span className="absolute bottom-2 right-2 z-10 rounded-md bg-emerald-600/90 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
+                  After
+                </span>
+              </div>
+            </div>
+          ) : cover ? (
             <img
               src={cover}
               alt={post.title}
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
@@ -47,8 +78,8 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
               No image
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-3 left-3 flex gap-2">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          <div className="absolute top-3 left-3 flex gap-2 z-10">
             {post.featured && (
               <Badge className="bg-primary text-primary-foreground border-0">Featured</Badge>
             )}

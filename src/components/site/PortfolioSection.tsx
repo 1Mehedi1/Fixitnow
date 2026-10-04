@@ -100,8 +100,10 @@ export function PortfolioSection({ posts }: Props) {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
           {filtered.map((post, i) => {
-            const cover = post.coverImage || post.images[0]?.url
-            const hasBeforeAfter = post.images.some((x) => x.kind === "before") && post.images.some((x) => x.kind === "after")
+            const before = post.images.find((x) => x.kind === "before")
+            const after = post.images.find((x) => x.kind === "after")
+            const hasBeforeAfter = Boolean(before && after)
+            const cover = post.coverImage || after?.url || before?.url || post.images[0]?.url
             return (
               <motion.div
                 key={post.id}
@@ -114,15 +116,47 @@ export function PortfolioSection({ posts }: Props) {
               >
                 <Card className="overflow-hidden border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full">
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                    {cover && (
+                    {hasBeforeAfter && before && after ? (
+                      <div className="absolute inset-0 flex">
+                        <div className="relative w-1/2 h-full overflow-hidden border-r border-white/40">
+                          <img
+                            src={before.url}
+                            alt={`${post.title} Before`}
+                            decoding="async"
+                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          <span className="absolute bottom-2 left-2 z-10 rounded-md bg-black/80 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
+                            Before
+                          </span>
+                        </div>
+                        <div className="relative w-1/2 h-full overflow-hidden">
+                          <img
+                            src={after.url}
+                            alt={`${post.title} After`}
+                            decoding="async"
+                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          <span className="absolute bottom-2 right-2 z-10 rounded-md bg-emerald-600/90 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
+                            After
+                          </span>
+                        </div>
+                      </div>
+                    ) : cover ? (
                       <img
                         src={cover}
                         alt={post.title}
+                        decoding="async"
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         loading="lazy"
                       />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
+                        No image
+                      </div>
                     )}
-                    <div className="absolute top-3 left-3 flex gap-2">
+                    <div className="absolute top-3 left-3 flex gap-2 z-10">
                       {post.featured && (
                         <Badge className="bg-primary text-primary-foreground border-0">Featured</Badge>
                       )}
@@ -132,11 +166,6 @@ export function PortfolioSection({ posts }: Props) {
                         </Badge>
                       )}
                     </div>
-                    {hasBeforeAfter && (
-                      <Badge className="absolute top-3 right-3 bg-black/70 text-white border-0 backdrop-blur">
-                        Before / After
-                      </Badge>
-                    )}
                   </div>
                   <CardContent className="p-5">
                     <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">

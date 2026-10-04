@@ -60,7 +60,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
       <aside className="hidden md:flex flex-col w-64 border-r border-slate-800 bg-slate-900/60 p-4 sticky top-0 h-screen shadow-lg">
         <div className="mb-6 px-2 flex items-center justify-between">
           <div>
-            <div className="font-display font-black text-lg tracking-tight text-white">Admin Console</div>
+            <div className="font-display font-black text-lg tracking-tight text-white">Admin Panel</div>
             <p className="text-[11px] text-slate-400 truncate max-w-[150px]">{session.user?.email}</p>
           </div>
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Online" />
@@ -111,7 +111,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-slate-900 border-b border-slate-800 shadow-md">
         <div className="flex items-center justify-between p-3">
           <div>
-            <div className="font-display font-black text-sm text-white">Admin Console</div>
+            <div className="font-display font-black text-sm text-white">Admin Panel</div>
             <div className="text-[10px] text-slate-400 truncate max-w-[150px]">{session.user?.email}</div>
           </div>
           <div className="flex items-center gap-1">
