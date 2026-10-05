@@ -4,10 +4,21 @@ import { getStoredHeroPhotos, saveStoredHeroPhotos } from "@/lib/hero-photos-sto
 import { isAdmin } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+  "Pragma": "no-cache",
+  "Expires": "0",
+  "Surrogate-Control": "no-store",
+}
 
 export async function GET() {
   const heroImages = await getStoredHeroPhotos()
-  return NextResponse.json({ heroImages })
+  return NextResponse.json({ heroImages }, { headers: NO_CACHE_HEADERS })
 }
 
 export async function POST(req: NextRequest) {
@@ -29,18 +40,20 @@ export async function POST(req: NextRequest) {
       photos = [...current]
       photos[body.index] = body.url
     } else {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
     const saved = await saveStoredHeroPhotos(photos)
 
     try {
-      revalidatePath("/")
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
     } catch {}
 
-    return NextResponse.json({ heroImages: saved, ok: true })
+    return NextResponse.json({ heroImages: saved, ok: true }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
     console.error("Hero photos save error:", err)
-    return NextResponse.json({ error: err?.message || "Failed to save hero photos" }, { status: 500 })
+    return NextResponse.json({ error: err?.message || "Failed to save hero photos" }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
+

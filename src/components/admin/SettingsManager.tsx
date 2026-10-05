@@ -173,7 +173,10 @@ export function SettingsManager() {
   const [newSubcatInputs, setNewSubcatInputs] = useState<Record<number, string>>({})
 
   useEffect(() => {
-    fetch("/api/settings")
+    fetch(`/api/settings?_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
       .then((r) => r.json())
       .then((d) => {
         if (d.settings) {
@@ -255,6 +258,20 @@ export function SettingsManager() {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || "Save failed")
+
+      // Refresh settings from server to ensure 100% cloud sync
+      fetch(`/api/settings?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+        .then((r) => r.json())
+        .then((fresh) => {
+          if (fresh.settings) {
+            setCustomSettings(fresh.settings)
+          }
+        })
+        .catch(() => {})
+
       toast.success("Settings saved! All changes are live across all devices.")
     } catch (e: any) {
       toast.error("Save failed", { description: e.message })

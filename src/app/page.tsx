@@ -5,6 +5,8 @@ import { FALLBACK_POSTS, FALLBACK_TESTIMONIALS } from "@/lib/fallback-data"
 import type { Post, PostImage, Testimonial } from "@prisma/client"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 import { getStoredPosts } from "@/lib/posts-store"
 import { getStoredTestimonials } from "@/lib/testimonials-store"
@@ -19,6 +21,15 @@ async function fetchHomePageData() {
   const settings = await loadSiteSettings().catch(() => defaultSiteConfig)
   const storedPosts = await getStoredPosts().catch(() => FALLBACK_POSTS)
   const storedTestimonials = await getStoredTestimonials().catch(() => FALLBACK_TESTIMONIALS)
+
+  // Stored posts and testimonials in Vercel Blob / persistent storage are primary
+  if (storedPosts && storedPosts.length > 0 && storedTestimonials && storedTestimonials.length > 0) {
+    return {
+      settings: settings || defaultSiteConfig,
+      posts: storedPosts,
+      testimonials: storedTestimonials,
+    }
+  }
 
   if (!hasValidPostgres) {
     return {
@@ -49,8 +60,8 @@ async function fetchHomePageData() {
     const [dbPosts, testimonials] = await Promise.race([queryPromise, timeoutPromise])
     return {
       settings: settings || defaultSiteConfig,
-      posts: dbPosts && dbPosts.length > 0 ? dbPosts : (storedPosts.length > 0 ? storedPosts : FALLBACK_POSTS),
-      testimonials: testimonials && testimonials.length > 0 ? testimonials : (storedTestimonials.length > 0 ? storedTestimonials : FALLBACK_TESTIMONIALS),
+      posts: storedPosts.length > 0 ? storedPosts : (dbPosts && dbPosts.length > 0 ? dbPosts : FALLBACK_POSTS),
+      testimonials: storedTestimonials.length > 0 ? storedTestimonials : (testimonials && testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS),
     }
   } catch (err) {
     return {

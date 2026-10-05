@@ -67,7 +67,7 @@ export function PostEditor() {
       return
     }
 
-    // Check store first for instant zero-lag hydration and preserve local edits
+    // Check store first for instant zero-lag hydration while network request runs
     const localPost = useStore.getState().customPosts?.find((p) => p.id === editingPostId)
     if (localPost) {
       setForm({
@@ -87,12 +87,15 @@ export function PostEditor() {
             }))
           : [],
       })
-      setLoading(false)
-      return
+    } else {
+      setLoading(true)
     }
 
-    setLoading(true)
-    fetch(`/api/posts/${editingPostId}`)
+    // Always fetch latest authoritative data from server API with zero caching
+    fetch(`/api/posts/${editingPostId}?_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
       .then((r) => r.json())
       .then((d) => {
         if (d.post) {
@@ -116,7 +119,7 @@ export function PostEditor() {
         }
       })
       .catch(() => {
-        toast.error("Could not load post details")
+        if (!localPost) toast.error("Could not load post details")
       })
       .finally(() => setLoading(false))
   }, [editorOpen, editingPostId])
@@ -170,6 +173,19 @@ export function PostEditor() {
       const finalPost = data.post || savedPost
       upsertCustomPost(finalPost)
 
+      // Refresh posts list from server to ensure 100% cloud consistency
+      fetch(`/api/posts?limit=100&includeDrafts=true&_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (Array.isArray(d.posts) && d.posts.length > 0) {
+            useStore.getState().setCustomPosts(d.posts)
+          }
+        })
+        .catch(() => {})
+
       toast.success(isNew ? "Post created! It is live on all devices." : "Post saved! Updates are live on all devices.")
       closeEditor()
     } catch (e: any) {
@@ -187,6 +203,20 @@ export function PostEditor() {
       const res = await fetch(`/api/posts/${editingPostId}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Delete failed")
       deleteCustomPost(editingPostId)
+
+      // Refresh list from server
+      fetch(`/api/posts?limit=100&includeDrafts=true&_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (Array.isArray(d.posts)) {
+            useStore.getState().setCustomPosts(d.posts)
+          }
+        })
+        .catch(() => {})
+
       toast.success("Post deleted")
       closeEditor()
     } catch {
@@ -457,31 +487,33 @@ export function PostEditor() {
         </div>
 
         {/* Responsive Sticky Footer — Always fully visible and clickable on all screens */}
-        <div className="border-t border-slate-800 px-4 sm:px-6 py-3 bg-slate-950/95 shrink-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
-          <div className="hidden sm:flex items-center gap-2 overflow-hidden">
-            {form.featured && <Badge className="bg-amber-500/20 text-amber-400 border-0 text-xs shrink-0">Featured</Badge>}
+        <div className="border-t border-slate-800 px-3 sm:px-6 py-3 bg-slate-950/95 shrink-0 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 overflow-hidden min-w-0">
+            {form.featured && <Badge className="bg-amber-500/20 text-amber-400 border-0 text-[11px] px-2 py-0.5 shrink-0">Featured</Badge>}
             {form.published ? (
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs shrink-0">Published</Badge>
+              <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-[11px] px-2 py-0.5 shrink-0">Published</Badge>
             ) : (
-              <Badge variant="outline" className="text-slate-400 text-xs shrink-0">Draft</Badge>
+              <Badge variant="outline" className="text-slate-400 text-[11px] px-2 py-0.5 shrink-0">Draft</Badge>
             )}
-            <Badge variant="secondary" className="bg-slate-800 text-slate-300 text-xs truncate max-w-[140px]">{form.category}</Badge>
+            <Badge variant="secondary" className="hidden sm:inline-flex bg-slate-800 text-slate-300 text-[11px] px-2 py-0.5 truncate max-w-[130px]">{form.category}</Badge>
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto ml-auto shrink-0">
+          <div className="flex items-center justify-end gap-2 shrink-0 ml-auto">
             <Button
               variant="ghost"
+              size="sm"
               onClick={closeEditor}
-              className="text-slate-400 hover:text-white cursor-pointer px-4 h-10"
+              className="text-slate-400 hover:text-white cursor-pointer px-3 sm:px-4 h-9 sm:h-10 text-xs sm:text-sm"
             >
               Cancel
             </Button>
             <Button
+              size="sm"
               onClick={save}
               disabled={saving || loading}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-10 px-5 shadow-lg shadow-emerald-950/50 cursor-pointer shrink-0 min-w-[130px]"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-9 sm:h-10 px-3.5 sm:px-5 shadow-lg shadow-emerald-950/50 cursor-pointer shrink-0 text-xs sm:text-sm whitespace-nowrap"
             >
-              {saving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Save className="h-4 w-4 mr-1.5" />}
+              {saving ? <Loader2 className="h-4 w-4 mr-1 sm:mr-1.5 animate-spin" /> : <Save className="h-4 w-4 mr-1 sm:mr-1.5" />}
               {saving ? "Saving…" : "Save Changes"}
             </Button>
           </div>

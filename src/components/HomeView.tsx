@@ -58,8 +58,14 @@ export function HomeView({
 
   // Universal cross-device sync on mount: ensure mobile and PC are always 100% in sync with live server data
   useEffect(() => {
+    const t = Date.now()
+    const fetchOpts: RequestInit = {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    }
+
     // 1. Fetch live settings (Branding, trade categories, rate cards, hero text)
-    fetch("/api/settings")
+    fetch(`/api/settings?_t=${t}`, fetchOpts)
       .then((r) => r.json())
       .then((d) => {
         if (d.settings) {
@@ -72,7 +78,7 @@ export function HomeView({
       .catch(() => {})
 
     // 2. Fetch live posts (Selected work, portfolio, before/after, covers)
-    fetch("/api/posts?limit=100")
+    fetch(`/api/posts?limit=100&includeDrafts=true&_t=${t}`, fetchOpts)
       .then((r) => r.json())
       .then((d) => {
         if (Array.isArray(d.posts) && d.posts.length > 0) {
@@ -85,7 +91,7 @@ export function HomeView({
       .catch(() => {})
 
     // 3. Fetch live testimonials & proof media (WhatsApp screenshots)
-    fetch("/api/testimonials")
+    fetch(`/api/testimonials?all=1&_t=${t}`, fetchOpts)
       .then((r) => r.json())
       .then((d) => {
         if (Array.isArray(d.testimonials) && d.testimonials.length > 0) {
@@ -98,7 +104,7 @@ export function HomeView({
       .catch(() => {})
 
     // 4. Fetch live hero showcase photos
-    fetch("/api/hero-photos")
+    fetch(`/api/hero-photos?_t=${t}`, fetchOpts)
       .then((r) => r.json())
       .then((d) => {
         if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {
@@ -201,7 +207,7 @@ export function HomeView({
   if (view === "admin") {
     return (
       <SiteSettingsProvider settings={activeSettings}>
-        <AdminPanel posts={allPosts} testimonials={activeTestimonials} />
+        <AdminPanel posts={activePosts} testimonials={activeTestimonials} />
       </SiteSettingsProvider>
     )
   }

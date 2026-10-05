@@ -3,27 +3,40 @@ import { revalidatePath } from "next/cache"
 import { isAdmin } from "@/lib/auth"
 import { getStoredPostById, saveStoredPost, deleteStoredPost, incrementPostViews } from "@/lib/posts-store"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+  "Pragma": "no-cache",
+  "Expires": "0",
+  "Surrogate-Control": "no-store",
+}
+
 /** Public: fetch single post by id, also increments views. */
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params
   try {
     const post = await getStoredPostById(id)
     if (!post) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 })
+      return NextResponse.json({ error: "Not found" }, { status: 404, headers: NO_CACHE_HEADERS })
     }
     // Background view increment
     incrementPostViews(id).catch(() => {})
-    return NextResponse.json({ post })
+    return NextResponse.json({ post }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
     console.error("Error fetching post by id:", err)
-    return NextResponse.json({ error: err?.message || "Failed to load post" }, { status: 500 })
+    return NextResponse.json({ error: err?.message || "Failed to load post" }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
 /** Admin: update post. */
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_CACHE_HEADERS })
   }
   const { id } = await ctx.params
   const body = await req.json().catch(() => ({}))
@@ -35,32 +48,35 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     })
 
     try {
-      revalidatePath("/")
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
     } catch {}
 
-    return NextResponse.json({ post, ok: true })
+    return NextResponse.json({ post, ok: true }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
     console.error("Post update error:", err)
-    return NextResponse.json({ error: err?.message || "Failed to update post" }, { status: 500 })
+    return NextResponse.json({ error: err?.message || "Failed to update post" }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
 /** Admin: delete post. */
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_CACHE_HEADERS })
   }
   try {
     const { id } = await ctx.params
     await deleteStoredPost(id)
 
     try {
-      revalidatePath("/")
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
     } catch {}
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
     console.error("Post delete error:", err)
-    return NextResponse.json({ error: err?.message || "Failed to delete post" }, { status: 500 })
+    return NextResponse.json({ error: err?.message || "Failed to delete post" }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
+

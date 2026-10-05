@@ -122,7 +122,10 @@ export function Hero() {
     } catch {}
 
     // Always fetch live photos from server API to guarantee 100% cross-device sync (mobile, tablet, desktop)
-    fetch("/api/hero-photos")
+    fetch(`/api/hero-photos?_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
       .then((r) => r.json())
       .then((d) => {
         if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {

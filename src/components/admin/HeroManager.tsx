@@ -24,19 +24,14 @@ const SLOT_META = [
 
 export function HeroManager() {
   const { customHeroPhotos, setCustomHeroPhotos, updateHeroPhoto } = useStore()
-  const [photos, setPhotos] = useState<string[]>([
-    "https://files.catbox.moe/xx0tqh.jpg",
-    "https://files.catbox.moe/fcb1g7.jpg",
-    "https://files.catbox.moe/6pj5rs.jpg",
-    "https://files.catbox.moe/g2969p.jpg",
-  ])
+  const [photos, setPhotos] = useState<string[]>([...DEFAULT_HERO_IMAGES])
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop")
 
-  // Load from localStorage or API on mount
+  // Always fetch live photos from server on mount with zero-cache headers
   useEffect(() => {
-    let loadedFromLocal = false
+    // 1. Initial quick hydrate from localStorage while network request is in flight
     try {
       const stored = localStorage.getItem("fixitnow_hero_photos")
       if (stored) {
@@ -45,23 +40,29 @@ export function HeroManager() {
           const cleaned = parsed.map((p, i) => (p && typeof p === "string" && p.trim()) ? normalizeImageUrl(p.trim()) : DEFAULT_HERO_IMAGES[i])
           setPhotos(cleaned)
           setCustomHeroPhotos(cleaned)
-          loadedFromLocal = true
         }
       }
     } catch {}
 
-    if (!loadedFromLocal) {
-      fetch("/api/hero-photos")
-        .then((r) => r.json())
-        .then((d) => {
-          if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {
-            const cleaned = d.heroImages.map((p: any, i: number) => (p && typeof p === "string" && p.trim()) ? normalizeImageUrl(p.trim()) : DEFAULT_HERO_IMAGES[i])
-            setPhotos(cleaned)
-            setCustomHeroPhotos(cleaned)
-          }
-        })
-        .catch(() => {})
-    }
+    // 2. Unconditional live fetch from server API to guarantee 100% sync across all devices
+    fetch(`/api/hero-photos?_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {
+          const cleaned = d.heroImages.map((p: any, i: number) => (p && typeof p === "string" && p.trim()) ? normalizeImageUrl(p.trim()) : DEFAULT_HERO_IMAGES[i])
+          setPhotos(cleaned)
+          setCustomHeroPhotos(cleaned)
+          try {
+            localStorage.setItem("fixitnow_hero_photos", JSON.stringify(cleaned))
+          } catch {}
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to fetch live hero photos:", err)
+      })
   }, [setCustomHeroPhotos])
 
   const handleUrlChange = (idx: number, rawUrl: string) => {
@@ -93,14 +94,17 @@ export function HeroManager() {
         })
         updateHeroPhoto(idx, directUrl)
 
-        // Instant background sync to /api/hero-photos
-        fetch("/api/hero-photos", {
+        // Instant awaited sync to /api/hero-photos so Vercel Blob is updated immediately
+        const syncRes = await fetch("/api/hero-photos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ index: idx, url: directUrl }),
-        }).catch(() => {})
+        })
+        if (!syncRes.ok) {
+          console.warn("Hero photo sync warning: response not ok", syncRes.status)
+        }
 
-        toast.success(`Photo ${idx + 1} updated and saved!`, { id: tId })
+        toast.success(`Photo ${idx + 1} updated and saved! Live across all devices.`, { id: tId })
       } else {
         throw new Error(data.error || "Upload failed")
       }

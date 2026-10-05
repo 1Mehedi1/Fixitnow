@@ -1,4 +1,4 @@
-import { put, del, list } from "@vercel/blob"
+import { put, del, list, get } from "@vercel/blob"
 import fs from "fs"
 import path from "path"
 import os from "os"
@@ -176,6 +176,7 @@ export async function saveJsonBlob(
       token,
       addRandomSuffix: false, // Maintain fixed URL for deterministic fetching
       allowOverwrite: true,  // Allow replacing existing file without throwing 409
+      cacheControlMaxAge: 60, // Minimum CDN cache TTL to prevent 30-day stale cache lockup
     })
     return blob.url
   } catch (err: any) {
@@ -185,28 +186,45 @@ export async function saveJsonBlob(
 }
 
 /**
- * Read JSON data from Vercel Blob by known URL or pathname.
+ * Read JSON data from Vercel Blob bypassing Edge CDN cache.
  */
 export async function readJsonBlob<T>(blobUrlOrPath: string): Promise<T | null> {
+  const token = getVercelBlobToken()
   try {
     // 1. If direct HTTP/HTTPS URL
     if (blobUrlOrPath.startsWith("http://") || blobUrlOrPath.startsWith("https://")) {
-      const res = await fetch(blobUrlOrPath, { cache: "no-store" })
+      const cacheBustUrl = blobUrlOrPath.includes("?")
+        ? `${blobUrlOrPath}&_cb=${Date.now()}`
+        : `${blobUrlOrPath}?_cb=${Date.now()}`
+      const res = await fetch(cacheBustUrl, { cache: "no-store" })
       if (res.ok) {
         return (await res.json()) as T
       }
     }
 
-    // 2. If pathname (e.g. "store/posts.json"), query Vercel Blob via token
-    const token = getVercelBlobToken()
+    // 2. If pathname (e.g. "store/posts.json"), query Vercel Blob origin directly bypassing CDN cache
     if (token) {
-      const { blobs } = await list({ prefix: blobUrlOrPath, token })
-      if (blobs && blobs.length > 0) {
-        const matched = blobs.find((b) => b.pathname === blobUrlOrPath) || blobs[0]
-        if (matched?.url) {
-          const res = await fetch(matched.url, { cache: "no-store" })
-          if (res.ok) {
-            return (await res.json()) as T
+      try {
+        const result = await get(blobUrlOrPath, {
+          access: "public",
+          token,
+          useCache: false, // Explicitly bypass Edge CDN cache and read origin storage directly
+        })
+        if (result && result.statusCode === 200 && result.stream) {
+          const text = await new Response(result.stream).text()
+          return JSON.parse(text) as T
+        }
+      } catch (getErr) {
+        // Fallback to list lookup if get throws
+        const { blobs } = await list({ prefix: blobUrlOrPath, token })
+        if (blobs && blobs.length > 0) {
+          const matched = blobs.find((b) => b.pathname === blobUrlOrPath) || blobs[0]
+          if (matched?.url) {
+            const bustUrl = `${matched.url}?_cb=${Date.now()}`
+            const res = await fetch(bustUrl, { cache: "no-store" })
+            if (res.ok) {
+              return (await res.json()) as T
+            }
           }
         }
       }

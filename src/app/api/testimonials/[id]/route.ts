@@ -4,10 +4,21 @@ import { isAdmin } from "@/lib/auth"
 import { saveStoredTestimonial, deleteStoredTestimonial } from "@/lib/testimonials-store"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+  "Pragma": "no-cache",
+  "Expires": "0",
+  "Surrogate-Control": "no-store",
+}
 
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_CACHE_HEADERS })
   }
   try {
     const { id } = await ctx.params
@@ -18,31 +29,34 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     })
 
     try {
-      revalidatePath("/")
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
     } catch {}
 
-    return NextResponse.json({ testimonial: t, ok: true })
+    return NextResponse.json({ testimonial: t, ok: true }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
     console.error("Testimonial update error:", err)
-    return NextResponse.json({ error: err?.message || "Failed to update testimonial" }, { status: 500 })
+    return NextResponse.json({ error: err?.message || "Failed to update testimonial" }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_CACHE_HEADERS })
   }
   try {
     const { id } = await ctx.params
     await deleteStoredTestimonial(id)
 
     try {
-      revalidatePath("/")
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
     } catch {}
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
     console.error("Testimonial delete error:", err)
-    return NextResponse.json({ error: err?.message || "Failed to delete testimonial" }, { status: 500 })
+    return NextResponse.json({ error: err?.message || "Failed to delete testimonial" }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
+

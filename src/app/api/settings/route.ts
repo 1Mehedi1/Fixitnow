@@ -4,6 +4,17 @@ import { isAdmin } from "@/lib/auth"
 import { getStoredSiteSettings, saveStoredSiteSettings } from "@/lib/settings-store"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+  "Pragma": "no-cache",
+  "Expires": "0",
+  "Surrogate-Control": "no-store",
+}
 
 /** Public — returns current site settings. */
 export async function GET() {
@@ -20,13 +31,13 @@ export async function GET() {
     services: settings.services,
     heroImages: settings.heroImages,
     typewriterSentences: settings.typewriterSentences || [],
-  })
+  }, { headers: NO_CACHE_HEADERS })
 }
 
 /** Admin only — update site settings. */
 export async function PUT(req: NextRequest) {
   if (!(await isAdmin())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_CACHE_HEADERS })
   }
   const body = await req.json()
   const allowed = [
@@ -58,7 +69,8 @@ export async function PUT(req: NextRequest) {
   const saved = await saveStoredSiteSettings(data)
 
   try {
-    revalidatePath("/")
+    revalidatePath("/", "layout")
+    revalidatePath("/admin", "layout")
   } catch {}
 
   return NextResponse.json({
@@ -70,5 +82,6 @@ export async function PUT(req: NextRequest) {
       typewriterSentencesJson: JSON.stringify(saved.typewriterSentences || []),
     },
     ok: true,
-  })
+  }, { headers: NO_CACHE_HEADERS })
 }
+

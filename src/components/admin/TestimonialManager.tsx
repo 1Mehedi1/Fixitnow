@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
   Plus, Trash2, Star, Loader2, Edit3, Upload,
@@ -43,7 +43,7 @@ const EMPTY_FORM: FormState = {
 }
 
 export function TestimonialManager({ testimonials: initialTestimonials }: Props) {
-  const { customTestimonials, upsertCustomTestimonial, deleteCustomTestimonial } = useStore()
+  const { customTestimonials, setCustomTestimonials, upsertCustomTestimonial, deleteCustomTestimonial } = useStore()
   const activeTestimonials = (customTestimonials && customTestimonials.length > 0)
     ? customTestimonials
     : initialTestimonials
@@ -54,6 +54,21 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
   const [uploadingMedia, setUploadingMedia] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+
+  // Always fetch latest authoritative testimonials from server on mount
+  useEffect(() => {
+    fetch(`/api/testimonials?all=1&_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.testimonials)) {
+          setCustomTestimonials(d.testimonials)
+        }
+      })
+      .catch(() => {})
+  }, [setCustomTestimonials])
 
   const openNew = () => {
     setEditingId(null)
@@ -159,6 +174,20 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
 
       // Reactively update store and localStorage immediately
       upsertCustomTestimonial(savedItem)
+
+      // Refresh from server to ensure 100% cloud sync
+      fetch(`/api/testimonials?all=1&_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (Array.isArray(d.testimonials)) {
+            setCustomTestimonials(d.testimonials)
+          }
+        })
+        .catch(() => {})
+
       toast.success(isEdit ? "Testimonial updated!" : "Testimonial added! It is live on all devices.")
       setOpen(false)
       setForm(EMPTY_FORM)
@@ -174,6 +203,20 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
     try {
       await fetch(`/api/testimonials/${id}`, { method: "DELETE" }).catch(() => {})
       deleteCustomTestimonial(id)
+
+      // Refresh from server
+      fetch(`/api/testimonials?all=1&_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (Array.isArray(d.testimonials)) {
+            setCustomTestimonials(d.testimonials)
+          }
+        })
+        .catch(() => {})
+
       toast.success("Testimonial deleted")
     } catch {
       toast.error("Delete failed")
@@ -188,6 +231,20 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ published: !t.published }),
     }).catch(() => {})
+
+    // Refresh from server
+    fetch(`/api/testimonials?all=1&_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.testimonials)) {
+          setCustomTestimonials(d.testimonials)
+        }
+      })
+      .catch(() => {})
+
     toast.success(updated.published ? "Marked as Live" : "Marked as Hidden")
   }
 
