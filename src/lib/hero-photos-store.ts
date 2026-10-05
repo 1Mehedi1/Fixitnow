@@ -24,8 +24,15 @@ function readJson(filePath: string): string[] | null {
   return null
 }
 
+import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+
 function writeJson(photos: string[]) {
   globalThis.__heroPhotos = photos
+
+  // Sync to Vercel Blob if available
+  if (hasVercelBlob) {
+    saveJsonBlob("store/hero-photos.json", photos).catch(() => {})
+  }
 
   try {
     const dir = path.dirname(HERO_FILE)
@@ -43,6 +50,15 @@ function writeJson(photos: string[]) {
 export async function getStoredHeroPhotos(): Promise<string[]> {
   if (globalThis.__heroPhotos && globalThis.__heroPhotos.length >= 4) {
     return globalThis.__heroPhotos
+  }
+
+  // Try Vercel Blob
+  if (hasVercelBlob) {
+    const fromBlob = await readJsonBlob<string[]>("store/hero-photos.json")
+    if (fromBlob && Array.isArray(fromBlob) && fromBlob.length >= 4) {
+      globalThis.__heroPhotos = fromBlob
+      return fromBlob
+    }
   }
 
   const fromTmp = readJson(TMP_HERO_FILE)

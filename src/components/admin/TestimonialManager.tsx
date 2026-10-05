@@ -147,6 +147,9 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
         body: JSON.stringify(payload),
       })
       const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save testimonial to server")
+      }
 
       const savedItem = data.testimonial || {
         ...payload,
@@ -156,7 +159,7 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
 
       // Reactively update store and localStorage immediately
       upsertCustomTestimonial(savedItem)
-      toast.success(isEdit ? "Testimonial updated!" : "Testimonial added! It is live on the site.")
+      toast.success(isEdit ? "Testimonial updated!" : "Testimonial added! It is live on all devices.")
       setOpen(false)
       setForm(EMPTY_FORM)
     } catch (e: any) {

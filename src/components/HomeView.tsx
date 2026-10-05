@@ -56,73 +56,48 @@ export function HomeView({
     customHeroPhotos, setCustomHeroPhotos,
   } = useStore()
 
-  // Hydrate client-side posts, testimonials, and settings on mount strictly ONCE (zero infinite loops)
+  // Universal cross-device sync on mount: ensure mobile and PC are always 100% in sync with live server data
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("fixitnow_client_posts")
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        const hasOutdatedCategories = Array.isArray(parsed) && (
-          parsed.some((p: any) => p.category === "Renovation" || p.category === "Electrical" || p.category === "Plumbing") ||
-          !parsed.some((p: any) => p.category === "Roofing & Waterproofing")
-        )
-
-        if (Array.isArray(parsed) && parsed.length > 0 && !hasOutdatedCategories) {
-          setCustomPosts(parsed)
-        } else if (posts && posts.length > 0) {
-          setCustomPosts(posts)
+    // 1. Fetch live settings (Branding, trade categories, rate cards, hero text)
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.settings) {
+          setCustomSettings(d.settings)
           try {
-            localStorage.setItem("fixitnow_client_posts", JSON.stringify(posts))
+            localStorage.setItem("fixitnow_client_settings", JSON.stringify(d.settings))
           } catch {}
         }
-      } else if (posts && posts.length > 0) {
-        setCustomPosts(posts)
-      }
-    } catch {}
+      })
+      .catch(() => {})
 
-    try {
-      const storedTests = localStorage.getItem("fixitnow_client_testimonials")
-      if (storedTests) {
-        const parsedTests = JSON.parse(storedTests)
-        if (Array.isArray(parsedTests) && parsedTests.length > 0) {
-          setCustomTestimonials(parsedTests)
-        } else if (testimonials && testimonials.length > 0) {
-          setCustomTestimonials(testimonials)
-        }
-      } else if (testimonials && testimonials.length > 0) {
-        setCustomTestimonials(testimonials)
-      }
-    } catch {}
-
-    try {
-      const storedSettings = localStorage.getItem("fixitnow_client_settings")
-      if (storedSettings) {
-        const parsedSettings = JSON.parse(storedSettings)
-        const hasRoofing = Array.isArray(parsedSettings?.services) && parsedSettings.services.some((s: any) => s.key === "roofing")
-        if (parsedSettings && typeof parsedSettings === "object" && hasRoofing) {
-          setCustomSettings(parsedSettings)
-        } else if (settings) {
-          setCustomSettings(settings)
+    // 2. Fetch live posts (Selected work, portfolio, before/after, covers)
+    fetch("/api/posts?limit=100")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.posts) && d.posts.length > 0) {
+          setCustomPosts(d.posts)
           try {
-            localStorage.setItem("fixitnow_client_settings", JSON.stringify(settings))
+            localStorage.setItem("fixitnow_client_posts", JSON.stringify(d.posts))
           } catch {}
         }
-      } else if (settings) {
-        setCustomSettings(settings)
-      }
-    } catch {}
+      })
+      .catch(() => {})
 
-    try {
-      const storedHero = localStorage.getItem("fixitnow_hero_photos")
-      if (storedHero) {
-        const parsedHero = JSON.parse(storedHero)
-        if (Array.isArray(parsedHero) && parsedHero.length >= 4) {
-          setCustomHeroPhotos(parsedHero)
+    // 3. Fetch live testimonials & proof media (WhatsApp screenshots)
+    fetch("/api/testimonials")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.testimonials) && d.testimonials.length > 0) {
+          setCustomTestimonials(d.testimonials)
+          try {
+            localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(d.testimonials))
+          } catch {}
         }
-      }
-    } catch {}
+      })
+      .catch(() => {})
 
-    // Cross-device sync: fetch latest hero photos from API for any new/mobile visitor
+    // 4. Fetch live hero showcase photos
     fetch("/api/hero-photos")
       .then((r) => r.json())
       .then((d) => {
@@ -134,7 +109,7 @@ export function HomeView({
         }
       })
       .catch(() => {})
-  }, []) // Empty dependency array runs once on mount!
+  }, [setCustomSettings, setCustomPosts, setCustomTestimonials, setCustomHeroPhotos])
 
   const activeSettings = customSettings || settings
   const activePosts = (customPosts && customPosts.length > 0) ? customPosts : posts
@@ -245,7 +220,7 @@ export function HomeView({
               <QuickQuoteCalculator />
               <FeaturedJobs
                 posts={portfolioPosts}
-                title="Selected work"
+                title="Portfolio Selected work"
                 subtitle="Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story."
               />
               {beforeAfterPosts.length > 0 && (

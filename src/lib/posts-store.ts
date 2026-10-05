@@ -29,9 +29,16 @@ function readJsonFile(filePath: string): StoredPost[] | null {
   return null
 }
 
+import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+
 function writeJsonFile(posts: StoredPost[]) {
   // Update memory cache first
   globalThis.__memoryPosts = posts
+
+  // Sync to Vercel Blob if available
+  if (hasVercelBlob) {
+    saveJsonBlob("store/posts.json", posts).catch(() => {})
+  }
 
   // Try writing to DATA_FILE (local dev / persistent storage)
   let wrote = false
@@ -59,21 +66,30 @@ export async function getStoredPosts(): Promise<StoredPost[]> {
     return globalThis.__memoryPosts
   }
 
-  // 2. Try /tmp/fixitnow-posts.json (serverless writable)
+  // 2. Try Vercel Blob
+  if (hasVercelBlob) {
+    const fromBlob = await readJsonBlob<StoredPost[]>("store/posts.json")
+    if (fromBlob && Array.isArray(fromBlob) && fromBlob.length > 0) {
+      globalThis.__memoryPosts = fromBlob
+      return fromBlob
+    }
+  }
+
+  // 3. Try /tmp/fixitnow-posts.json (serverless writable)
   const fromTmp = readJsonFile(TMP_FILE)
   if (fromTmp) {
     globalThis.__memoryPosts = fromTmp
     return fromTmp
   }
 
-  // 3. Try data/posts.json
+  // 4. Try data/posts.json
   const fromData = readJsonFile(DATA_FILE)
   if (fromData) {
     globalThis.__memoryPosts = fromData
     return fromData
   }
 
-  // 4. Fallback default
+  // 5. Fallback default
   globalThis.__memoryPosts = FALLBACK_POSTS as StoredPost[]
   writeJsonFile(globalThis.__memoryPosts)
   return globalThis.__memoryPosts

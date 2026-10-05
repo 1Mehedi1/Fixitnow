@@ -40,8 +40,15 @@ function readJsonFile(filePath: string): any | null {
   return null
 }
 
+import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+
 function writeJsonFile(settings: SiteSettingsT) {
   globalThis.__memorySettings = settings
+
+  // Sync to Vercel Blob if available
+  if (hasVercelBlob) {
+    saveJsonBlob("store/site-settings.json", settings).catch(() => {})
+  }
 
   try {
     const dir = path.dirname(DATA_FILE)
@@ -128,7 +135,17 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
     return globalThis.__memorySettings
   }
 
-  // 2. /tmp file (serverless lambda writable)
+  // 2. Try Vercel Blob
+  if (hasVercelBlob) {
+    const fromBlob = await readJsonBlob<any>("store/site-settings.json")
+    if (fromBlob) {
+      const parsed = parseRawSettings(fromBlob)
+      globalThis.__memorySettings = parsed
+      return parsed
+    }
+  }
+
+  // 3. /tmp file (serverless lambda writable)
   const fromTmp = readJsonFile(TMP_FILE)
   if (fromTmp) {
     const parsed = parseRawSettings(fromTmp)

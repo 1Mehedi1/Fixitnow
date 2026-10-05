@@ -27,8 +27,15 @@ function readJsonFile(filePath: string): StoredTestimonial[] | null {
   return null
 }
 
+import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+
 function writeJsonFile(items: StoredTestimonial[]) {
   globalThis.__memoryTestimonials = items
+
+  // Sync to Vercel Blob if available
+  if (hasVercelBlob) {
+    saveJsonBlob("store/testimonials.json", items).catch(() => {})
+  }
 
   try {
     const dir = path.dirname(DATA_FILE)
@@ -47,6 +54,16 @@ export async function getStoredTestimonials(): Promise<StoredTestimonial[]> {
   if (globalThis.__memoryTestimonials && globalThis.__memoryTestimonials.length > 0) {
     return globalThis.__memoryTestimonials
   }
+
+  // Try Vercel Blob
+  if (hasVercelBlob) {
+    const fromBlob = await readJsonBlob<StoredTestimonial[]>("store/testimonials.json")
+    if (fromBlob && Array.isArray(fromBlob) && fromBlob.length > 0) {
+      globalThis.__memoryTestimonials = fromBlob
+      return fromBlob
+    }
+  }
+
   const fromTmp = readJsonFile(TMP_FILE)
   if (fromTmp) {
     globalThis.__memoryTestimonials = fromTmp

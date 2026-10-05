@@ -156,17 +156,21 @@ export function PostEditor() {
         })),
       }
 
-      // Update Zustand and localStorage FIRST (immediate guaranteed client update)
-      upsertCustomPost(savedPost)
-
-      // Send to server
-      fetch(url, {
+      // Send to server first and await persistence confirmation
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      }).catch((err) => console.warn("Background server save notice:", err))
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data.error || "Server failed to save post")
+      }
 
-      toast.success(isNew ? "Post created! It is live on the site." : "Post saved! Updates are live on the site.")
+      const finalPost = data.post || savedPost
+      upsertCustomPost(finalPost)
+
+      toast.success(isNew ? "Post created! It is live on all devices." : "Post saved! Updates are live on all devices.")
       closeEditor()
     } catch (e: any) {
       toast.error("Save failed", { description: e.message })
@@ -452,29 +456,33 @@ export function PostEditor() {
           )}
         </div>
 
-        {/* Fixed Footer with Secondary Save Button */}
-        <div className="border-t border-slate-800 px-6 py-3.5 flex items-center justify-between gap-3 bg-slate-950/90 shrink-0">
-          <div className="flex items-center gap-2">
-            {form.featured && <Badge className="bg-amber-500/20 text-amber-400 border-0 text-xs">Featured</Badge>}
+        {/* Responsive Sticky Footer — Always fully visible and clickable on all screens */}
+        <div className="border-t border-slate-800 px-4 sm:px-6 py-3 bg-slate-950/95 shrink-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+          <div className="hidden sm:flex items-center gap-2 overflow-hidden">
+            {form.featured && <Badge className="bg-amber-500/20 text-amber-400 border-0 text-xs shrink-0">Featured</Badge>}
             {form.published ? (
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs">Published</Badge>
+              <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs shrink-0">Published</Badge>
             ) : (
-              <Badge variant="outline" className="text-slate-400 text-xs">Draft</Badge>
+              <Badge variant="outline" className="text-slate-400 text-xs shrink-0">Draft</Badge>
             )}
-            <Badge variant="secondary" className="bg-slate-800 text-slate-300 text-xs">{form.category}</Badge>
+            <Badge variant="secondary" className="bg-slate-800 text-slate-300 text-xs truncate max-w-[140px]">{form.category}</Badge>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <Button variant="ghost" onClick={closeEditor} className="text-slate-400 hover:text-white cursor-pointer">
+          <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto ml-auto shrink-0">
+            <Button
+              variant="ghost"
+              onClick={closeEditor}
+              className="text-slate-400 hover:text-white cursor-pointer px-4 h-10"
+            >
               Cancel
             </Button>
             <Button
               onClick={save}
               disabled={saving || loading}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-10 px-5 shadow-md cursor-pointer"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-10 px-5 shadow-lg shadow-emerald-950/50 cursor-pointer shrink-0 min-w-[130px]"
             >
               {saving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Save className="h-4 w-4 mr-1.5" />}
-              {saving ? "Saving Changes…" : "Save Changes"}
+              {saving ? "Saving…" : "Save Changes"}
             </Button>
           </div>
         </div>

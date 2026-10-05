@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowRight, MapPin, Eye } from "lucide-react"
+import { ArrowRight, MapPin, Eye, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -98,6 +98,7 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
             <Eye className="h-3 w-3" /> View
           </div>
         </div>
+
         <CardContent className="p-5">
           <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
             {post.title}
@@ -141,7 +142,7 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
   )
 }
 
-export function FeaturedJobs({ posts, title = "Recent work", subtitle, showAll = false, emptyMessage }: Props) {
+export function FeaturedJobs({ posts, title = "Portfolio Selected work", subtitle, showAll = false, emptyMessage }: Props) {
   const { setView } = useStore()
   const display = showAll ? posts : posts.slice(0, 6)
 
@@ -153,23 +154,41 @@ export function FeaturedJobs({ posts, title = "Recent work", subtitle, showAll =
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-10"
+          className="mb-8 sm:mb-12 space-y-4"
         >
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary mb-3 sm:mb-4 uppercase tracking-wider">
-              Portfolio
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3.5 py-1 text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+                <Sparkles className="h-3.5 w-3.5 fill-current" />
+                Portfolio
+              </div>
+              <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">
+                Portfolio Selected work
+              </h2>
             </div>
-            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-balance">
-              {title}
-            </h2>
-            {subtitle && <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 sm:mt-3 text-pretty">{subtitle}</p>}
+            {!showAll && posts.length > 6 && (
+              <Button variant="ghost" className="self-start sm:self-auto hover:bg-primary/10" onClick={() => setView("portfolio")}>
+                See all work
+                <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            )}
           </div>
-          {!showAll && posts.length > 6 && (
-            <Button variant="ghost" className="self-start sm:self-auto" onClick={() => setView("portfolio")}>
-              See all work
-              <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          )}
+
+          {/* Highlighted responsive subtitle card with cool hover effect in one straight line */}
+          <div className="w-full">
+            <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/25 dark:border-emerald-400/30 bg-gradient-to-r from-emerald-500/10 via-card to-emerald-500/5 dark:from-[#0d281a]/70 dark:via-[#112318]/60 dark:to-[#0b1f13]/70 p-3.5 sm:p-4.5 px-4 sm:px-6 shadow-xs hover:shadow-lg hover:shadow-emerald-500/10 hover:border-emerald-500/50 transition-all duration-300 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 w-full">
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                </span>
+                <p className="text-xs sm:text-sm md:text-base font-semibold text-foreground/90 dark:text-emerald-100 tracking-tight leading-relaxed group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
+                  Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story.
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-emerald-500 shrink-0 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all hidden md:block" />
+            </div>
+          </div>
         </motion.div>
 
         {display.length === 0 ? (

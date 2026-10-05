@@ -1,40 +1,45 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Check, X, ShieldAlert, Award, UserCheck } from "lucide-react"
+import { Check, X, ShieldAlert, Award, UserCheck, ShieldCheck, Zap, ArrowRight, MessageCircle } from "lucide-react"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 
-const COMPARISON = [
+const COMPARISON_ROWS = [
   {
     feature: "Pricing Transparency",
-    fixitnow: "Direct contractor trade rates (0% middleman markup)",
-    others: "25% to 35% broker markup added by aggregator platforms & IDs",
+    directTitle: "0% Middleman Markups",
+    directDesc: "Fair trade rates with zero broker platform fee added. You pay only for genuine parts and skilled labor.",
+    brokerTitle: "25% to 35% Inflated Markup",
+    brokerDesc: "Aggregator platforms and sales portals take a steep 25%–35% commission on top of the repair cost.",
   },
   {
-    feature: "Who Actually Does the Work?",
-    fixitnow: "Executed directly by registered trade entity (4R ENGINEERING PTE. LTD.)",
-    others: "Subcontracted out to unknown random third-party freelancers",
+    feature: "Workmanship Execution",
+    directTitle: "Direct Registered Trade Contractor",
+    directDesc: "Executed directly by our registered Singapore team (4R ENGINEERING PTE. LTD. · UEN: 202143324G).",
+    brokerTitle: "Outsourced to Unknown Freelancers",
+    brokerDesc: "Jobs are auctioned to random third-party handymen with no verified quality control.",
   },
   {
-    feature: "Direct Technical Communication",
-    fixitnow: "Direct WhatsApp with master trade specialist Tanbir",
-    others: "Relayed through non-technical customer service call centers",
+    feature: "Technical Communication",
+    directTitle: "Direct WhatsApp with Master Specialist",
+    directDesc: "Speak straight to technician Tanbir. Send photos, get immediate technical advice and instant fixes.",
+    brokerTitle: "Non-Technical Call Centers",
+    brokerDesc: "Customer service agents relay generic messages back and forth with endless delays.",
   },
   {
     feature: "Warranty Accountability",
-    fixitnow: "1 Direct Specialist, 1 Phone Number, 1 Firm Workmanship Warranty",
-    others: "Finger-pointing between platform customer service and subcontractors",
+    directTitle: "1 Specialist · 1 Phone · 7-Day Guarantee",
+    directDesc: "Zero finger-pointing. If any fitting needs tweaking within 7 days, we return promptly to fix it.",
+    brokerTitle: "Finger-Pointing Liability Runaround",
+    brokerDesc: "Brokers blame the subcontractor; subcontractors claim the platform underquoted. You get stuck in between.",
   },
   {
-    feature: "Turnaround & Scheduling",
-    fixitnow: "Same-day emergency response or scheduled weekend slots islandwide",
-    others: "Coordination delays waiting for an available subcontractor",
-  },
-  {
-    feature: "Legal Singapore Entity",
-    fixitnow: "ACRA Registered UEN: 202143324G · Company: 4R ENGINEERING PTE. LTD.",
-    others: "Often disclaim on-site liability in platform fine print terms",
+    feature: "Scheduling & Response",
+    directTitle: "Same-Day Emergency & Weekend Slots",
+    directDesc: "Direct dispatch islandwide across Singapore HDBs, condos, and landed properties.",
+    brokerTitle: "Multi-Day Scheduling Delays",
+    brokerDesc: "Prolonged back-and-forth waiting for a subcontractor to accept the job.",
   },
 ]
 
@@ -42,92 +47,148 @@ export function ComparisonTable() {
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
 
   return (
-    <section className="py-12 sm:py-20 lg:py-24 tech-grid-slate relative overflow-hidden">
-      <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <section className="py-14 sm:py-20 lg:py-24 relative overflow-hidden bg-background">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-14 max-w-2xl mx-auto"
+          className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto"
         >
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            Direct Trade Specialist vs Platform Middlemen
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 dark:bg-emerald-400/20 border border-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-3.5 uppercase tracking-wider shadow-xs">
+            <Zap className="h-3.5 w-3.5 fill-current" />
+            Direct Contractor vs Platform Brokers
           </div>
-          <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-balance">
+          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-balance text-foreground">
             Direct Trade Contractor vs. Aggregator Brokers
           </h2>
-          <p className="text-xs sm:text-base text-muted-foreground mt-2.5 sm:mt-3 leading-relaxed">
+          <p className="text-xs sm:text-base text-muted-foreground mt-3 leading-relaxed">
             Why pay 25%–35% extra for aggregator platform fees and outsourced middlemen? Deal directly with the registered Singapore trade specialist who actually executes your work.
           </p>
         </motion.div>
 
-        <div className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-sm">
-          {/* Mobile stacked card view */}
-          <div className="md:hidden divide-y divide-border/60">
-            {COMPARISON.map((row, i) => (
-              <div key={i} className="p-4 space-y-2.5">
-                <div className="font-bold text-xs uppercase tracking-wide text-primary">
-                  {row.feature}
+        {/* Visual Comparison Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+          {/* Winner Card: Fixitnow Direct Contractor */}
+          <div className="rounded-3xl border-2 border-emerald-500/50 dark:border-emerald-400/60 bg-gradient-to-b from-emerald-500/[0.08] via-card to-card p-6 sm:p-8 flex flex-col justify-between shadow-xl shadow-emerald-500/10 relative overflow-hidden">
+            {/* Top Recommended Banner */}
+            <div className="absolute top-0 right-0 bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest py-1 px-4 rounded-bl-xl shadow-sm">
+              Recommended Choice
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black">
+                  <ShieldCheck className="h-6 w-6" />
                 </div>
-                <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 flex items-start gap-2.5 text-xs font-semibold text-foreground">
-                  <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-primary font-bold mr-1">{s.brand} (Direct):</span>
-                    {row.fixitnow}
-                  </div>
-                </div>
-                <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 flex items-start gap-2.5 text-xs text-muted-foreground">
-                  <X className="h-4 w-4 text-destructive/70 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-medium mr-1 text-foreground/80">Platform Brokers / Middlemen:</span>
-                    {row.others}
-                  </div>
+                <div>
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-foreground">
+                    {s.brand} (Direct Specialist)
+                  </h3>
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    4R ENGINEERING PTE. LTD. · UEN: 202143324G
+                  </p>
                 </div>
               </div>
-            ))}
+
+              {/* Price advantage banner */}
+              <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 mb-6 flex items-center justify-between gap-3">
+                <div className="text-xs font-bold text-emerald-950 dark:text-emerald-200">
+                  Direct Trade Rates · Zero Platform Fees
+                </div>
+                <span className="font-mono text-xs font-black bg-emerald-600 text-white px-2.5 py-1 rounded-lg shrink-0">
+                  SAVE 25%–35%
+                </span>
+              </div>
+
+              {/* Feature Checklist */}
+              <div className="space-y-4">
+                {COMPARISON_ROWS.map((row, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-emerald-500/5 transition-colors">
+                    <div className="h-6 w-6 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="h-3.5 w-3.5 stroke-[3]" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-foreground">
+                        {row.directTitle}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                        {row.directDesc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-emerald-500/20">
+              <a
+                href={whatsappLink(s, `Hi ${s.workerName || "Tanbir"}, I'd like a direct quote with 0% middleman fees.`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-6 text-sm shadow-md shadow-emerald-950/30 transition-all hover:scale-[1.01] cursor-pointer"
+              >
+                <MessageCircle className="h-4 w-4 fill-current shrink-0" />
+                <span>Chat Direct with Specialist on WhatsApp</span>
+                <ArrowRight className="h-4 w-4 ml-1 shrink-0" />
+              </a>
+            </div>
           </div>
 
-          {/* Desktop table view */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[540px]">
-              <thead>
-                <tr className="border-b border-border/80 bg-muted/30">
-                  <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">
-                    Factor
-                  </th>
-                  <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 w-1/3">
-                    <span className="flex items-center gap-1.5">
-                      <UserCheck className="h-4 w-4" /> {s.brand} (Direct Trade Contractor)
-                    </span>
-                  </th>
-                  <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/3">
-                    Aggregator Platforms / Broker Middlemen
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60 text-xs sm:text-sm">
-                {COMPARISON.map((row, i) => (
-                  <tr key={i} className="hover:bg-muted/20 transition-colors">
-                    <td className="p-4 sm:p-5 font-semibold text-foreground">
-                      {row.feature}
-                    </td>
-                    <td className="p-4 sm:p-5 bg-primary/5 text-foreground font-medium">
-                      <div className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                        <span>{row.fixitnow}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 sm:p-5 text-muted-foreground">
-                      <div className="flex items-start gap-2">
-                        <X className="h-4 w-4 text-destructive/70 shrink-0 mt-0.5" />
-                        <span>{row.others}</span>
-                      </div>
-                    </td>
-                  </tr>
+          {/* Aggregator Platforms Card */}
+          <div className="rounded-3xl border border-border/80 bg-card/60 p-6 sm:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-12 w-12 rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 flex items-center justify-center font-black">
+                  <ShieldAlert className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-xl sm:text-2xl text-foreground">
+                    Aggregator Platforms & Brokers
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-medium">
+                    Third-Party Directories & Lead Resellers
+                  </p>
+                </div>
+              </div>
+
+              {/* Price penalty banner */}
+              <div className="p-3.5 rounded-2xl bg-destructive/10 border border-destructive/20 mb-6 flex items-center justify-between gap-3">
+                <div className="text-xs font-semibold text-destructive dark:text-red-300">
+                  Hidden 25%–35% Broker Markups Added
+                </div>
+                <span className="font-mono text-xs font-bold bg-destructive/20 text-destructive dark:text-red-300 px-2.5 py-1 rounded-lg shrink-0">
+                  +30% COST
+                </span>
+              </div>
+
+              {/* Feature Checklist */}
+              <div className="space-y-4">
+                {COMPARISON_ROWS.map((row, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-2.5 rounded-xl opacity-80">
+                    <div className="h-6 w-6 rounded-full bg-destructive/10 text-destructive flex items-center justify-center shrink-0 mt-0.5">
+                      <X className="h-3.5 w-3.5 stroke-[3]" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-semibold text-foreground/90">
+                        {row.brokerTitle}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                        {row.brokerDesc}
+                      </p>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-border/50 text-center">
+              <span className="text-xs text-muted-foreground italic font-medium">
+                "Platform terms frequently disclaim on-site liability for third-party subcontractors."
+              </span>
+            </div>
           </div>
         </div>
       </div>
