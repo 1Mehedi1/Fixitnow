@@ -260,7 +260,14 @@ export function Hero() {
               <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full">
                 {heroPhotos.slice(0, 4).map((imgUrl, i) => (
                   <div key={i} className="aspect-[4/3] rounded-xl overflow-hidden shadow-xs border border-border/80 relative">
-                    <img src={imgUrl} alt={`Showcase work ${i + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={imgUrl}
+                      alt={`Showcase work ${i + 1}`}
+                      className="w-full h-full object-cover"
+                      loading="eager"
+                      decoding="async"
+                      fetchPriority={i === 0 ? "high" : "auto"}
+                    />
                   </div>
                 ))}
               </div>
@@ -287,6 +294,8 @@ export function Hero() {
                     alt="Work showcase 1"
                     className="h-full w-full object-cover hover:scale-105 transition duration-500"
                     loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
                   />
                 </div>
                 <div className="aspect-square rounded-3xl overflow-hidden shadow-xl shadow-black/10 border border-border/50">
@@ -294,7 +303,9 @@ export function Hero() {
                     src={heroPhotos[1]}
                     alt="Work showcase 2"
                     className="h-full w-full object-cover hover:scale-105 transition duration-500"
-                    loading="lazy"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
                   />
                 </div>
               </motion.div>
@@ -309,7 +320,8 @@ export function Hero() {
                     src={heroPhotos[2]}
                     alt="Work showcase 3"
                     className="h-full w-full object-cover hover:scale-105 transition duration-500"
-                    loading="lazy"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-xl shadow-black/10 border border-border/50">
@@ -317,7 +329,8 @@ export function Hero() {
                     src={heroPhotos[3]}
                     alt="Work showcase 4"
                     className="h-full w-full object-cover hover:scale-105 transition duration-500"
-                    loading="lazy"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
               </motion.div>

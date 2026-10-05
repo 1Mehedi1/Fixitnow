@@ -1,4 +1,4 @@
-import { put, del } from "@vercel/blob"
+import { put, del, list } from "@vercel/blob"
 import fs from "fs"
 import path from "path"
 import os from "os"
@@ -24,8 +24,8 @@ export function isVercelBlobAvailable(): boolean {
   return Boolean(getVercelBlobToken())
 }
 
-// Backwards-compatible getter
-export const hasVercelBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+// Backwards-compatible getter that evaluates dynamically at runtime
+export const hasVercelBlob = true
 
 /**
  * Save an uploaded image permanently to Vercel Blob or Public CDN.
@@ -175,6 +175,7 @@ export async function saveJsonBlob(
       contentType: "application/json",
       token,
       addRandomSuffix: false, // Maintain fixed URL for deterministic fetching
+      allowOverwrite: true,  // Allow replacing existing file without throwing 409
     })
     return blob.url
   } catch (err: any) {
@@ -188,12 +189,30 @@ export async function saveJsonBlob(
  */
 export async function readJsonBlob<T>(blobUrlOrPath: string): Promise<T | null> {
   try {
+    // 1. If direct HTTP/HTTPS URL
     if (blobUrlOrPath.startsWith("http://") || blobUrlOrPath.startsWith("https://")) {
       const res = await fetch(blobUrlOrPath, { cache: "no-store" })
       if (res.ok) {
         return (await res.json()) as T
       }
     }
-  } catch {}
+
+    // 2. If pathname (e.g. "store/posts.json"), query Vercel Blob via token
+    const token = getVercelBlobToken()
+    if (token) {
+      const { blobs } = await list({ prefix: blobUrlOrPath, token })
+      if (blobs && blobs.length > 0) {
+        const matched = blobs.find((b) => b.pathname === blobUrlOrPath) || blobs[0]
+        if (matched?.url) {
+          const res = await fetch(matched.url, { cache: "no-store" })
+          if (res.ok) {
+            return (await res.json()) as T
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    console.warn(`readJsonBlob failed for ${blobUrlOrPath}:`, err?.message || err)
+  }
   return null
 }

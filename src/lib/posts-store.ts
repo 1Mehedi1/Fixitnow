@@ -29,15 +29,17 @@ function readJsonFile(filePath: string): StoredPost[] | null {
   return null
 }
 
-import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+import { saveJsonBlob, readJsonBlob } from "./storage-sync"
 
-function writeJsonFile(posts: StoredPost[]) {
+async function writeJsonFile(posts: StoredPost[]) {
   // Update memory cache first
   globalThis.__memoryPosts = posts
 
-  // Sync to Vercel Blob if available
-  if (hasVercelBlob) {
-    saveJsonBlob("store/posts.json", posts).catch(() => {})
+  // Sync to Vercel Blob if available (awaited to guarantee persistence before Lambda completes)
+  try {
+    await saveJsonBlob("store/posts.json", posts)
+  } catch (err) {
+    console.warn("Error persisting posts to Vercel Blob:", err)
   }
 
   // Try writing to DATA_FILE (local dev / persistent storage)
@@ -61,18 +63,18 @@ function writeJsonFile(posts: StoredPost[]) {
 }
 
 export async function getStoredPosts(): Promise<StoredPost[]> {
-  // 1. In-memory cache
-  if (globalThis.__memoryPosts && globalThis.__memoryPosts.length > 0) {
-    return globalThis.__memoryPosts
-  }
-
-  // 2. Try Vercel Blob
-  if (hasVercelBlob) {
+  // 1. Try Vercel Blob first so cross-device sync always gets the latest cloud data!
+  try {
     const fromBlob = await readJsonBlob<StoredPost[]>("store/posts.json")
     if (fromBlob && Array.isArray(fromBlob) && fromBlob.length > 0) {
       globalThis.__memoryPosts = fromBlob
       return fromBlob
     }
+  } catch {}
+
+  // 2. In-memory cache
+  if (globalThis.__memoryPosts && globalThis.__memoryPosts.length > 0) {
+    return globalThis.__memoryPosts
   }
 
   // 3. Try /tmp/fixitnow-posts.json (serverless writable)
@@ -89,9 +91,8 @@ export async function getStoredPosts(): Promise<StoredPost[]> {
     return fromData
   }
 
-  // 5. Fallback default
+  // 5. Fallback default (Do NOT overwrite Vercel Blob with fallback on read)
   globalThis.__memoryPosts = FALLBACK_POSTS as StoredPost[]
-  writeJsonFile(globalThis.__memoryPosts)
   return globalThis.__memoryPosts
 }
 
@@ -173,7 +174,7 @@ export async function saveStoredPost(data: any): Promise<StoredPost> {
     posts.unshift(postRecord)
   }
 
-  writeJsonFile(posts)
+  await writeJsonFile(posts)
 
   // Background sync to Prisma if configured
   try {
@@ -223,7 +224,7 @@ export async function saveStoredPost(data: any): Promise<StoredPost> {
 export async function deleteStoredPost(id: string): Promise<boolean> {
   const posts = await getStoredPosts()
   const filtered = posts.filter((p) => p.id !== id)
-  writeJsonFile(filtered)
+  await writeJsonFile(filtered)
 
   try {
     const hasValidPostgres =

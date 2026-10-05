@@ -122,10 +122,10 @@ export function BeforeAfterSection({ posts }: Props) {
                 className="cursor-pointer group h-full"
                 onClick={() => openPost(post)}
               >
-                <Card className="overflow-hidden border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between">
+                <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between">
                   {/* Image / slider */}
                   {hasSlider ? (
-                    <div onClick={(e) => e.stopPropagation()} className="relative">
+                    <div onClick={(e) => e.stopPropagation()} className="relative rounded-t-xl overflow-hidden">
                       <BeforeAfterSlider
                         before={before!.url}
                         after={after!.url}
@@ -136,7 +136,7 @@ export function BeforeAfterSection({ posts }: Props) {
                       </Badge>
                     </div>
                   ) : (
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0">
                       {single && (
                         <img
                           src={single}

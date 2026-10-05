@@ -27,14 +27,16 @@ function readJsonFile(filePath: string): StoredTestimonial[] | null {
   return null
 }
 
-import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+import { saveJsonBlob, readJsonBlob } from "./storage-sync"
 
-function writeJsonFile(items: StoredTestimonial[]) {
+async function writeJsonFile(items: StoredTestimonial[]) {
   globalThis.__memoryTestimonials = items
 
-  // Sync to Vercel Blob if available
-  if (hasVercelBlob) {
-    saveJsonBlob("store/testimonials.json", items).catch(() => {})
+  // Sync to Vercel Blob if available (awaited to guarantee persistence before Lambda completes)
+  try {
+    await saveJsonBlob("store/testimonials.json", items)
+  } catch (err) {
+    console.warn("Error persisting testimonials to Vercel Blob:", err)
   }
 
   try {
@@ -51,31 +53,36 @@ function writeJsonFile(items: StoredTestimonial[]) {
 }
 
 export async function getStoredTestimonials(): Promise<StoredTestimonial[]> {
-  if (globalThis.__memoryTestimonials && globalThis.__memoryTestimonials.length > 0) {
-    return globalThis.__memoryTestimonials
-  }
-
-  // Try Vercel Blob
-  if (hasVercelBlob) {
+  // 1. Try Vercel Blob first so cross-device sync always gets the latest cloud data!
+  try {
     const fromBlob = await readJsonBlob<StoredTestimonial[]>("store/testimonials.json")
     if (fromBlob && Array.isArray(fromBlob) && fromBlob.length > 0) {
       globalThis.__memoryTestimonials = fromBlob
       return fromBlob
     }
+  } catch {}
+
+  // 2. In-memory cache
+  if (globalThis.__memoryTestimonials && globalThis.__memoryTestimonials.length > 0) {
+    return globalThis.__memoryTestimonials
   }
 
+  // 3. Try /tmp
   const fromTmp = readJsonFile(TMP_FILE)
   if (fromTmp) {
     globalThis.__memoryTestimonials = fromTmp
     return fromTmp
   }
+
+  // 4. Try data file
   const fromData = readJsonFile(DATA_FILE)
   if (fromData) {
     globalThis.__memoryTestimonials = fromData
     return fromData
   }
+
+  // 5. Fallback default (Do NOT overwrite Vercel Blob with fallback on read)
   globalThis.__memoryTestimonials = FALLBACK_TESTIMONIALS as StoredTestimonial[]
-  writeJsonFile(globalThis.__memoryTestimonials)
   return globalThis.__memoryTestimonials
 }
 
@@ -110,7 +117,7 @@ export async function saveStoredTestimonial(data: any): Promise<StoredTestimonia
     items.unshift(record)
   }
 
-  writeJsonFile(items)
+  await writeJsonFile(items)
 
   try {
     const hasValidPostgres =
@@ -149,7 +156,7 @@ export async function saveStoredTestimonial(data: any): Promise<StoredTestimonia
 export async function deleteStoredTestimonial(id: string): Promise<boolean> {
   const items = await getStoredTestimonials()
   const filtered = items.filter((t) => t.id !== id)
-  writeJsonFile(filtered)
+  await writeJsonFile(filtered)
 
   try {
     const hasValidPostgres =

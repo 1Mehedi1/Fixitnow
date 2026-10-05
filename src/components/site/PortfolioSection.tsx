@@ -122,8 +122,8 @@ export function PortfolioSection({ posts }: Props) {
                 className="cursor-pointer group"
                 onClick={() => openPost(post)}
               >
-                <Card className="overflow-hidden border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0">
                     {hasBeforeAfter && before && after ? (
                       <div className="absolute inset-0 flex">
                         <div className="relative w-1/2 h-full overflow-hidden border-r border-white/40">

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { useStore } from "@/store/useStore"
 import type { Testimonial } from "@prisma/client"
 
 interface Props {
@@ -14,9 +15,13 @@ interface Props {
 }
 
 export function Testimonials({ testimonials }: Props) {
+  const { customTestimonials } = useStore()
+  const activeTestimonials = (customTestimonials && customTestimonials.length > 0)
+    ? customTestimonials
+    : testimonials
   const [selectedProof, setSelectedProof] = useState<{ url: string; name: string } | null>(null)
 
-  const publishedList = (testimonials || []).filter((t) => t.published !== false)
+  const publishedList = (activeTestimonials || []).filter((t) => t.published !== false)
   if (publishedList.length === 0) return null
 
   return (

@@ -89,10 +89,10 @@ export interface SiteSettingsT {
 }
 
 export const DEFAULT_HERO_IMAGES = [
-  "https://files.catbox.moe/xx0tqh.jpg",
-  "https://files.catbox.moe/fcb1g7.jpg",
-  "https://files.catbox.moe/6pj5rs.jpg",
-  "https://files.catbox.moe/g2969p.jpg",
+  "/hero/hero-1.webp",
+  "/hero/hero-2.webp",
+  "/hero/hero-3.webp",
+  "/hero/hero-4.webp",
 ]
 
 const DEFAULT_SERVICES: ServiceItem[] = [

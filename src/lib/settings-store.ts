@@ -40,14 +40,16 @@ function readJsonFile(filePath: string): any | null {
   return null
 }
 
-import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+import { saveJsonBlob, readJsonBlob } from "./storage-sync"
 
-function writeJsonFile(settings: SiteSettingsT) {
+async function writeJsonFile(settings: SiteSettingsT) {
   globalThis.__memorySettings = settings
 
-  // Sync to Vercel Blob if available
-  if (hasVercelBlob) {
-    saveJsonBlob("store/site-settings.json", settings).catch(() => {})
+  // Sync to Vercel Blob if available (awaited to guarantee persistence before Lambda completes)
+  try {
+    await saveJsonBlob("store/site-settings.json", settings)
+  } catch (err) {
+    console.warn("Error persisting site settings to Vercel Blob:", err)
   }
 
   try {
@@ -130,19 +132,19 @@ export function parseRawSettings(raw: any): SiteSettingsT {
 }
 
 export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
-  // 1. In-memory cache
-  if (globalThis.__memorySettings) {
-    return globalThis.__memorySettings
-  }
-
-  // 2. Try Vercel Blob
-  if (hasVercelBlob) {
+  // 1. Try Vercel Blob first so cross-device sync always gets the latest cloud settings!
+  try {
     const fromBlob = await readJsonBlob<any>("store/site-settings.json")
     if (fromBlob) {
       const parsed = parseRawSettings(fromBlob)
       globalThis.__memorySettings = parsed
       return parsed
     }
+  } catch {}
+
+  // 2. In-memory cache
+  if (globalThis.__memorySettings) {
+    return globalThis.__memorySettings
   }
 
   // 3. /tmp file (serverless lambda writable)
@@ -153,7 +155,7 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
     return parsed
   }
 
-  // 3. data/site-settings.json
+  // 4. data/site-settings.json
   const fromData = readJsonFile(DATA_FILE)
   if (fromData) {
     const parsed = parseRawSettings(fromData)
@@ -231,7 +233,7 @@ export async function saveStoredSiteSettings(data: any): Promise<SiteSettingsT> 
     typewriterSentencesJson: JSON.stringify(typewriterSentences),
   }
   const settings = parseRawSettings(mergedRaw)
-  writeJsonFile(settings)
+  await writeJsonFile(settings)
 
   // Background sync to Prisma if configured
   try {

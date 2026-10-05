@@ -37,26 +37,41 @@ const NAV: { key: AdminTab; label: string; icon: any }[] = [
 
 export function AdminPanel({ posts, testimonials }: Props) {
   const { data: session, status } = useSession()
-  const { adminTab, setAdminTab, setView, openEditor, customPosts, setCustomPosts } = useStore()
+  const {
+    adminTab, setAdminTab, setView, openEditor,
+    customPosts, setCustomPosts,
+    customTestimonials, setCustomTestimonials,
+  } = useStore()
 
-  // Ensure full post list is present in customPosts so edits never wipe siblings
+  // Ensure full live post list and testimonials are present from server on mount
   useEffect(() => {
-    if (!customPosts && posts && posts.length > 0) {
-      try {
-        const stored = localStorage.getItem("fixitnow_client_posts")
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setCustomPosts(parsed)
-            return
-          }
+    fetch("/api/posts?limit=100")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.posts) && d.posts.length > 0) {
+          setCustomPosts(d.posts)
+          try {
+            localStorage.setItem("fixitnow_client_posts", JSON.stringify(d.posts))
+          } catch {}
         }
-      } catch {}
-      setCustomPosts(posts)
-    }
-  }, [customPosts, posts, setCustomPosts])
+      })
+      .catch(() => {})
+
+    fetch("/api/testimonials")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.testimonials) && d.testimonials.length > 0) {
+          setCustomTestimonials(d.testimonials)
+          try {
+            localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(d.testimonials))
+          } catch {}
+        }
+      })
+      .catch(() => {})
+  }, [setCustomPosts, setCustomTestimonials])
 
   const activePosts = customPosts || posts
+  const activeTestimonials = (customTestimonials && customTestimonials.length > 0) ? customTestimonials : testimonials
 
   // Show login screen if unauthenticated
   if (status === "loading") {
@@ -73,7 +88,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
   const counts = {
     posts: activePosts.length,
     portfolio: activePosts.filter((p) => p.type === "portfolio").length,
-    testimonials: testimonials.length,
+    testimonials: activeTestimonials.length,
   }
 
   return (
@@ -244,7 +259,7 @@ export function AdminPanel({ posts, testimonials }: Props) {
 
           {adminTab === "heroPhotos" && <HeroManager />}
           {adminTab === "posts" && <PostList posts={activePosts} />}
-          {adminTab === "testimonials" && <TestimonialManager testimonials={testimonials} />}
+          {adminTab === "testimonials" && <TestimonialManager testimonials={activeTestimonials} />}
           {adminTab === "analytics" && <AnalyticsDashboard />}
           {adminTab === "settings" && <SettingsManager />}
         </motion.div>

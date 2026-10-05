@@ -24,14 +24,16 @@ function readJson(filePath: string): string[] | null {
   return null
 }
 
-import { saveJsonBlob, readJsonBlob, hasVercelBlob } from "./storage-sync"
+import { saveJsonBlob, readJsonBlob } from "./storage-sync"
 
-function writeJson(photos: string[]) {
+async function writeJson(photos: string[]) {
   globalThis.__heroPhotos = photos
 
-  // Sync to Vercel Blob if available
-  if (hasVercelBlob) {
-    saveJsonBlob("store/hero-photos.json", photos).catch(() => {})
+  // Sync to Vercel Blob if available (awaited to guarantee persistence before Lambda completes)
+  try {
+    await saveJsonBlob("store/hero-photos.json", photos)
+  } catch (err) {
+    console.warn("Error persisting hero photos to Vercel Blob:", err)
   }
 
   try {
@@ -48,39 +50,36 @@ function writeJson(photos: string[]) {
 }
 
 export async function getStoredHeroPhotos(): Promise<string[]> {
-  if (globalThis.__heroPhotos && globalThis.__heroPhotos.length >= 4) {
-    return globalThis.__heroPhotos
-  }
-
-  // Try Vercel Blob
-  if (hasVercelBlob) {
+  // 1. Try Vercel Blob first so cross-device sync always gets the latest cloud photos!
+  try {
     const fromBlob = await readJsonBlob<string[]>("store/hero-photos.json")
     if (fromBlob && Array.isArray(fromBlob) && fromBlob.length >= 4) {
       globalThis.__heroPhotos = fromBlob
       return fromBlob
     }
+  } catch {}
+
+  // 2. In-memory cache
+  if (globalThis.__heroPhotos && globalThis.__heroPhotos.length >= 4) {
+    return globalThis.__heroPhotos
   }
 
+  // 3. /tmp
   const fromTmp = readJson(TMP_HERO_FILE)
   if (fromTmp && fromTmp.length >= 4) {
     globalThis.__heroPhotos = fromTmp
     return fromTmp
   }
 
+  // 4. data file
   const fromData = readJson(HERO_FILE)
   if (fromData && fromData.length >= 4) {
     globalThis.__heroPhotos = fromData
     return fromData
   }
 
-  const fallback = [
-    "https://files.catbox.moe/xx0tqh.jpg",
-    "https://files.catbox.moe/fcb1g7.jpg",
-    "https://files.catbox.moe/6pj5rs.jpg",
-    "https://files.catbox.moe/g2969p.jpg",
-  ]
+  const fallback = [...DEFAULT_HERO_IMAGES]
   globalThis.__heroPhotos = fallback
-  writeJson(fallback)
   return fallback
 }
 
@@ -94,7 +93,7 @@ export async function saveStoredHeroPhotos(photos: string[]): Promise<string[]> 
     return current[i] || DEFAULT_HERO_IMAGES[i]
   })
 
-  writeJson(cleaned)
+  await writeJson(cleaned)
 
   // Sync to settings-store in background
   try {
