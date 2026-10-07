@@ -89,22 +89,32 @@ export async function PUT(req: NextRequest) {
     data.servicesJson = JSON.stringify(data.services)
   }
 
-  const saved = await saveStoredSiteSettings(data)
-
   try {
-    revalidatePath("/", "layout")
-    revalidatePath("/admin", "layout")
-  } catch {}
+    const saved = await saveStoredSiteSettings(data)
 
-  return NextResponse.json({
-    settings: {
-      ...saved,
-      id: "singleton",
-      servicesJson: JSON.stringify(saved.services),
-      heroImagesJson: JSON.stringify(saved.heroImages),
-      typewriterSentencesJson: JSON.stringify(saved.typewriterSentences || []),
-    },
-    ok: true,
-  }, { headers: NO_CACHE_HEADERS })
+    try {
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
+      revalidatePath("/")
+      revalidatePath("/admin")
+    } catch {}
+
+    return NextResponse.json({
+      settings: {
+        ...saved,
+        id: "singleton",
+        servicesJson: JSON.stringify(saved.services),
+        heroImagesJson: JSON.stringify(saved.heroImages),
+        typewriterSentencesJson: JSON.stringify(saved.typewriterSentences || []),
+      },
+      ok: true,
+    }, { headers: NO_CACHE_HEADERS })
+  } catch (err: any) {
+    console.error("PUT /api/settings error:", err)
+    return NextResponse.json(
+      { error: err?.message || "Failed to save settings to database", ok: false },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    )
+  }
 }
 

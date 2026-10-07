@@ -70,9 +70,6 @@ export function HomeView({
       .then((d) => {
         if (d.settings) {
           setCustomSettings(d.settings)
-          try {
-            localStorage.setItem("fixitnow_client_settings", JSON.stringify(d.settings))
-          } catch {}
         }
       })
       .catch(() => {})

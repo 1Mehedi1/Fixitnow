@@ -131,11 +131,6 @@ export const useStore = create<AppState>((set) => ({
       return { customTestimonials: next }
     }),
   setCustomSettings: (settings) => {
-    try {
-      localStorage.setItem("fixitnow_client_settings", JSON.stringify(settings))
-    } catch (err) {
-      console.warn("localStorage quota exceeded or unavailable:", err)
-    }
     set({ customSettings: settings })
   },
   setCustomHeroPhotos: (photos) => {
@@ -146,11 +141,6 @@ export const useStore = create<AppState>((set) => ({
       const nextSettings = state.customSettings
         ? { ...state.customSettings, heroImages: photos }
         : null
-      if (nextSettings) {
-        try {
-          localStorage.setItem("fixitnow_client_settings", JSON.stringify(nextSettings))
-        } catch {}
-      }
       return { customHeroPhotos: photos, customSettings: nextSettings || state.customSettings }
     })
   },
@@ -174,11 +164,6 @@ export const useStore = create<AppState>((set) => ({
       const nextSettings = state.customSettings
         ? { ...state.customSettings, heroImages: next }
         : null
-      if (nextSettings) {
-        try {
-          localStorage.setItem("fixitnow_client_settings", JSON.stringify(nextSettings))
-        } catch {}
-      }
       return { customHeroPhotos: next, customSettings: nextSettings || state.customSettings }
     })
   },

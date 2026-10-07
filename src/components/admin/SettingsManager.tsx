@@ -136,37 +136,12 @@ export function SettingsManager() {
   const { setCustomSettings, setAdminTab } = useStore()
   const [activeTab, setActiveTab] = useState<SettingsTab>("branding")
 
-  const [form, setForm] = useState<FormState>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("fixitnow_client_settings")
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          if (parsed && typeof parsed === "object") {
-            return {
-              ...defaultSiteConfig,
-              ...parsed,
-              typewriterSentences: Array.isArray(parsed.typewriterSentences)
-                ? parsed.typewriterSentences
-                : [...(defaultSiteConfig.typewriterSentences || [])],
-              services: Array.isArray(parsed.services)
-                ? parsed.services
-                : [...defaultSiteConfig.services],
-              heroImages: Array.isArray(parsed.heroImages)
-                ? parsed.heroImages
-                : [...defaultSiteConfig.heroImages],
-            }
-          }
-        }
-      } catch {}
-    }
-    return {
-      ...defaultSiteConfig,
-      typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
-      services: [...defaultSiteConfig.services],
-      heroImages: [...defaultSiteConfig.heroImages],
-    }
-  })
+  const [form, setForm] = useState<FormState>(() => ({
+    ...defaultSiteConfig,
+    typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
+    services: [...defaultSiteConfig.services],
+    heroImages: [...defaultSiteConfig.heroImages],
+  }))
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

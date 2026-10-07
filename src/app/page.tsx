@@ -13,10 +13,8 @@ import { getStoredTestimonials } from "@/lib/testimonials-store"
 import { getStoredSiteSettings as loadSiteSettings } from "@/lib/settings-store"
 
 async function fetchHomePageData() {
-  const hasValidPostgres =
-    Boolean(process.env.DATABASE_URL) &&
-    (process.env.DATABASE_URL!.startsWith("postgresql://") ||
-      process.env.DATABASE_URL!.startsWith("postgres://"))
+  const rawDb = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || ""
+  const hasValidPostgres = rawDb.startsWith("postgresql://") || rawDb.startsWith("postgres://")
 
   const settings = await loadSiteSettings().catch(() => defaultSiteConfig)
   const storedPosts = await getStoredPosts().catch(() => FALLBACK_POSTS)

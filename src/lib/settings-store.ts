@@ -131,8 +131,32 @@ export function parseRawSettings(raw: any): SiteSettingsT {
   }
 }
 
+function hasDatabaseConfig(): boolean {
+  const url =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL ||
+    ""
+  return url.startsWith("postgresql://") || url.startsWith("postgres://")
+}
+
 export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
-  // 1. Try Vercel Blob first so cross-device sync always gets the latest cloud settings!
+  // 1. Primary: Prisma database (SiteSettings table)
+  if (hasDatabaseConfig()) {
+    try {
+      const { db } = await import("@/lib/db")
+      const row = await db.siteSettings.findUnique({ where: { id: "singleton" } })
+      if (row) {
+        const parsed = parseRawSettings(row)
+        globalThis.__memorySettings = parsed
+        return parsed
+      }
+    } catch (err) {
+      console.warn("Prisma getStoredSiteSettings error, falling back to backup stores:", err)
+    }
+  }
+
+  // 2. Secondary cloud store: Vercel Blob
   try {
     const fromBlob = await readJsonBlob<any>("store/site-settings.json")
     if (fromBlob) {
@@ -142,12 +166,12 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
     }
   } catch {}
 
-  // 2. In-memory cache
+  // 3. In-memory cache
   if (globalThis.__memorySettings) {
     return globalThis.__memorySettings
   }
 
-  // 3. /tmp file (serverless lambda writable)
+  // 4. /tmp file (serverless lambda writable)
   const fromTmp = readJsonFile(TMP_FILE)
   if (fromTmp) {
     const parsed = parseRawSettings(fromTmp)
@@ -155,7 +179,7 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
     return parsed
   }
 
-  // 4. data/site-settings.json
+  // 5. data/site-settings.json (bundled static fallback)
   const fromData = readJsonFile(DATA_FILE)
   if (fromData) {
     const parsed = parseRawSettings(fromData)
@@ -163,27 +187,8 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
     return parsed
   }
 
-  // 4. Prisma if configured
-  try {
-    const hasValidPostgres =
-      Boolean(process.env.DATABASE_URL) &&
-      (process.env.DATABASE_URL!.startsWith("postgresql://") ||
-        process.env.DATABASE_URL!.startsWith("postgres://"))
-
-    if (hasValidPostgres) {
-      const { db } = await import("@/lib/db")
-      const row = await db.siteSettings.findUnique({ where: { id: "singleton" } })
-      if (row) {
-        const parsed = parseRawSettings(row)
-        writeJsonFile(parsed)
-        return parsed
-      }
-    }
-  } catch {}
-
-  // 5. Default
+  // 6. Default fallback
   globalThis.__memorySettings = defaultSiteConfig
-  writeJsonFile(defaultSiteConfig)
   return defaultSiteConfig
 }
 
@@ -233,16 +238,10 @@ export async function saveStoredSiteSettings(data: any): Promise<SiteSettingsT> 
     typewriterSentencesJson: JSON.stringify(typewriterSentences),
   }
   const settings = parseRawSettings(mergedRaw)
-  await writeJsonFile(settings)
 
-  // Background sync to Prisma if configured
-  try {
-    const hasValidPostgres =
-      Boolean(process.env.DATABASE_URL) &&
-      (process.env.DATABASE_URL!.startsWith("postgresql://") ||
-        process.env.DATABASE_URL!.startsWith("postgres://"))
-
-    if (hasValidPostgres) {
+  // 1. Primary write: Prisma database (SiteSettings table)
+  if (hasDatabaseConfig()) {
+    try {
       const { db } = await import("@/lib/db")
       const prismaPayload = {
         brand: settings.brand,
@@ -252,10 +251,10 @@ export async function saveStoredSiteSettings(data: any): Promise<SiteSettingsT> 
         whatsapp: settings.whatsapp,
         email: settings.email,
         location: settings.location,
-        yearsExperience: settings.yearsExperience,
-        jobsCompleted: settings.jobsCompleted,
-        happyClients: settings.happyClients,
-        rating: settings.rating,
+        yearsExperience: Number(settings.yearsExperience) || defaultSiteConfig.yearsExperience,
+        jobsCompleted: Number(settings.jobsCompleted) || defaultSiteConfig.jobsCompleted,
+        happyClients: Number(settings.happyClients) || defaultSiteConfig.happyClients,
+        rating: Number(settings.rating) || defaultSiteConfig.rating,
         heroHeadline: settings.heroHeadline,
         heroSubtext: settings.heroSubtext,
         aboutTitle: settings.aboutTitle,
@@ -272,8 +271,14 @@ export async function saveStoredSiteSettings(data: any): Promise<SiteSettingsT> 
         update: prismaPayload,
         create: { id: "singleton", ...prismaPayload },
       })
+    } catch (err) {
+      console.error("Failed to persist site settings to Prisma:", err)
+      throw new Error(`Database save failed: ${(err as Error)?.message || String(err)}`)
     }
-  } catch {}
+  }
+
+  // 2. Secondary resilient write: Vercel Blob, in-memory, disk
+  await writeJsonFile(settings)
 
   return settings
 }
