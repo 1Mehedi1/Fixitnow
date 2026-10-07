@@ -170,6 +170,7 @@ export function SettingsManager() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [convertingServiceBg, setConvertingServiceBg] = useState<number | null>(null)
   const [newSubcatInputs, setNewSubcatInputs] = useState<Record<number, string>>({})
 
   useEffect(() => {
@@ -238,11 +239,67 @@ export function SettingsManager() {
       .finally(() => setLoading(false))
   }, [setCustomSettings])
 
+  const handleConvertServiceBg = async (index: number) => {
+    const rawUrl = form.services[index]?.bgImage?.trim()
+    if (!rawUrl) {
+      toast.error("Please enter a background image URL first")
+      return
+    }
+
+    setConvertingServiceBg(index)
+    const tId = toast.loading(`Converting background image for "${form.services[index]?.label}" to WebP...`)
+    try {
+      const res = await fetch("/api/process-image-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: rawUrl }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.url) throw new Error(data.error || "Processing failed")
+
+      updateService(index, "bgImage", data.url)
+      const sizeSaved = data.originalSize && data.optimizedSize
+        ? ` (${Math.round(data.optimizedSize / 1024)} KB WebP)`
+        : " (Optimized WebP)"
+      toast.success(`Background image converted to WebP & saved!${sizeSaved}`, { id: tId })
+    } catch (err: any) {
+      toast.error("WebP conversion failed", { description: err.message, id: tId })
+    } finally {
+      setConvertingServiceBg(null)
+    }
+  }
+
   const save = async () => {
     setSaving(true)
+    const tId = toast.loading("Checking & saving settings...")
     try {
+      // Auto-convert any external non-WebP background images
+      const updatedServices = [...form.services]
+      for (let i = 0; i < updatedServices.length; i++) {
+        const bg = updatedServices[i]?.bgImage?.trim()
+        if (
+          bg &&
+          bg.startsWith("http") &&
+          !bg.includes(".public.blob.vercel-storage.com") &&
+          !bg.endsWith(".webp") &&
+          !bg.includes("/uploads/")
+        ) {
+          try {
+            const proc = await fetch("/api/process-image-url", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url: bg }),
+            }).then((r) => r.json())
+            if (proc.ok && proc.url) {
+              updatedServices[i] = { ...updatedServices[i], bgImage: proc.url }
+            }
+          } catch {}
+        }
+      }
+
       const payload: FormState = {
         ...form,
+        services: updatedServices,
       }
       setForm(payload)
       setCustomSettings(payload as any)
@@ -272,9 +329,9 @@ export function SettingsManager() {
         })
         .catch(() => {})
 
-      toast.success("Settings saved! All changes are live across all devices.")
+      toast.success("Settings saved! All changes are live across all devices.", { id: tId })
     } catch (e: any) {
-      toast.error("Save failed", { description: e.message })
+      toast.error("Save failed", { description: e.message, id: tId })
     } finally {
       setSaving(false)
     }
@@ -782,8 +839,14 @@ export function SettingsManager() {
                     {/* Background Image */}
                     <div className="space-y-2 p-3.5 rounded-xl border border-slate-800 bg-slate-950/50">
                       <Label className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center justify-between">
-                        <span>Card Background Image</span>
-                        {svc.bgImage && <span className="text-[11px] text-emerald-400 font-medium">✓ Image Active</span>}
+                        <span className="flex items-center gap-1.5 text-emerald-400">
+                          <Sparkles className="h-3.5 w-3.5" /> Card Background Image (Auto WebP)
+                        </span>
+                        {svc.bgImage && (
+                          <span className="text-[11px] text-emerald-400 font-medium">
+                            ✓ {svc.bgImage.endsWith(".webp") || svc.bgImage.includes("opt-") ? "WebP Active" : "Active"}
+                          </span>
+                        )}
                       </Label>
                       <div className="flex items-center gap-3">
                         <div className="relative h-14 w-20 rounded-lg overflow-hidden border border-slate-700 bg-slate-950 shrink-0">
@@ -792,15 +855,47 @@ export function SettingsManager() {
                             alt={svc.label}
                             className="h-full w-full object-cover"
                           />
+                          {(svc.bgImage?.endsWith(".webp") || svc.bgImage?.includes("opt-")) && (
+                            <span className="absolute bottom-0 inset-x-0 bg-emerald-600 text-[8px] font-bold text-white text-center py-0.5 uppercase tracking-wider">
+                              WebP
+                            </span>
+                          )}
                         </div>
                         <Input
                           value={svc.bgImage || ""}
                           onChange={(e) => updateService(i, "bgImage", e.target.value)}
-                          placeholder="https://... image URL"
-                          className="bg-slate-950/60 border-slate-700 text-white text-xs font-mono flex-1"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault()
+                              handleConvertServiceBg(i)
+                            }
+                          }}
+                          placeholder="https://... image URL (Google Drive, Imgur, etc.)"
+                          disabled={convertingServiceBg === i}
+                          className="bg-slate-950/60 border-slate-700 text-white text-xs font-mono flex-1 focus:border-emerald-500"
                         />
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => handleConvertServiceBg(i)}
+                          disabled={convertingServiceBg === i || !svc.bgImage?.trim()}
+                          className="h-9 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shrink-0 shadow-sm cursor-pointer"
+                          title="Download & convert to WebP"
+                        >
+                          {convertingServiceBg === i ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                              <span>Converting…</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="h-3.5 w-3.5 mr-1 text-emerald-200" />
+                              <span>Convert to WebP</span>
+                            </>
+                          )}
+                        </Button>
                         <label className="shrink-0 h-9 px-3 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors">
-                          <Upload className="h-3.5 w-3.5 text-emerald-400" />
+                          <Upload className="h-3.5 w-3.5 text-slate-300" />
                           <span>Upload</span>
                           <input
                             type="file"
@@ -810,6 +905,9 @@ export function SettingsManager() {
                           />
                         </label>
                       </div>
+                      <p className="text-[10px] text-slate-500">
+                        Paste an external image link and tap &quot;Convert to WebP&quot; to optimize and store permanently.
+                      </p>
                     </div>
 
                     {/* Subcategories Chips */}

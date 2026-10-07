@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { getStoredHeroPhotos, saveStoredHeroPhotos } from "@/lib/hero-photos-store"
 import { isAdmin } from "@/lib/auth"
+import { processImageUrlToPermanentWebp } from "@/lib/storage-sync"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -41,6 +42,27 @@ export async function POST(req: NextRequest) {
       photos[body.index] = body.url
     } else {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400, headers: NO_CACHE_HEADERS })
+    }
+
+    // Auto-convert any external non-WebP links to permanent WebP
+    for (let i = 0; i < photos.length; i++) {
+      const p = photos[i]?.trim()
+      if (
+        p &&
+        p.startsWith("http") &&
+        !p.includes(".public.blob.vercel-storage.com") &&
+        !p.endsWith(".webp") &&
+        !p.includes("/uploads/")
+      ) {
+        try {
+          const proc = await processImageUrlToPermanentWebp(p)
+          if (proc.ok && proc.url) {
+            photos[i] = proc.url
+          }
+        } catch (e) {
+          console.warn(`Hero photo WebP auto-conversion failed for slot ${i}:`, e)
+        }
+      }
     }
 
     const saved = await saveStoredHeroPhotos(photos)

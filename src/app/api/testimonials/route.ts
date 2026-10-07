@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { isAdmin } from "@/lib/auth"
 import { getStoredTestimonials, saveStoredTestimonial } from "@/lib/testimonials-store"
+import { processImageUrlToPermanentWebp } from "@/lib/storage-sync"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -42,12 +43,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name and content required" }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
+    let finalAvatar = avatar || null
+    if (
+      finalAvatar &&
+      typeof finalAvatar === "string" &&
+      finalAvatar.startsWith("http") &&
+      !finalAvatar.includes(".public.blob.vercel-storage.com") &&
+      !finalAvatar.endsWith(".webp") &&
+      !finalAvatar.includes("/uploads/")
+    ) {
+      try {
+        const proc = await processImageUrlToPermanentWebp(finalAvatar)
+        if (proc.ok && proc.url) {
+          finalAvatar = proc.url
+        }
+      } catch (e) {
+        console.warn("Avatar WebP conversion warning:", e)
+      }
+    }
+
     const t = await saveStoredTestimonial({
       name,
       role,
       rating: typeof rating === "number" ? Math.max(1, Math.min(5, rating)) : 5,
       content,
-      avatar,
+      avatar: finalAvatar,
       published: published !== false,
     })
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { isAdmin } from "@/lib/auth"
 import { saveStoredTestimonial, deleteStoredTestimonial } from "@/lib/testimonials-store"
+import { processImageUrlToPermanentWebp } from "@/lib/storage-sync"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -23,6 +24,25 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   try {
     const { id } = await ctx.params
     const body = await req.json().catch(() => ({}))
+
+    if (
+      body.avatar &&
+      typeof body.avatar === "string" &&
+      body.avatar.startsWith("http") &&
+      !body.avatar.includes(".public.blob.vercel-storage.com") &&
+      !body.avatar.endsWith(".webp") &&
+      !body.avatar.includes("/uploads/")
+    ) {
+      try {
+        const proc = await processImageUrlToPermanentWebp(body.avatar)
+        if (proc.ok && proc.url) {
+          body.avatar = proc.url
+        }
+      } catch (e) {
+        console.warn("Avatar WebP conversion warning:", e)
+      }
+    }
+
     const t = await saveStoredTestimonial({
       ...body,
       id,

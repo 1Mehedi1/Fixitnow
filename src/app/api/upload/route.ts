@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { isAdmin } from "@/lib/auth"
 import path from "path"
-import { uploadImagePermanent } from "@/lib/storage-sync"
+import sharp from "sharp"
+import { uploadImagePermanent, processImageUrlToPermanentWebp } from "@/lib/storage-sync"
+import { revalidatePath } from "next/cache"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -21,6 +23,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_CACHE_HEADERS })
   }
 
+  const contentType = req.headers.get("content-type") || ""
+
+  // 1. JSON Request: Paste Image URL -> Auto convert to WebP -> Store permanently
+  if (contentType.includes("application/json")) {
+    try {
+      const body = await req.json().catch(() => ({}))
+      const url = body?.url
+      if (!url || typeof url !== "string" || !url.trim()) {
+        return NextResponse.json({ error: "No image URL provided" }, { status: 400, headers: NO_CACHE_HEADERS })
+      }
+
+      const result = await processImageUrlToPermanentWebp(url.trim())
+      if (!result.ok) {
+        return NextResponse.json({ error: result.error || "Failed to process image" }, { status: 400, headers: NO_CACHE_HEADERS })
+      }
+
+      try {
+        revalidatePath("/", "layout")
+        revalidatePath("/admin", "layout")
+      } catch {}
+
+      return NextResponse.json(result, { headers: NO_CACHE_HEADERS })
+    } catch (err: any) {
+      console.error("Upload JSON URL processing error:", err)
+      return NextResponse.json({ error: err?.message || "Internal processing error" }, { status: 500, headers: NO_CACHE_HEADERS })
+    }
+  }
+
+  // 2. FormData Request: File upload with automatic WebP conversion
   try {
     const form = await req.formData()
     const file = form.get("file") as File | null
@@ -28,32 +59,48 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
-    // Only allow image MIME types
     const mimeType = file.type || "image/jpeg"
     if (!mimeType.startsWith("image/") && !mimeType.startsWith("application/octet-stream")) {
       return NextResponse.json({ error: "Only image files are allowed" }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
-    const buf = Buffer.from(await file.arrayBuffer())
+    const rawBuf = Buffer.from(await file.arrayBuffer())
+    if (rawBuf.length > 25 * 1024 * 1024) {
+      return NextResponse.json({ error: "File exceeds 25MB limit" }, { status: 400, headers: NO_CACHE_HEADERS })
+    }
 
-    // File size check: 10MB limit
-    if (buf.length > 10 * 1024 * 1024) {
-      return NextResponse.json({ error: "File exceeds 10MB limit" }, { status: 400, headers: NO_CACHE_HEADERS })
+    // Convert file to WebP and auto-orient
+    let webpBuf: Buffer
+    try {
+      webpBuf = await sharp(rawBuf)
+        .rotate()
+        .resize(2048, 2048, { fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 84, effort: 4 })
+        .toBuffer()
+    } catch {
+      webpBuf = rawBuf
     }
 
     const cleanBaseName = file.name
       .replace(/\.[^.]+$/, "")
       .replace(/[^a-zA-Z0-9_-]/g, "_")
-      .slice(0, 40)
-    const ext = path.extname(file.name) || (mimeType === "image/png" ? ".png" : mimeType === "image/webp" ? ".webp" : ".jpg")
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${cleanBaseName}${ext}`
+      .slice(0, 35)
+    const filename = `opt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${cleanBaseName}.webp`
 
-    // Upload to permanent storage (Vercel Blob -> FreeImage CDN -> TmpFiles CDN -> Catbox CDN -> Local filesystem)
-    const result = await uploadImagePermanent(buf, filename, mimeType)
+    const result = await uploadImagePermanent(webpBuf, filename, "image/webp")
+
+    try {
+      revalidatePath("/", "layout")
+      revalidatePath("/admin", "layout")
+    } catch {}
 
     return NextResponse.json({
+      ok: true,
       url: result.url,
       storage: result.provider,
+      format: "webp",
+      originalSize: rawBuf.length,
+      optimizedSize: webpBuf.length,
       filename,
     }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {

@@ -4,9 +4,8 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
   Plus, Trash2, Star, Loader2, Edit3, Upload,
-  ImageIcon, Check, X, ExternalLink, MessageSquare,
+  ImageIcon, Check, X, ExternalLink, MessageSquare, Sparkles, Link as LinkIcon
 } from "lucide-react"
-import imageCompression from "browser-image-compression"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -52,6 +51,9 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [uploadingMedia, setUploadingMedia] = useState(false)
+  const [processingUrl, setProcessingUrl] = useState(false)
+  const [urlInput, setUrlInput] = useState("")
+  const [showFilePicker, setShowFilePicker] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
 
@@ -73,6 +75,8 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
   const openNew = () => {
     setEditingId(null)
     setForm(EMPTY_FORM)
+    setUrlInput("")
+    setShowFilePicker(false)
     setOpen(true)
   }
 
@@ -87,10 +91,57 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
       avatar: t.avatar || "",
       published: t.published !== false,
     })
+    setUrlInput("")
+    setShowFilePicker(false)
     setOpen(true)
   }
 
-  // Handle proof media / WhatsApp screenshot upload
+  // Handle URL paste -> Download -> WebP convert -> Permanent storage
+  const handleConvertUrlToWebp = async () => {
+    const raw = urlInput.trim()
+    if (!raw) {
+      toast.error("Please paste an image URL first")
+      return
+    }
+
+    setProcessingUrl(true)
+    const tId = toast.loading("Downloading & converting screenshot to WebP...")
+    try {
+      const res = await fetch("/api/process-image-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: raw }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Failed to process screenshot URL")
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        avatar: data.url,
+        name: prev.name || "Homeowner (Verified Client)",
+        role: prev.role || "Direct WhatsApp Chat Review",
+        content: prev.content || "Client sent photo appreciation and positive review via WhatsApp.",
+      }))
+      setUrlInput("")
+
+      const sizeSaved = data.originalSize && data.optimizedSize
+        ? ` (${Math.round(data.optimizedSize / 1024)} KB WebP)`
+        : " (Optimized WebP)"
+
+      toast.success(`WhatsApp screenshot converted to WebP & attached!${sizeSaved}`, { id: tId })
+    } catch (e: any) {
+      toast.error("Screenshot processing failed", {
+        description: e.message || "Please check the URL and ensure it is publicly accessible.",
+        id: tId,
+      })
+    } finally {
+      setProcessingUrl(false)
+    }
+  }
+
+  // Handle proof media / WhatsApp screenshot direct file upload
   const handleProofUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file")
@@ -98,22 +149,10 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
     }
 
     setUploadingMedia(true)
+    const tId = toast.loading("Converting file to WebP & uploading...")
     try {
-      let uploadFile: File | Blob = file
-      try {
-        uploadFile = await imageCompression(file, {
-          maxSizeMB: 0.6,
-          maxWidthOrHeight: 1200,
-          useWebWorker: true,
-          fileType: "image/webp",
-        })
-      } catch {
-        // Fallback to original file
-      }
-
       const formData = new FormData()
-      const cleanName = file.name.replace(/\.[^.]+$/, "") + ".webp"
-      formData.append("file", uploadFile, cleanName)
+      formData.append("file", file, file.name)
 
       const res = await fetch("/api/upload", { method: "POST", body: formData })
       const data = await res.json().catch(() => ({}))
@@ -127,9 +166,9 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
         role: prev.role || "Direct WhatsApp Chat Review",
         content: prev.content || "Client sent photo appreciation and positive review via WhatsApp.",
       }))
-      toast.success("Proof document / WhatsApp screenshot uploaded!")
+      toast.success("WhatsApp screenshot converted to WebP & attached!", { id: tId })
     } catch (e: any) {
-      toast.error("Upload failed", { description: e.message })
+      toast.error("Upload failed", { description: e.message, id: tId })
     } finally {
       setUploadingMedia(false)
     }
@@ -143,12 +182,34 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
 
     setSaving(true)
     try {
+      let finalAvatar = form.avatar || null
+
+      // If user typed/pasted an external URL directly without converting, auto-convert it now
+      if (
+        finalAvatar &&
+        finalAvatar.startsWith("http") &&
+        !finalAvatar.includes(".public.blob.vercel-storage.com") &&
+        !finalAvatar.endsWith(".webp") &&
+        !finalAvatar.includes("/uploads/")
+      ) {
+        try {
+          const proc = await fetch("/api/process-image-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: finalAvatar }),
+          }).then((r) => r.json())
+          if (proc.ok && proc.url) {
+            finalAvatar = proc.url
+          }
+        } catch {}
+      }
+
       const payload = {
         name: form.name.trim() || "Verified WhatsApp Client",
         role: form.role.trim() || "WhatsApp Chat Review",
         rating: form.rating,
         content: form.content.trim() || "Verified client review and photo feedback received via WhatsApp.",
-        avatar: form.avatar || null,
+        avatar: finalAvatar,
         published: form.published,
       }
 
@@ -407,25 +468,37 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
 
           {/* Scrollable Form Body */}
           <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 max-h-[calc(90vh-130px)]">
-            {/* Quick Proof Media Upload */}
-            <div className="space-y-2 p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 overflow-hidden">
-              <Label className="text-xs uppercase tracking-wider font-bold text-emerald-400 flex items-center gap-1.5">
-                <ImageIcon className="h-4 w-4" /> Proof Document / WhatsApp Screenshot
-              </Label>
+            {/* Proof Media: Paste Image URL -> Auto WebP Converter */}
+            <div className="space-y-2.5 p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/10 space-y-2 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <Label className="text-xs uppercase tracking-wider font-bold text-emerald-400 flex items-center gap-1.5">
+                  <ImageIcon className="h-4 w-4" /> Proof Document / WhatsApp Screenshot
+                </Label>
+                <span className="text-[10px] text-slate-400">
+                  Google Drive, Imgur, Catbox, Cloudinary...
+                </span>
+              </div>
               <p className="text-[11px] text-slate-400">
-                Upload a screenshot of the client's WhatsApp chat feedback, review, or job completion message.
+                Paste an image link or upload a screenshot of the client&apos;s WhatsApp chat feedback.
               </p>
 
               {form.avatar ? (
-                <div className="flex items-center gap-3 pt-2 w-full overflow-hidden">
+                <div className="flex items-center gap-3 pt-2 w-full overflow-hidden bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
                   <div className="relative h-16 w-16 rounded-lg overflow-hidden border border-emerald-500/50 bg-slate-900 shrink-0">
                     <img src={form.avatar} alt="Proof" className="h-full w-full object-cover" />
+                    {(form.avatar.endsWith(".webp") || form.avatar.includes(".webp?") || form.avatar.includes("opt-")) && (
+                      <span className="absolute bottom-0 inset-x-0 bg-emerald-600 text-[8px] font-bold text-white text-center py-0.5 uppercase tracking-wider">
+                        WebP
+                      </span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                      <Check className="h-3.5 w-3.5 shrink-0" /> Screenshot Attached
+                      <Check className="h-3.5 w-3.5 shrink-0" /> Screenshot Attached (WebP Optimized)
                     </div>
-                    <p className="text-[11px] text-slate-400 font-medium">Image attached & ready to save</p>
+                    <p className="text-[11px] text-slate-400 font-medium truncate font-mono text-[10px] mt-0.5">
+                      {form.avatar}
+                    </p>
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, avatar: "" })}
@@ -436,24 +509,76 @@ export function TestimonialManager({ testimonials: initialTestimonials }: Props)
                   </div>
                 </div>
               ) : (
-                <div className="pt-1">
-                  <label className="flex items-center justify-center gap-2 py-3 px-4 border border-dashed border-emerald-500/40 hover:border-emerald-500 rounded-xl bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer transition-colors text-xs font-semibold text-emerald-300">
-                    {uploadingMedia ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
-                    ) : (
-                      <Upload className="h-4 w-4 text-emerald-400" />
-                    )}
-                    <span>{uploadingMedia ? "Compressing & uploading…" : "Choose WhatsApp Screenshot / Image"}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) handleProofUpload(e.target.files[0])
-                        e.target.value = ""
+                <div className="space-y-2 pt-1">
+                  {/* URL Paste Input + Convert Button */}
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          handleConvertUrlToWebp()
+                        }
                       }}
+                      placeholder="https://drive.google.com/... or https://..."
+                      disabled={processingUrl}
+                      className="text-xs h-9 font-mono bg-slate-950/80 border-slate-700 text-slate-200 focus:border-emerald-500 flex-1"
                     />
-                  </label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleConvertUrlToWebp}
+                      disabled={processingUrl || !urlInput.trim()}
+                      className="h-9 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shrink-0 shadow-sm cursor-pointer"
+                    >
+                      {processingUrl ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                          <span>Converting…</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-3.5 w-3.5 mr-1 text-emerald-200" />
+                          <span>Convert to WebP</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+                    <span>Automatically converts to WebP &amp; saves permanently</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowFilePicker(!showFilePicker)}
+                      className="text-slate-400 hover:text-slate-200 underline cursor-pointer"
+                    >
+                      {showFilePicker ? "Hide file uploader" : "Or upload local file"}
+                    </button>
+                  </div>
+
+                  {/* Secondary File Upload Fallback */}
+                  {showFilePicker && (
+                    <div className="pt-1">
+                      <label className="flex items-center justify-center gap-2 py-3 px-4 border border-dashed border-emerald-500/40 hover:border-emerald-500 rounded-xl bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer transition-colors text-xs font-semibold text-emerald-300">
+                        {uploadingMedia ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+                        ) : (
+                          <Upload className="h-4 w-4 text-emerald-400" />
+                        )}
+                        <span>{uploadingMedia ? "Converting to WebP & uploading…" : "Choose WhatsApp Screenshot / Image"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) handleProofUpload(e.target.files[0])
+                            e.target.value = ""
+                          }}
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

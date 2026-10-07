@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { isAdmin } from "@/lib/auth"
 import { getStoredPosts, saveStoredPost } from "@/lib/posts-store"
+import { processImageUrlToPermanentWebp } from "@/lib/storage-sync"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -68,6 +69,44 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    let finalCover = coverImage || ""
+    if (
+      finalCover &&
+      finalCover.startsWith("http") &&
+      !finalCover.includes(".public.blob.vercel-storage.com") &&
+      !finalCover.endsWith(".webp") &&
+      !finalCover.includes("/uploads/")
+    ) {
+      try {
+        const proc = await processImageUrlToPermanentWebp(finalCover)
+        if (proc.ok && proc.url) finalCover = proc.url
+      } catch {}
+    }
+
+    const finalImages = Array.isArray(images) ? [...images] : []
+    for (let i = 0; i < finalImages.length; i++) {
+      const u = typeof finalImages[i] === "string" ? finalImages[i] : finalImages[i]?.url
+      if (
+        u &&
+        typeof u === "string" &&
+        u.startsWith("http") &&
+        !u.includes(".public.blob.vercel-storage.com") &&
+        !u.endsWith(".webp") &&
+        !u.includes("/uploads/")
+      ) {
+        try {
+          const proc = await processImageUrlToPermanentWebp(u)
+          if (proc.ok && proc.url) {
+            if (typeof finalImages[i] === "string") {
+              finalImages[i] = proc.url
+            } else {
+              finalImages[i] = { ...finalImages[i], url: proc.url }
+            }
+          }
+        } catch {}
+      }
+    }
+
     const post = await saveStoredPost({
       title: title.trim(),
       excerpt,
@@ -77,8 +116,8 @@ export async function POST(req: NextRequest) {
       tags,
       featured,
       published,
-      coverImage,
-      images,
+      coverImage: finalCover,
+      images: finalImages,
     })
 
     try {

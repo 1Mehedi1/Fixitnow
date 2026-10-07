@@ -29,6 +29,8 @@ export function HeroManager() {
   const [saving, setSaving] = useState(false)
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop")
 
+  const [convertingIndex, setConvertingIndex] = useState<number | null>(null)
+
   // Always fetch live photos from server on mount with zero-cache headers
   useEffect(() => {
     // 1. Initial quick hydrate from localStorage while network request is in flight
@@ -73,6 +75,59 @@ export function HeroManager() {
     updateHeroPhoto(idx, cleaned)
   }
 
+  // Convert pasted URL to optimized permanent WebP format
+  const handleConvertUrlToWebp = async (idx: number) => {
+    const current = photos[idx]?.trim()
+    if (!current) {
+      toast.error("Please paste an image URL first")
+      return
+    }
+
+    setConvertingIndex(idx)
+    const tId = toast.loading(`Converting Photo ${idx + 1} to WebP & storing permanently...`)
+    try {
+      const res = await fetch("/api/process-image-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: current }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Failed to process image")
+      }
+
+      const webpUrl = data.url
+      const next = [...photos]
+      next[idx] = webpUrl
+      setPhotos(next)
+      updateHeroPhoto(idx, webpUrl)
+
+      // Instantly persist to /api/hero-photos
+      await fetch("/api/hero-photos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index: idx, url: webpUrl }),
+      })
+
+      try {
+        localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))
+      } catch {}
+
+      const sizeSaved = data.originalSize && data.optimizedSize
+        ? ` (${Math.round(data.optimizedSize / 1024)} KB WebP)`
+        : " (Optimized WebP)"
+
+      toast.success(`Photo ${idx + 1} converted to WebP & saved! Live across all devices.${sizeSaved}`, { id: tId })
+    } catch (err: any) {
+      toast.error("WebP conversion failed", {
+        description: err.message || "Please check the image URL and try again.",
+        id: tId,
+      })
+    } finally {
+      setConvertingIndex(null)
+    }
+  }
+
   const handleFileUpload = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -81,17 +136,15 @@ export function HeroManager() {
     const fd = new FormData()
     fd.append("file", file)
 
-    const tId = toast.loading(`Uploading Photo ${idx + 1}...`)
+    const tId = toast.loading(`Converting Photo ${idx + 1} to WebP & uploading...`)
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd })
       const data = await res.json()
       if (data.url) {
         const directUrl = normalizeImageUrl(data.url)
-        setPhotos((prev) => {
-          const next = [...prev]
-          next[idx] = directUrl
-          return next
-        })
+        const next = [...photos]
+        next[idx] = directUrl
+        setPhotos(next)
         updateHeroPhoto(idx, directUrl)
 
         // Instant awaited sync to /api/hero-photos so Vercel Blob is updated immediately
@@ -104,7 +157,11 @@ export function HeroManager() {
           console.warn("Hero photo sync warning: response not ok", syncRes.status)
         }
 
-        toast.success(`Photo ${idx + 1} updated and saved! Live across all devices.`, { id: tId })
+        try {
+          localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))
+        } catch {}
+
+        toast.success(`Photo ${idx + 1} converted to WebP & saved! Live across all devices.`, { id: tId })
       } else {
         throw new Error(data.error || "Upload failed")
       }
@@ -121,15 +178,45 @@ export function HeroManager() {
     next[idx] = DEFAULT_HERO_IMAGES[idx]
     setPhotos(next)
     updateHeroPhoto(idx, DEFAULT_HERO_IMAGES[idx])
+    fetch("/api/hero-photos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ index: idx, url: DEFAULT_HERO_IMAGES[idx] }),
+    }).catch(() => {})
+    try {
+      localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))
+    } catch {}
     toast.info(`Photo ${idx + 1} reset to default template image.`)
   }
 
   const saveAll = async () => {
     setSaving(true)
+    const tId = toast.loading("Checking & optimizing hero photos...")
     try {
-      const cleaned = photos.map((p, i) => (p && typeof p === "string" && p.trim()) ? normalizeImageUrl(p.trim()) : DEFAULT_HERO_IMAGES[i])
+      const cleaned = [...photos]
+
+      // Auto-convert any external non-WebP links
+      for (let i = 0; i < cleaned.length; i++) {
+        const p = cleaned[i]?.trim()
+        if (p && p.startsWith("http") && !p.includes(".public.blob.vercel-storage.com") && !p.endsWith(".webp") && !p.includes("/uploads/")) {
+          try {
+            const proc = await fetch("/api/process-image-url", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url: p }),
+            }).then((r) => r.json())
+            if (proc.ok && proc.url) {
+              cleaned[i] = proc.url
+            }
+          } catch {}
+        }
+      }
+
       setPhotos(cleaned)
       setCustomHeroPhotos(cleaned)
+      try {
+        localStorage.setItem("fixitnow_hero_photos", JSON.stringify(cleaned))
+      } catch {}
 
       const res = await fetch("/api/hero-photos", {
         method: "POST",
@@ -138,9 +225,9 @@ export function HeroManager() {
       })
       if (!res.ok) throw new Error("Server save failed")
 
-      toast.success("All 4 Hero Photos saved! They are live on your website.")
+      toast.success("All 4 Hero Photos saved! They are live on your website across all devices.", { id: tId })
     } catch (e: any) {
-      toast.error("Save completed locally", { description: "Your photos are active on this device." })
+      toast.error("Save completed locally", { description: "Your photos are active on this device.", id: tId })
     } finally {
       setSaving(false)
     }
@@ -276,6 +363,15 @@ export function HeroManager() {
                     </div>
                   )}
 
+                  {/* Top-left WebP badge */}
+                  {currentUrl && (currentUrl.endsWith(".webp") || currentUrl.includes(".webp?") || currentUrl.includes("opt-")) && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <Badge className="bg-emerald-600/90 text-white font-mono text-[9px] px-1.5 py-0 border-0 shadow-xs">
+                        WebP · Optimized
+                      </Badge>
+                    </div>
+                  )}
+
                   {/* Overlay URL viewer button */}
                   {currentUrl && (
                     <a
@@ -289,18 +385,54 @@ export function HeroManager() {
                   )}
                 </div>
 
-                {/* Direct Image URL input */}
-                <div className="space-y-1">
+                {/* Direct Image URL input + Convert to WebP button */}
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Image URL</Label>
-                    <span className="text-[10px] text-slate-500">Google Drive share links supported</span>
+                    <Label className="text-[11px] font-medium uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" /> Paste Image URL
+                    </Label>
+                    <span className="text-[10px] text-slate-400">Google Drive, Imgur, Catbox, etc.</span>
                   </div>
-                  <Input
-                    value={photos[idx] || ""}
-                    onChange={(e) => handleUrlChange(idx, e.target.value)}
-                    placeholder="https://... or Google Drive sharing link"
-                    className="text-xs h-9 font-mono bg-slate-950/60 border-slate-800 text-slate-200"
-                  />
+
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={photos[idx] || ""}
+                      onChange={(e) => handleUrlChange(idx, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          handleConvertUrlToWebp(idx)
+                        }
+                      }}
+                      placeholder="https://drive.google.com/... or https://..."
+                      disabled={convertingIndex === idx}
+                      className="text-xs h-9 font-mono bg-slate-950/80 border-slate-700 text-slate-200 focus:border-emerald-500 flex-1"
+                    />
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => handleConvertUrlToWebp(idx)}
+                      disabled={convertingIndex === idx || !photos[idx]?.trim()}
+                      className="h-9 px-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shrink-0 shadow-sm cursor-pointer"
+                      title="Download image, convert to WebP and save permanently"
+                    >
+                      {convertingIndex === idx ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                          <span>Converting…</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-3.5 w-3.5 mr-1 text-emerald-200" />
+                          <span>Convert to WebP</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-slate-500">
+                    Paste any external image link and tap &quot;Convert to WebP&quot; to permanently store and optimize.
+                  </p>
                 </div>
               </CardContent>
             </Card>

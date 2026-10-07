@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { isAdmin } from "@/lib/auth"
 import { getStoredSiteSettings, saveStoredSiteSettings } from "@/lib/settings-store"
+import { processImageUrlToPermanentWebp } from "@/lib/storage-sync"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -64,6 +65,28 @@ export async function PUT(req: NextRequest) {
         data[k] = String(body[k] ?? "")
       }
     }
+  }
+
+  // Auto-convert any services bgImage or heroImages to permanent WebP
+  if (Array.isArray(data.services)) {
+    for (let i = 0; i < data.services.length; i++) {
+      const bg = data.services[i]?.bgImage?.trim()
+      if (
+        bg &&
+        bg.startsWith("http") &&
+        !bg.includes(".public.blob.vercel-storage.com") &&
+        !bg.endsWith(".webp") &&
+        !bg.includes("/uploads/")
+      ) {
+        try {
+          const proc = await processImageUrlToPermanentWebp(bg)
+          if (proc.ok && proc.url) {
+            data.services[i].bgImage = proc.url
+          }
+        } catch {}
+      }
+    }
+    data.servicesJson = JSON.stringify(data.services)
   }
 
   const saved = await saveStoredSiteSettings(data)
