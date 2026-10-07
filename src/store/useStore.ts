@@ -132,27 +132,53 @@ export const useStore = create<AppState>((set) => ({
     }),
   setCustomSettings: (settings) => {
     try {
-      // Actively remove old client settings from localStorage so browser always relies on live cloud state
-      localStorage.removeItem("fixitnow_client_settings")
-    } catch {}
+      localStorage.setItem("fixitnow_client_settings", JSON.stringify(settings))
+    } catch (err) {
+      console.warn("localStorage quota exceeded or unavailable:", err)
+    }
     set({ customSettings: settings })
   },
   setCustomHeroPhotos: (photos) => {
+    try {
+      localStorage.setItem("fixitnow_hero_photos", JSON.stringify(photos))
+    } catch {}
     set((state) => {
       const nextSettings = state.customSettings
         ? { ...state.customSettings, heroImages: photos }
         : null
+      if (nextSettings) {
+        try {
+          localStorage.setItem("fixitnow_client_settings", JSON.stringify(nextSettings))
+        } catch {}
+      }
       return { customHeroPhotos: photos, customSettings: nextSettings || state.customSettings }
     })
   },
   updateHeroPhoto: (index, url) => {
     set((state) => {
-      const current = state.customHeroPhotos || [...DEFAULT_HERO_IMAGES]
-      const next = [...current]
+      let current = state.customHeroPhotos
+      if (!current) {
+        try {
+          const stored = localStorage.getItem("fixitnow_hero_photos")
+          if (stored) {
+            const parsed = JSON.parse(stored)
+            if (Array.isArray(parsed) && parsed.length >= 4) current = parsed
+          }
+        } catch {}
+      }
+      const next = current ? [...current] : [...DEFAULT_HERO_IMAGES]
       next[index] = url
+      try {
+        localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))
+      } catch {}
       const nextSettings = state.customSettings
         ? { ...state.customSettings, heroImages: next }
         : null
+      if (nextSettings) {
+        try {
+          localStorage.setItem("fixitnow_client_settings", JSON.stringify(nextSettings))
+        } catch {}
+      }
       return { customHeroPhotos: next, customSettings: nextSettings || state.customSettings }
     })
   },

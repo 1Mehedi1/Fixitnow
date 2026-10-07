@@ -48,7 +48,6 @@ export async function PUT(req: NextRequest) {
     "services", "servicesJson", "heroImages", "heroImagesJson",
     "typewriterSentences", "typewriterSentencesJson",
     "companyName", "companyUen", "licenseInfo",
-    "portfolioTitle", "portfolioSubtitle", "beforeAfterTitle", "beforeAfterSubtitle",
   ]
 
   const data: any = {}
@@ -95,8 +94,6 @@ export async function PUT(req: NextRequest) {
   try {
     revalidatePath("/", "layout")
     revalidatePath("/admin", "layout")
-    revalidatePath("/")
-    revalidatePath("/admin")
   } catch {}
 
   return NextResponse.json({

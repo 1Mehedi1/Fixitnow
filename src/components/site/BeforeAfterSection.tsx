@@ -62,10 +62,12 @@ export function BeforeAfterSection({ posts }: Props) {
           <Layers className="h-3.5 w-3.5" /> Before & After
         </div>
         <h1 className="font-display text-5xl sm:text-6xl font-bold tracking-tight text-balance">
-          {s.beforeAfterTitle || "The difference is in the details."}
+          The difference is in the details.
         </h1>
         <p className="text-lg text-muted-foreground mt-4 text-pretty">
-          {s.beforeAfterSubtitle || `Real jobs, real transformations. Drag the slider on any card to see the before-and-after. Every photo here is from actual work ${s.brand} completed across Singapore.`}
+          Real jobs, real transformations. Drag the slider on any card to see the
+          before-and-after. Every photo here is from actual work {s.brand} completed
+          across Singapore.
         </p>
         <div className="flex gap-4 mt-5 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">

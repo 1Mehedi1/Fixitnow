@@ -49,10 +49,11 @@ export function PortfolioSection({ posts }: Props) {
           Portfolio
         </div>
         <h1 className="font-display text-5xl sm:text-6xl font-bold tracking-tight text-balance">
-          {s.portfolioTitle || "Every job, finished."}
+          Every job, finished.
         </h1>
         <p className="text-lg text-muted-foreground mt-4 text-pretty">
-          {s.portfolioSubtitle || "A selection of work I've completed across Singapore. Tap any job for the full story, before/after photos, and what I learned on it."}
+          A selection of work I've completed across Singapore. Tap any job for the full
+          story, before/after photos, and what I learned on it.
         </p>
       </motion.div>
 

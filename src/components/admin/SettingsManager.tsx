@@ -64,10 +64,6 @@ interface FormState {
   companyName: string
   companyUen: string
   licenseInfo: string
-  portfolioTitle: string
-  portfolioSubtitle: string
-  beforeAfterTitle: string
-  beforeAfterSubtitle: string
 }
 
 export type SettingsTab = "branding" | "categories" | "pricing" | "hero" | "acra"
@@ -140,16 +136,37 @@ export function SettingsManager() {
   const { setCustomSettings, setAdminTab } = useStore()
   const [activeTab, setActiveTab] = useState<SettingsTab>("branding")
 
-  const [form, setForm] = useState<FormState>(() => ({
-    ...defaultSiteConfig,
-    portfolioTitle: defaultSiteConfig.portfolioTitle || "Portfolio Selected work",
-    portfolioSubtitle: defaultSiteConfig.portfolioSubtitle || "Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story.",
-    beforeAfterTitle: defaultSiteConfig.beforeAfterTitle || "See the difference.",
-    beforeAfterSubtitle: defaultSiteConfig.beforeAfterSubtitle || "Drag any slider to compare before and after. Real jobs, real transformations.",
-    typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
-    services: [...defaultSiteConfig.services],
-    heroImages: [...defaultSiteConfig.heroImages],
-  }))
+  const [form, setForm] = useState<FormState>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("fixitnow_client_settings")
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed && typeof parsed === "object") {
+            return {
+              ...defaultSiteConfig,
+              ...parsed,
+              typewriterSentences: Array.isArray(parsed.typewriterSentences)
+                ? parsed.typewriterSentences
+                : [...(defaultSiteConfig.typewriterSentences || [])],
+              services: Array.isArray(parsed.services)
+                ? parsed.services
+                : [...defaultSiteConfig.services],
+              heroImages: Array.isArray(parsed.heroImages)
+                ? parsed.heroImages
+                : [...defaultSiteConfig.heroImages],
+            }
+          }
+        }
+      } catch {}
+    }
+    return {
+      ...defaultSiteConfig,
+      typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
+      services: [...defaultSiteConfig.services],
+      heroImages: [...defaultSiteConfig.heroImages],
+    }
+  })
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -157,11 +174,6 @@ export function SettingsManager() {
   const [newSubcatInputs, setNewSubcatInputs] = useState<Record<number, string>>({})
 
   useEffect(() => {
-    // Clean up any stale localStorage settings from previous sessions
-    try {
-      localStorage.removeItem("fixitnow_client_settings")
-    } catch {}
-
     fetch(`/api/settings?_t=${Date.now()}`, {
       cache: "no-store",
       headers: { "Cache-Control": "no-cache" },
@@ -218,10 +230,6 @@ export function SettingsManager() {
             companyName: d.settings.companyName || defaultSiteConfig.companyName,
             companyUen: d.settings.companyUen || defaultSiteConfig.companyUen,
             licenseInfo: d.settings.licenseInfo || defaultSiteConfig.licenseInfo,
-            portfolioTitle: d.settings.portfolioTitle || defaultSiteConfig.portfolioTitle || "Portfolio Selected work",
-            portfolioSubtitle: d.settings.portfolioSubtitle || defaultSiteConfig.portfolioSubtitle || "Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story.",
-            beforeAfterTitle: d.settings.beforeAfterTitle || defaultSiteConfig.beforeAfterTitle || "See the difference.",
-            beforeAfterSubtitle: d.settings.beforeAfterSubtitle || defaultSiteConfig.beforeAfterSubtitle || "Drag any slider to compare before and after. Real jobs, real transformations.",
           }
 
           setForm(loadedData)
@@ -333,10 +341,6 @@ export function SettingsManager() {
     if (!confirm("Reset all settings to defaults? Your custom values will be replaced with defaults.")) return
     const resetData: FormState = {
       ...defaultSiteConfig,
-      portfolioTitle: defaultSiteConfig.portfolioTitle || "Portfolio Selected work",
-      portfolioSubtitle: defaultSiteConfig.portfolioSubtitle || "Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story.",
-      beforeAfterTitle: defaultSiteConfig.beforeAfterTitle || "See the difference.",
-      beforeAfterSubtitle: defaultSiteConfig.beforeAfterSubtitle || "Drag any slider to compare before and after. Real jobs, real transformations.",
       typewriterSentences: [...(defaultSiteConfig.typewriterSentences || [])],
       services: [...defaultSiteConfig.services],
       heroImages: [...defaultSiteConfig.heroImages],
@@ -1184,73 +1188,6 @@ export function SettingsManager() {
                   </Button>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          {/* Section Titles & Showcase Headings */}
-          <Card className="bg-slate-900 border-slate-800 shadow-sm">
-            <CardHeader className="border-b border-slate-800/80 pb-4">
-              <CardTitle className="text-base text-white flex items-center gap-2">
-                <Layers className="h-4 w-4 text-emerald-400" /> Showcase Section Titles & Subtitles
-              </CardTitle>
-              <CardDescription className="text-slate-400">
-                Customize titles and subtitles for the Portfolio (Selected Work) and Before & After showcase sections across all devices.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5 pt-5">
-              <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px] uppercase font-bold">
-                    Portfolio Section
-                  </Badge>
-                  <span className="text-xs text-slate-400">Homepage "Selected Work" showcase</span>
-                </div>
-                <Field
-                  label="Portfolio Section Title"
-                  value={form.portfolioTitle}
-                  onChange={(v) => setForm({ ...form, portfolioTitle: v })}
-                  placeholder="Portfolio Selected work"
-                />
-                <div className="space-y-1.5">
-                  <Label className="text-xs uppercase tracking-wider font-bold text-slate-300">
-                    Portfolio Section Subtitle
-                  </Label>
-                  <Textarea
-                    value={form.portfolioSubtitle}
-                    onChange={(e) => setForm({ ...form, portfolioSubtitle: e.target.value })}
-                    rows={2}
-                    placeholder="Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story."
-                    className="bg-slate-950/60 border-slate-700 text-white text-xs sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px] uppercase font-bold">
-                    Before & After Section
-                  </Badge>
-                  <span className="text-xs text-slate-400">Interactive transformation slider showcase</span>
-                </div>
-                <Field
-                  label="Before & After Section Title"
-                  value={form.beforeAfterTitle}
-                  onChange={(v) => setForm({ ...form, beforeAfterTitle: v })}
-                  placeholder="See the difference."
-                />
-                <div className="space-y-1.5">
-                  <Label className="text-xs uppercase tracking-wider font-bold text-slate-300">
-                    Before & After Section Subtitle
-                  </Label>
-                  <Textarea
-                    value={form.beforeAfterSubtitle}
-                    onChange={(e) => setForm({ ...form, beforeAfterSubtitle: e.target.value })}
-                    rows={2}
-                    placeholder="Drag any slider to compare before and after. Real jobs, real transformations."
-                    className="bg-slate-950/60 border-slate-700 text-white text-xs sm:text-sm"
-                  />
-                </div>
-              </div>
             </CardContent>
           </Card>
 
