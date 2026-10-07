@@ -51,6 +51,8 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     try {
       revalidatePath("/", "layout")
       revalidatePath("/admin", "layout")
+      revalidatePath("/")
+      revalidatePath("/admin")
     } catch {}
 
     return NextResponse.json({ testimonial: t, ok: true }, { headers: NO_CACHE_HEADERS })
@@ -71,6 +73,8 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
     try {
       revalidatePath("/", "layout")
       revalidatePath("/admin", "layout")
+      revalidatePath("/")
+      revalidatePath("/admin")
     } catch {}
 
     return NextResponse.json({ ok: true }, { headers: NO_CACHE_HEADERS })

@@ -71,7 +71,7 @@ export function HomeView({
         if (d.settings) {
           setCustomSettings(d.settings)
           try {
-            localStorage.setItem("fixitnow_client_settings", JSON.stringify(d.settings))
+            localStorage.removeItem("fixitnow_client_settings")
           } catch {}
         }
       })
@@ -226,8 +226,8 @@ export function HomeView({
               <QuickQuoteCalculator />
               <FeaturedJobs
                 posts={portfolioPosts}
-                title="Portfolio Selected work"
-                subtitle="Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story."
+                title={activeSettings.portfolioTitle || "Portfolio Selected work"}
+                subtitle={activeSettings.portfolioSubtitle || "Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story."}
               />
               {beforeAfterPosts.length > 0 && (
                 <BeforeAfterPreview posts={beforeAfterPosts.slice(0, 4)} onSeeAll={() => setView("beforeAfter")} />
@@ -283,10 +283,10 @@ function BeforeAfterPreview({
               Before & After
             </div>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-balance">
-              See the difference.
+              {s.beforeAfterTitle || "See the difference."}
             </h2>
             <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 sm:mt-3 text-pretty">
-              Drag any slider to compare before and after. Real jobs, real transformations.
+              {s.beforeAfterSubtitle || "Drag any slider to compare before and after. Real jobs, real transformations."}
             </p>
           </div>
           <button

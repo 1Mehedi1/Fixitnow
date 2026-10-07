@@ -169,21 +169,30 @@ export async function saveJsonBlob(
 ): Promise<string | null> {
   const token = getVercelBlobToken()
   if (!token) return null
-  try {
-    const content = typeof data === "string" ? data : JSON.stringify(data, null, 2)
-    const blob = await put(blobPath, content, {
-      access: "public",
-      contentType: "application/json",
-      token,
-      addRandomSuffix: false, // Maintain fixed URL for deterministic fetching
-      allowOverwrite: true,  // Allow replacing existing file without throwing 409
-      cacheControlMaxAge: 60, // Minimum CDN cache TTL to prevent 30-day stale cache lockup
-    })
-    return blob.url
-  } catch (err: any) {
-    console.warn(`Failed to save ${blobPath} to Vercel Blob:`, err?.message || err)
-    return null
+
+  const content = typeof data === "string" ? data : JSON.stringify(data, null, 2)
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const blob = await put(blobPath, content, {
+        access: "public",
+        contentType: "application/json",
+        token,
+        addRandomSuffix: false, // Maintain fixed URL for deterministic fetching
+        allowOverwrite: true,  // Allow replacing existing file without throwing 409
+        cacheControlMaxAge: 0, // Zero CDN cache TTL so updates propagate instantaneously across all devices
+      })
+      if (blob?.url) {
+        return blob.url
+      }
+    } catch (err: any) {
+      console.warn(`Attempt ${attempt + 1}: Failed to save ${blobPath} to Vercel Blob:`, err?.message || err)
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 400))
+      }
+    }
   }
+  return null
 }
 
 /**
@@ -191,19 +200,26 @@ export async function saveJsonBlob(
  */
 export async function readJsonBlob<T>(blobUrlOrPath: string): Promise<T | null> {
   const token = getVercelBlobToken()
+  const randomSuffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+  const fetchHeaders = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+  }
+
   try {
     // 1. If direct HTTP/HTTPS URL
     if (blobUrlOrPath.startsWith("http://") || blobUrlOrPath.startsWith("https://")) {
       const cacheBustUrl = blobUrlOrPath.includes("?")
-        ? `${blobUrlOrPath}&_cb=${Date.now()}`
-        : `${blobUrlOrPath}?_cb=${Date.now()}`
-      const res = await fetch(cacheBustUrl, { cache: "no-store" })
+        ? `${blobUrlOrPath}&_cb=${randomSuffix}`
+        : `${blobUrlOrPath}?_cb=${randomSuffix}`
+      const res = await fetch(cacheBustUrl, { cache: "no-store", headers: fetchHeaders })
       if (res.ok) {
         return (await res.json()) as T
       }
     }
 
-    // 2. If pathname (e.g. "store/posts.json"), query Vercel Blob origin directly bypassing CDN cache
+    // 2. If pathname (e.g. "store/site-settings.json"), query Vercel Blob origin directly bypassing CDN cache
     if (token) {
       try {
         const result = await get(blobUrlOrPath, {
@@ -221,8 +237,8 @@ export async function readJsonBlob<T>(blobUrlOrPath: string): Promise<T | null> 
         if (blobs && blobs.length > 0) {
           const matched = blobs.find((b) => b.pathname === blobUrlOrPath) || blobs[0]
           if (matched?.url) {
-            const bustUrl = `${matched.url}?_cb=${Date.now()}`
-            const res = await fetch(bustUrl, { cache: "no-store" })
+            const bustUrl = `${matched.url}?_cb=${randomSuffix}`
+            const res = await fetch(bustUrl, { cache: "no-store", headers: fetchHeaders })
             if (res.ok) {
               return (await res.json()) as T
             }

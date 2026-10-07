@@ -70,6 +70,8 @@ export async function POST(req: NextRequest) {
     try {
       revalidatePath("/", "layout")
       revalidatePath("/admin", "layout")
+      revalidatePath("/")
+      revalidatePath("/admin")
     } catch {}
 
     return NextResponse.json({ heroImages: saved, ok: true }, { headers: NO_CACHE_HEADERS })

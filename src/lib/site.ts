@@ -86,6 +86,10 @@ export interface SiteSettingsT {
   companyName: string
   companyUen: string
   licenseInfo: string
+  portfolioTitle?: string
+  portfolioSubtitle?: string
+  beforeAfterTitle?: string
+  beforeAfterSubtitle?: string
 }
 
 export const DEFAULT_HERO_IMAGES = [
@@ -149,6 +153,12 @@ export const defaultSiteConfig: SiteSettingsT = {
   companyName: "4R ENGINEERING PTE. LTD.",
   companyUen: "202143324G",
   licenseInfo: "ACRA Registered Entity · Company: 4R ENGINEERING PTE. LTD.",
+  portfolioTitle: "Portfolio Selected work",
+  portfolioSubtitle:
+    "Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story.",
+  beforeAfterTitle: "See the difference.",
+  beforeAfterSubtitle:
+    "Drag any slider to compare before and after. Real jobs, real transformations.",
 }
 
 /**

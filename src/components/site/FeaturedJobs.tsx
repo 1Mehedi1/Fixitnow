@@ -142,8 +142,9 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
   )
 }
 
-export function FeaturedJobs({ posts, title = "Portfolio Selected work", subtitle, showAll = false, emptyMessage }: Props) {
+export function FeaturedJobs({ posts, title, subtitle, showAll = false, emptyMessage }: Props) {
   const { setView } = useStore()
+  const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   const display = showAll ? posts : posts.slice(0, 6)
 
   return (
@@ -163,7 +164,7 @@ export function FeaturedJobs({ posts, title = "Portfolio Selected work", subtitl
                 Portfolio
               </div>
               <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">
-                Portfolio Selected work
+                {title || s.portfolioTitle || "Portfolio Selected work"}
               </h2>
             </div>
             {!showAll && posts.length > 6 && (
@@ -183,7 +184,7 @@ export function FeaturedJobs({ posts, title = "Portfolio Selected work", subtitl
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
                 <p className="text-xs sm:text-sm md:text-base font-semibold text-foreground/90 dark:text-emerald-100 tracking-tight leading-relaxed group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
-                  Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story.
+                  {subtitle || s.portfolioSubtitle || "Recent roofing & waterproofing, painting services, and plumbing jobs completed across Singapore. Tap any card for the full story."}
                 </p>
               </div>
               <ArrowRight className="h-4 w-4 text-emerald-500 shrink-0 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all hidden md:block" />

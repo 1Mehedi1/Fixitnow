@@ -40,16 +40,22 @@ function readJsonFile(filePath: string): any | null {
   return null
 }
 
-import { saveJsonBlob, readJsonBlob } from "./storage-sync"
+import { saveJsonBlob, readJsonBlob, isVercelBlobAvailable } from "./storage-sync"
 
-async function writeJsonFile(settings: SiteSettingsT) {
+async function writeJsonFile(settings: SiteSettingsT): Promise<boolean> {
   globalThis.__memorySettings = settings
+  let blobSuccess = false
 
   // Sync to Vercel Blob if available (awaited to guarantee persistence before Lambda completes)
-  try {
-    await saveJsonBlob("store/site-settings.json", settings)
-  } catch (err) {
-    console.warn("Error persisting site settings to Vercel Blob:", err)
+  if (isVercelBlobAvailable()) {
+    try {
+      const blobUrl = await saveJsonBlob("store/site-settings.json", settings)
+      if (blobUrl) {
+        blobSuccess = true
+      }
+    } catch (err) {
+      console.warn("Error persisting site settings to Vercel Blob:", err)
+    }
   }
 
   try {
@@ -63,6 +69,8 @@ async function writeJsonFile(settings: SiteSettingsT) {
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
     fs.writeFileSync(TMP_FILE, JSON.stringify(settings, null, 2), "utf-8")
   } catch {}
+
+  return blobSuccess
 }
 
 const HERO_FILE = path.join(process.cwd(), "data", "hero-photos.json")
@@ -128,6 +136,10 @@ export function parseRawSettings(raw: any): SiteSettingsT {
     companyName: raw.companyName || defaultSiteConfig.companyName,
     companyUen: raw.companyUen || defaultSiteConfig.companyUen,
     licenseInfo: raw.licenseInfo || defaultSiteConfig.licenseInfo,
+    portfolioTitle: raw.portfolioTitle || defaultSiteConfig.portfolioTitle,
+    portfolioSubtitle: raw.portfolioSubtitle || defaultSiteConfig.portfolioSubtitle,
+    beforeAfterTitle: raw.beforeAfterTitle || defaultSiteConfig.beforeAfterTitle,
+    beforeAfterSubtitle: raw.beforeAfterSubtitle || defaultSiteConfig.beforeAfterSubtitle,
   }
 }
 
@@ -155,14 +167,6 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
     return parsed
   }
 
-  // 4. data/site-settings.json
-  const fromData = readJsonFile(DATA_FILE)
-  if (fromData) {
-    const parsed = parseRawSettings(fromData)
-    globalThis.__memorySettings = parsed
-    return parsed
-  }
-
   // 4. Prisma if configured
   try {
     const hasValidPostgres =
@@ -175,15 +179,21 @@ export async function getStoredSiteSettings(): Promise<SiteSettingsT> {
       const row = await db.siteSettings.findUnique({ where: { id: "singleton" } })
       if (row) {
         const parsed = parseRawSettings(row)
-        writeJsonFile(parsed)
+        globalThis.__memorySettings = parsed
         return parsed
       }
     }
   } catch {}
 
-  // 5. Default
+  // 5. Fallback from data/site-settings.json or default config
+  const fromData = readJsonFile(DATA_FILE)
+  if (fromData) {
+    const parsed = parseRawSettings(fromData)
+    globalThis.__memorySettings = parsed
+    return parsed
+  }
+
   globalThis.__memorySettings = defaultSiteConfig
-  writeJsonFile(defaultSiteConfig)
   return defaultSiteConfig
 }
 
