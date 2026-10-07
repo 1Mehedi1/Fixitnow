@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -112,6 +113,7 @@ export function PortfolioSection({ posts }: Props) {
             const after = post.images.find((x) => x.kind === "after")
             const hasBeforeAfter = Boolean(before && after)
             const cover = post.coverImage || after?.url || before?.url || post.images[0]?.url
+            const postUrl = `/work/${post.slug || post.id}`
             return (
               <motion.div
                 key={post.id}
@@ -119,11 +121,10 @@ export function PortfolioSection({ posts }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: Math.min(i * 0.05, 0.4) }}
                 whileHover={{ y: -6 }}
-                className="cursor-pointer group"
-                onClick={() => openPost(post)}
+                className="group"
               >
-                <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0">
+                <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col bg-card">
+                  <Link href={postUrl} className="block relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0 cursor-pointer">
                     {hasBeforeAfter && before && after ? (
                       <div className="absolute inset-0 flex">
                         <div className="relative w-1/2 h-full overflow-hidden border-r border-white/40">
@@ -179,17 +180,23 @@ export function PortfolioSection({ posts }: Props) {
                         </Badge>
                       )}
                     </div>
-                  </div>
-                  <CardContent className="p-5">
-                    <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h3>
-                    {post.excerpt && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
-                    )}
+                  </Link>
+                  <CardContent className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                        <Link href={postUrl}>
+                          {post.title}
+                        </Link>
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
+                      )}
+                    </div>
                     <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                       <span>{new Date(post.createdAt).toLocaleDateString("en-SG", { month: "short", year: "numeric" })}</span>
-                      <span>{post.views} views</span>
+                      <Link href={postUrl} className="font-semibold text-primary hover:underline">
+                        View Story →
+                      </Link>
                     </div>
 
                     {/* Outside View WhatsApp Button */}

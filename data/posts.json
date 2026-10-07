@@ -170,5 +170,97 @@
         "createdAt": "2026-10-04T02:01:07.982Z"
       }
     ]
+  },
+  {
+    "id": "fallback-post-6",
+    "title": "Licensed Electrician HDB Full Rewiring & DB Box in Tampines",
+    "slug": "licensed-electrician-hdb-rewiring-tampines",
+    "excerpt": "Complete 4-room HDB flat electrical overhaul: EMA-compliant rewiring, 12-way Hager DB box, and RCCB safety testing.",
+    "content": "## Project Scope\n\n- Complete HDB 4-room flat electrical rewiring adhering strictly to Singapore EMA and SS CP5 electrical standards.\n- Upgraded obsolete fuse unit to a modern Hager 12-way Distribution Board (DB) with dedicated RCCB residual current circuit breakers.\n- Installed 18 new double 13A switch socket outlets, concealed kitchen cooker point, and 14 dimmable architectural LED ceiling points.\n- Completed insulation resistance testing and SP Services connection inspection with zero defects.",
+    "type": "portfolio",
+    "category": "Electrical Services",
+    "tags": "Licensed electrician,Electrical rewiring,DB Box,Tampines,EMA compliant",
+    "featured": true,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=70",
+    "views": 284,
+    "whatsappClicks": 65,
+    "authorId": null,
+    "createdAt": "2026-10-07T16:11:00.788Z",
+    "updatedAt": "2026-10-07T16:11:00.788Z",
+    "images": [
+      {
+        "id": "img-6a",
+        "postId": "fallback-post-6",
+        "url": "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=1200&auto=format&fit=crop&q=70",
+        "kind": "before",
+        "position": 0,
+        "createdAt": "2026-10-07T16:11:00.788Z"
+      },
+      {
+        "id": "img-6b",
+        "postId": "fallback-post-6",
+        "url": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=70",
+        "kind": "after",
+        "position": 1,
+        "createdAt": "2026-10-07T16:11:00.788Z"
+      }
+    ]
+  },
+  {
+    "id": "fallback-post-7",
+    "title": "Emergency Power Trip & Short Circuit Repair in Jurong West",
+    "slug": "emergency-power-trip-repair-jurong",
+    "excerpt": "Emergency troubleshooting for a total blackout caused by an underground concealed water heater short circuit. Restored power in 45 minutes.",
+    "content": "## Issue & Resolution\n\nHomeowner experienced immediate main RCCB tripping whenever switching on the water heater circuit.\n- Deployed diagnostic megohmmeter to trace concealed neutral-earth breakdown in the master bath conduit.\n- Bypassed faulty segment with flame-retardant heat-resistant wiring.\n- Full load stress test conducted and certified safe.",
+    "type": "portfolio",
+    "category": "Electrical Services",
+    "tags": "Power trip,Emergency electrician,Short circuit,Jurong",
+    "featured": false,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=1200&auto=format&fit=crop&q=70",
+    "views": 198,
+    "whatsappClicks": 49,
+    "authorId": null,
+    "createdAt": "2026-10-07T16:11:00.788Z",
+    "updatedAt": "2026-10-07T16:11:00.788Z",
+    "images": [
+      {
+        "id": "img-7a",
+        "postId": "fallback-post-7",
+        "url": "https://images.unsplash.com/photo-1581092446327-9b52bd1570c2?w=1200&auto=format&fit=crop&q=70",
+        "kind": "gallery",
+        "position": 0,
+        "createdAt": "2026-10-07T16:11:00.788Z"
+      }
+    ]
+  },
+  {
+    "id": "fallback-post-8",
+    "title": "Islandwide Handyman Door Lock, TV Console & Wall Mounting in Woodlands",
+    "slug": "handyman-door-lock-wall-mounting-woodlands",
+    "excerpt": "Precision heavy-duty concrete drilling for 75-inch TV swivel bracket, digital smart lock installation, and sliding balcony door roller realignment.",
+    "content": "## Handyman Scope\n\n- Heavy-duty wall mounting on reinforced concrete shear wall using Fischer DuoPower rawlplugs.\n- Replaced misaligned main door mortise lock with high-security digital smart lock.\n- Repaired stuck sliding aluminum door rollers with heavy-duty stainless steel bearing wheels.",
+    "type": "portfolio",
+    "category": "Handyman Services",
+    "tags": "Handyman Singapore,Door lock repair,TV mounting,Woodlands",
+    "featured": false,
+    "published": true,
+    "coverImage": "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=1200&auto=format&fit=crop&q=70",
+    "views": 154,
+    "whatsappClicks": 38,
+    "authorId": null,
+    "createdAt": "2026-10-07T16:11:00.788Z",
+    "updatedAt": "2026-10-07T16:11:00.788Z",
+    "images": [
+      {
+        "id": "img-8a",
+        "postId": "fallback-post-8",
+        "url": "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=1200&auto=format&fit=crop&q=70",
+        "kind": "gallery",
+        "position": 0,
+        "createdAt": "2026-10-07T16:11:00.788Z"
+      }
+    ]
   }
 ]

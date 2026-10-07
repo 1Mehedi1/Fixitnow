@@ -105,6 +105,19 @@ export async function getStoredPostById(id: string): Promise<StoredPost | null> 
   return fallback || null
 }
 
+export async function getStoredPostBySlug(slug: string): Promise<StoredPost | null> {
+  if (!slug) return null
+  const decoded = decodeURIComponent(slug).toLowerCase().trim()
+  const posts = await getStoredPosts()
+  const found = posts.find((p) => p.slug?.toLowerCase() === decoded || p.id === slug)
+  if (found) return found
+
+  const fallback = (FALLBACK_POSTS as StoredPost[]).find(
+    (p) => p.slug?.toLowerCase() === decoded || p.id === slug
+  )
+  return fallback || null
+}
+
 export async function saveStoredPost(data: any): Promise<StoredPost> {
   const posts = await getStoredPosts()
   const now = new Date()

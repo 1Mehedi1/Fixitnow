@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { useStore } from "@/store/useStore"
 import { Header } from "@/components/site/Header"
 import { Hero } from "@/components/site/Hero"
@@ -286,13 +287,13 @@ function BeforeAfterPreview({
               Drag any slider to compare before and after. Real jobs, real transformations.
             </p>
           </div>
-          <button
-            onClick={onSeeAll}
+          <Link
+            href="/work"
             className="self-start sm:self-auto text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
             See all
             <ArrowRight className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
@@ -300,20 +301,20 @@ function BeforeAfterPreview({
             const before = post.images.find((img) => img.kind === "before")
             const after = post.images.find((img) => img.kind === "after")
             if (!before || !after) return null
+            const postUrl = `/work/${post.slug || post.id}`
             return (
               <div key={post.id}>
-                <div
-                  className="cursor-pointer group h-full"
-                  onClick={() => openPost(post)}
-                >
+                <div className="group h-full">
                   <div className="overflow-hidden rounded-xl border border-border/80 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between bg-card">
-                    <div onClick={(e) => e.stopPropagation()} className="relative">
+                    <div className="relative">
                       <BeforeAfterSlider before={before.url} after={after.url} alt={post.title} />
                     </div>
                     <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between">
                       <div>
                         <h3 className="font-display font-bold text-sm sm:text-base mb-1 line-clamp-1 group-hover:text-primary transition-colors">
-                          {post.title}
+                          <Link href={postUrl}>
+                            {post.title}
+                          </Link>
                         </h3>
                         <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                           {post.excerpt}

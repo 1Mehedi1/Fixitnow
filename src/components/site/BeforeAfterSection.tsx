@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Filter, ArrowRight, ImageIcon, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -113,19 +114,19 @@ export function BeforeAfterSection({ posts }: Props) {
             const after = post.images.find((img) => img.kind === "after")
             const hasSlider = !!(before && after)
             const single = post.coverImage || post.images[0]?.url
+            const postUrl = `/work/${post.slug || post.id}`
             return (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: Math.min(i * 0.06, 0.4) }}
-                className="cursor-pointer group h-full"
-                onClick={() => openPost(post)}
+                className="group h-full"
               >
-                <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between">
+                <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col justify-between bg-card">
                   {/* Image / slider */}
                   {hasSlider ? (
-                    <div onClick={(e) => e.stopPropagation()} className="relative rounded-t-xl overflow-hidden">
+                    <div className="relative rounded-t-xl overflow-hidden">
                       <BeforeAfterSlider
                         before={before!.url}
                         after={after!.url}
@@ -136,7 +137,7 @@ export function BeforeAfterSection({ posts }: Props) {
                       </Badge>
                     </div>
                   ) : (
-                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0">
+                    <Link href={postUrl} className="block relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0 cursor-pointer">
                       {single && (
                         <img
                           src={single}
@@ -146,7 +147,7 @@ export function BeforeAfterSection({ posts }: Props) {
                         />
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+                    </Link>
                   )}
 
                   {/* Body */}
@@ -167,18 +168,20 @@ export function BeforeAfterSection({ posts }: Props) {
                         </span>
                       </div>
                       <h3 className="font-display font-bold text-sm sm:text-base leading-snug mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-                        {post.title}
+                        <Link href={postUrl}>
+                          {post.title}
+                        </Link>
                       </h3>
                       {post.excerpt && (
                         <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2">{post.excerpt}</p>
                       )}
                     </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
                       <span>{post.views} views</span>
-                      <span className="font-semibold text-primary flex items-center gap-1 group-hover:gap-1.5 transition-all">
-                        View details
+                      <Link href={postUrl} className="font-semibold text-primary flex items-center gap-1 hover:underline">
+                        Case Study
                         <ArrowRight className="h-3 w-3" />
-                      </span>
+                      </Link>
                     </div>
 
                     {/* Outside View WhatsApp Button */}

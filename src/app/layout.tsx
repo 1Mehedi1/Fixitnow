@@ -35,34 +35,63 @@ const outfit = Outfit({
   display: "swap",
 })
 
+import { getBaseUrl, buildLocalBusinessSchema } from "@/lib/seo"
+
+const baseUrl = getBaseUrl()
+
 export const metadata: Metadata = {
-  title: `${defaultSiteConfig.brand} — ${defaultSiteConfig.tagline}`,
-  description: `Singapore trade specialist: roofing & waterproofing, painting services, and plumbing repair. ${defaultSiteConfig.yearsExperience}+ years, ${defaultSiteConfig.jobsCompleted}+ jobs completed.`,
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: `${defaultSiteConfig.brand} — Licensed Electrician, Handyman & Home Services Singapore`,
+    template: `%s | ${defaultSiteConfig.brand} Singapore`,
+  },
+  description: `Licensed electrician, handyman, roofing & waterproofing, painting services, and plumbing repair across Singapore. Direct trade rates by 4R ENGINEERING PTE. LTD. (UEN 202143324G).`,
   keywords: [
-    "Roofing Singapore",
-    "Waterproofing Singapore",
-    "Roof leak repair",
-    "Canopy repair",
-    "Roof tiles installation",
-    "Painting services Singapore",
-    "Epoxy painting",
-    "House painting HDB",
-    "Office painting",
-    "Plumbing Singapore",
-    "Toilet leaking repair",
+    "electrician Singapore",
+    "licensed electrician Singapore",
+    "electrical rewiring Singapore",
+    "power trip repair Singapore",
+    "emergency electrician Singapore",
+    "handyman Singapore",
+    "HDB handyman service",
+    "home repair Singapore",
+    "TV wall mounting Singapore",
+    "roofing Singapore",
+    "waterproofing Singapore",
+    "roof leak repair Singapore",
+    "painting services Singapore",
+    "house painting Singapore",
+    "plumbing Singapore",
+    "toilet leaking repair Singapore",
+    "4R Engineering Pte Ltd",
   ],
   authors: [{ name: defaultSiteConfig.workerName }],
+  creator: defaultSiteConfig.workerName,
+  publisher: "4R ENGINEERING PTE. LTD.",
+  alternates: {
+    canonical: baseUrl,
+  },
   openGraph: {
-    title: `${defaultSiteConfig.brand} — ${defaultSiteConfig.tagline}`,
-    description: `Premium trade contractor in Singapore. Roofing & waterproofing, painting services, and plumbing repair.`,
+    title: `${defaultSiteConfig.brand} — Licensed Electrician, Handyman & Home Services Singapore`,
+    description: `Direct trade contractor in Singapore. Licensed electrician, handyman, roofing & waterproofing, painting, and plumbing.`,
+    url: baseUrl,
     siteName: defaultSiteConfig.brand,
-    type: "website",
     locale: "en_SG",
+    type: "website",
+    images: [
+      {
+        url: `${baseUrl}/hero/hero-1.webp`,
+        width: 1200,
+        height: 630,
+        alt: `${defaultSiteConfig.brand} Singapore Trade Contractor`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: defaultSiteConfig.brand,
-    description: "Singapore home-services specialist",
+    title: `${defaultSiteConfig.brand} — Licensed Electrician & Handyman Singapore`,
+    description: "Direct trade contractor across Singapore homes",
+    images: [`${baseUrl}/hero/hero-1.webp`],
   },
   icons: {
     icon: "/favicon.ico",
@@ -72,9 +101,15 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const globalSchema = buildLocalBusinessSchema(defaultSiteConfig)
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(globalSchema) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

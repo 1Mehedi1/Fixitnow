@@ -1,11 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight, MapPin, Eye, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useStore } from "@/store/useStore"
 import { whatsappLink, type SiteSettingsT, defaultSiteConfig } from "@/lib/site"
 import { useSiteSettings } from "@/components/site-settings-context"
 import type { Post, PostImage } from "@prisma/client"
@@ -19,13 +19,14 @@ interface Props {
 }
 
 function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); index: number }) {
-  const { openPost } = useStore()
   const s: SiteSettingsT = useSiteSettings() ?? defaultSiteConfig
   const before = post.images.find((x) => x.kind === "before")
   const after = post.images.find((x) => x.kind === "after")
   const hasBeforeAfter = Boolean(before && after)
   const cover = post.coverImage || after?.url || before?.url || post.images[0]?.url
   const category = post.category || post.type
+  const postUrl = `/work/${post.slug || post.id}`
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -33,11 +34,10 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.06, 0.4) }}
       whileHover={{ y: -8 }}
-      className="cursor-pointer group"
-      onClick={() => openPost(post)}
+      className="group"
     >
-      <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0">
+      <Card className="overflow-hidden p-0 py-0 gap-0 border-border/80 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col bg-card">
+        <Link href={postUrl} className="block relative aspect-[4/3] w-full overflow-hidden bg-muted rounded-t-xl shrink-0 cursor-pointer">
           {hasBeforeAfter && before && after ? (
             <div className="absolute inset-0 flex">
               <div className="relative w-1/2 h-full overflow-hidden border-r border-white/40">
@@ -95,23 +95,30 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
             )}
           </div>
           <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-xs text-white bg-black/50 backdrop-blur px-2.5 py-1 rounded-full">
-            <Eye className="h-3 w-3" /> View
+            <Eye className="h-3 w-3" /> Case Study
           </div>
-        </div>
+        </Link>
 
-        <CardContent className="p-5">
-          <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-            {post.title}
-          </h3>
-          {post.excerpt && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{post.excerpt}</p>
-          )}
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              {s.location}
-            </span>
-            <span>{new Date(post.createdAt).toLocaleDateString("en-SG", { month: "short", year: "numeric" })}</span>
+        <CardContent className="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 className="font-display font-bold text-lg leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+              <Link href={postUrl}>
+                {post.title}
+              </Link>
+            </h3>
+            {post.excerpt && (
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{post.excerpt}</p>
+            )}
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {s.location}
+              </span>
+              <Link href={postUrl} className="font-semibold text-primary hover:underline inline-flex items-center gap-1">
+                View Story
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
 
           {/* Outside Home View WhatsApp Button at bottom middle */}
@@ -143,7 +150,6 @@ function PostCard({ post, index }: { post: (Post & { images: PostImage[] }); ind
 }
 
 export function FeaturedJobs({ posts, title = "Portfolio Selected work", subtitle, showAll = false, emptyMessage }: Props) {
-  const { setView } = useStore()
   const display = showAll ? posts : posts.slice(0, 6)
 
   return (
@@ -167,9 +173,11 @@ export function FeaturedJobs({ posts, title = "Portfolio Selected work", subtitl
               </h2>
             </div>
             {!showAll && posts.length > 6 && (
-              <Button variant="ghost" className="self-start sm:self-auto hover:bg-primary/10" onClick={() => setView("portfolio")}>
-                See all work
-                <ArrowRight className="ml-1.5 h-4 w-4" />
+              <Button asChild variant="ghost" className="self-start sm:self-auto hover:bg-primary/10">
+                <Link href="/work">
+                  See all work
+                  <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
               </Button>
             )}
           </div>
