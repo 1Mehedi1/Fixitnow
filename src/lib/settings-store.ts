@@ -272,12 +272,11 @@ export async function saveStoredSiteSettings(data: any): Promise<SiteSettingsT> 
         create: { id: "singleton", ...prismaPayload },
       })
     } catch (err) {
-      console.error("Failed to persist site settings to Prisma:", err)
-      throw new Error(`Database save failed: ${(err as Error)?.message || String(err)}`)
+      console.warn("Prisma save warning (falling back to Vercel Blob cloud persistence):", err)
     }
   }
 
-  // 2. Secondary resilient write: Vercel Blob, in-memory, disk
+  // 2. Resilient cloud write: Vercel Blob, in-memory, disk
   await writeJsonFile(settings)
 
   return settings

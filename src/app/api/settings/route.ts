@@ -97,6 +97,16 @@ export async function PUT(req: NextRequest) {
       revalidatePath("/admin", "layout")
       revalidatePath("/")
       revalidatePath("/admin")
+      revalidatePath("/work", "layout")
+      revalidatePath("/services", "layout")
+      revalidatePath("/before-and-after", "layout")
+      revalidatePath("/reviews", "layout")
+      revalidatePath("/pricing", "layout")
+      revalidatePath("/how-it-works", "layout")
+      revalidatePath("/direct-contractor", "layout")
+      revalidatePath("/about", "layout")
+      revalidatePath("/faq", "layout")
+      revalidatePath("/contact", "layout")
     } catch {}
 
     return NextResponse.json({

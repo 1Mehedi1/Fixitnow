@@ -121,7 +121,10 @@ export async function POST(req: NextRequest) {
     })
 
     try {
-      revalidatePath("/")
+      revalidatePath("/", "layout")
+      revalidatePath("/work", "layout")
+      revalidatePath("/before-and-after", "layout")
+      revalidatePath("/admin")
     } catch {}
 
     return NextResponse.json({ post, ok: true })

@@ -196,6 +196,53 @@ export default async function WorkArchivePage() {
               })}
             </div>
           </div>
+
+          {/* Dedicated SEO FAQ Section */}
+          <section className="mt-16 py-16 sm:py-20 bg-muted/30 border-t border-border/50">
+            <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary uppercase tracking-wider mb-2">
+                  Frequently Asked Questions
+                </div>
+                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-foreground">
+                  Portfolio & Case Studies FAQ
+                </h2>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Information about our documented jobs across Singapore HDBs, condos, and landed properties.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-2xs">
+                  <h3 className="font-bold text-base text-foreground mb-2 flex items-start gap-2.5">
+                    <span className="text-primary font-mono text-sm">Q:</span>
+                    <span>Can you provide references or show similar work for my specific HDB estate?</span>
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                    Yes. We have completed over 540+ residential jobs across all major Singapore estates (Tampines, Jurong West, Woodlands, Bedok, Punggol, Bukit Batok, etc.). You can browse our case studies above or WhatsApp us your estate to see comparable completed projects.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-2xs">
+                  <h3 className="font-bold text-base text-foreground mb-2 flex items-start gap-2.5">
+                    <span className="text-primary font-mono text-sm">Q:</span>
+                    <span>How do I get an exact price quote for a job similar to those shown?</span>
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                    Tap any project card or WhatsApp Ahmad directly with 2-3 photos of your home issue. We compare your photos against our past case studies and quote an upfront fixed price within minutes.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-5 sm:p-6 shadow-2xs">
+                  <h3 className="font-bold text-base text-foreground mb-2 flex items-start gap-2.5">
+                    <span className="text-primary font-mono text-sm">Q:</span>
+                    <span>What materials and warranty do you provide on completed portfolio projects?</span>
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                    We use exclusively commercial-grade Singapore safety-certified materials (Nippon Paint, British Standard wiring, PUB-approved plumbing fittings, German PU grouting chemical resins) backed by up to 1-year workmanship warranty.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
 
         <Footer />

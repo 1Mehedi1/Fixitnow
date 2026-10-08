@@ -177,7 +177,7 @@ export async function saveJsonBlob(
       token,
       addRandomSuffix: false, // Maintain fixed URL for deterministic fetching
       allowOverwrite: true,  // Allow replacing existing file without throwing 409
-      cacheControlMaxAge: 60, // Minimum CDN cache TTL to prevent 30-day stale cache lockup
+      cacheControlMaxAge: 0, // Zero CDN cache TTL to ensure immediate visibility on all devices
     })
     return blob.url
   } catch (err: any) {
@@ -197,38 +197,47 @@ export async function readJsonBlob<T>(blobUrlOrPath: string): Promise<T | null> 
       const cacheBustUrl = blobUrlOrPath.includes("?")
         ? `${blobUrlOrPath}&_cb=${Date.now()}`
         : `${blobUrlOrPath}?_cb=${Date.now()}`
-      const res = await fetch(cacheBustUrl, { cache: "no-store" })
+      const res = await fetch(cacheBustUrl, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" },
+      })
       if (res.ok) {
         return (await res.json()) as T
       }
     }
 
-    // 2. If pathname (e.g. "store/posts.json"), query Vercel Blob origin directly bypassing CDN cache
+    // 2. Query Vercel Blob API via list() to get authoritative origin URL
     if (token) {
       try {
-        const result = await get(blobUrlOrPath, {
-          access: "public",
-          token,
-          useCache: false, // Explicitly bypass Edge CDN cache and read origin storage directly
-        })
-        if (result && result.statusCode === 200 && result.stream) {
-          const text = await new Response(result.stream).text()
-          return JSON.parse(text) as T
-        }
-      } catch (getErr) {
-        // Fallback to list lookup if get throws
-        const { blobs } = await list({ prefix: blobUrlOrPath, token })
+        const { blobs } = await list({ prefix: blobUrlOrPath, token, limit: 10 })
         if (blobs && blobs.length > 0) {
           const matched = blobs.find((b) => b.pathname === blobUrlOrPath) || blobs[0]
-          if (matched?.url) {
-            const bustUrl = `${matched.url}?_cb=${Date.now()}`
-            const res = await fetch(bustUrl, { cache: "no-store" })
+          const targetUrl = matched?.downloadUrl || matched?.url
+          if (targetUrl) {
+            const bustUrl = targetUrl.includes("?")
+              ? `${targetUrl}&_cb=${Date.now()}`
+              : `${targetUrl}?_cb=${Date.now()}`
+            const res = await fetch(bustUrl, {
+              cache: "no-store",
+              headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" },
+            })
             if (res.ok) {
               return (await res.json()) as T
             }
           }
         }
+      } catch (listErr: any) {
+        console.warn(`Vercel Blob list error for ${blobUrlOrPath}:`, listErr?.message || listErr)
       }
+
+      // Fallback: try direct get()
+      try {
+        const result = await get(blobUrlOrPath, { access: "public", token })
+        if (result && result.statusCode === 200 && result.stream) {
+          const text = await new Response(result.stream).text()
+          return JSON.parse(text) as T
+        }
+      } catch {}
     }
   } catch (err: any) {
     console.warn(`readJsonBlob failed for ${blobUrlOrPath}:`, err?.message || err)

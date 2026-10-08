@@ -81,9 +81,6 @@ export function HomeView({
       .then((d) => {
         if (Array.isArray(d.posts) && d.posts.length > 0) {
           setCustomPosts(d.posts)
-          try {
-            localStorage.setItem("fixitnow_client_posts", JSON.stringify(d.posts))
-          } catch {}
         }
       })
       .catch(() => {})
@@ -94,9 +91,6 @@ export function HomeView({
       .then((d) => {
         if (Array.isArray(d.testimonials) && d.testimonials.length > 0) {
           setCustomTestimonials(d.testimonials)
-          try {
-            localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(d.testimonials))
-          } catch {}
         }
       })
       .catch(() => {})
@@ -107,9 +101,6 @@ export function HomeView({
       .then((d) => {
         if (Array.isArray(d.heroImages) && d.heroImages.length >= 4) {
           setCustomHeroPhotos(d.heroImages)
-          try {
-            localStorage.setItem("fixitnow_hero_photos", JSON.stringify(d.heroImages))
-          } catch {}
         }
       })
       .catch(() => {})

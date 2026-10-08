@@ -500,16 +500,18 @@ export function buildProjectSchema(post: StoredPost, settings: SiteSettingsT) {
 /**
  * Builds Schema.org FAQPage JSON-LD.
  */
-export function buildFaqSchema(faqs: { question: string; answer: string }[]) {
+export function buildFaqSchema(
+  faqs: Array<{ question?: string; answer?: string; q?: string; a?: string }>
+) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: faqs.map((f) => ({
       "@type": "Question",
-      name: f.question,
+      name: f.question || f.q || "",
       acceptedAnswer: {
         "@type": "Answer",
-        text: f.answer,
+        text: f.answer || f.a || "",
       },
     })),
   }

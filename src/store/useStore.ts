@@ -57,17 +57,7 @@ export const useStore = create<AppState>((set) => ({
   setCustomPosts: (posts) => set({ customPosts: posts }),
   upsertCustomPost: (post) =>
     set((state) => {
-      let current = state.customPosts
-      if (!current) {
-        try {
-          const stored = localStorage.getItem("fixitnow_client_posts")
-          if (stored) {
-            const parsed = JSON.parse(stored)
-            if (Array.isArray(parsed) && parsed.length > 0) current = parsed
-          }
-        } catch {}
-      }
-      current = current || []
+      const current = state.customPosts || []
       const idx = current.findIndex((p) => p.id === post.id)
       let next: any[]
       if (idx >= 0) {
@@ -76,32 +66,12 @@ export const useStore = create<AppState>((set) => ({
       } else {
         next = [post, ...current]
       }
-      try {
-        localStorage.setItem("fixitnow_client_posts", JSON.stringify(next))
-      } catch (err) {
-        console.warn("localStorage quota exceeded or unavailable:", err)
-      }
       return { customPosts: next }
     }),
   deleteCustomPost: (id) =>
     set((state) => {
-      let current = state.customPosts
-      if (!current) {
-        try {
-          const stored = localStorage.getItem("fixitnow_client_posts")
-          if (stored) {
-            const parsed = JSON.parse(stored)
-            if (Array.isArray(parsed) && parsed.length > 0) current = parsed
-          }
-        } catch {}
-      }
-      current = current || []
+      const current = state.customPosts || []
       const next = current.filter((p) => p.id !== id)
-      try {
-        localStorage.setItem("fixitnow_client_posts", JSON.stringify(next))
-      } catch (err) {
-        console.warn("localStorage quota exceeded or unavailable:", err)
-      }
       return { customPosts: next }
     }),
   setCustomTestimonials: (testimonials) => set({ customTestimonials: testimonials }),
@@ -116,27 +86,18 @@ export const useStore = create<AppState>((set) => ({
       } else {
         next = [item, ...current]
       }
-      try {
-        localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(next))
-      } catch {}
       return { customTestimonials: next }
     }),
   deleteCustomTestimonial: (id) =>
     set((state) => {
       const current = state.customTestimonials || []
       const next = current.filter((t) => t.id !== id)
-      try {
-        localStorage.setItem("fixitnow_client_testimonials", JSON.stringify(next))
-      } catch {}
       return { customTestimonials: next }
     }),
   setCustomSettings: (settings) => {
     set({ customSettings: settings })
   },
   setCustomHeroPhotos: (photos) => {
-    try {
-      localStorage.setItem("fixitnow_hero_photos", JSON.stringify(photos))
-    } catch {}
     set((state) => {
       const nextSettings = state.customSettings
         ? { ...state.customSettings, heroImages: photos }
@@ -146,21 +107,9 @@ export const useStore = create<AppState>((set) => ({
   },
   updateHeroPhoto: (index, url) => {
     set((state) => {
-      let current = state.customHeroPhotos
-      if (!current) {
-        try {
-          const stored = localStorage.getItem("fixitnow_hero_photos")
-          if (stored) {
-            const parsed = JSON.parse(stored)
-            if (Array.isArray(parsed) && parsed.length >= 4) current = parsed
-          }
-        } catch {}
-      }
-      const next = current ? [...current] : [...DEFAULT_HERO_IMAGES]
+      const current = state.customHeroPhotos || [...DEFAULT_HERO_IMAGES]
+      const next = [...current]
       next[index] = url
-      try {
-        localStorage.setItem("fixitnow_hero_photos", JSON.stringify(next))
-      } catch {}
       const nextSettings = state.customSettings
         ? { ...state.customSettings, heroImages: next }
         : null
